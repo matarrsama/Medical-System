@@ -48,7 +48,7 @@ export async function queryDocuments<T = DocumentData>(
   }
 
   const querySnapshot = await getQuerySnapshot(query(q, ...constraints))
-  return querySnapshot.docs.map((d) => ({ id: d.id, ...d.data() }) as T)
+  return querySnapshot.docs.map((d) => ({ id: d.id, ...d.data() as Record<string, unknown> }) as T)
 }
 
 async function getQuerySnapshot(q: ReturnType<typeof query>) {
