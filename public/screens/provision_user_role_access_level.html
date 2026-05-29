@@ -132,7 +132,7 @@
             var raw = localStorage.getItem('clinicalUser') || sessionStorage.getItem('clinicalUser');
             if (raw) {
                 var user = JSON.parse(raw);
-                var roleEl = document.getElementById('navbar-user-role');
+                var nameEl = document.getElementById(\x27navbar-user-name\x27); if (nameEl \x26\x26 user.fullName) nameEl.textContent = user.fullName; var roleEl = document.getElementById(\x27navbar-user-role\x27);
                 if (roleEl && user.role) roleEl.textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
             }
         } catch(e) {}
@@ -143,7 +143,7 @@
         applySettings();
     }
 })();
-</script>
+;function loadNotifications(){try{var n=JSON.parse(localStorage.getItem("ci_notifications")||"[]");var el=document.getElementById("notif-list");var ct=document.getElementById("notif-count");if(!el)return;if(n.length===0){el.innerHTML="<div class=\"px-6 py-8 text-center\"><p class=\"text-sm text-on-surface-variant\">No new notifications</p></div>";if(ct)ct.textContent="0";return}var h="";for(var i=0;i<n.length;i++){var item=n[i];var icon=item.icon||"assignment";var color=item.color||"text-primary";var time=item.createdAt?new Date(item.createdAt.seconds*1000).toLocaleString():"just now";h+="<div class=\"px-6 py-4 hover:bg-surface-container-low transition-colors cursor-pointer border-b border-outline-variant/10\"><div class=\"flex items-start gap-3\"><span class=\"material-symbols-outlined "+color+" mt-0.5\">"+icon+"</span><div class=\"flex-1 min-w-0\"><p class=\"text-sm font-semibold text-[#001e41]\">"+(item.title||"Notification")+"</p><p class=\"text-xs text-on-surface-variant mt-0.5\">"+(item.message||"")+"</p><p class=\"text-[10px] text-on-surface-variant/60 mt-1\">"+time+"</p></div></div></div>"}el.innerHTML=h;if(ct)ct.textContent=n.length}catch(e){}}loadNotifications();</script>
 <nav class="flex-1 space-y-1 overflow-y-auto">
 <a class="flex items-center gap-3 px-4 py-3 text-[#44474e] opacity-80 font-medium text-sm hover:bg-[#eaeef2] transition-all duration-300 rounded-lg group" href="javascript:void(0)" onclick="return navigateTo('/ict-support')">
 <span class="material-symbols-outlined group-hover:scale-110 transition-transform">dashboard</span> Dashboard</a>
@@ -218,7 +218,7 @@
 <div class="flex items-center gap-3 pl-4 border-l border-outline-variant/30 cursor-pointer" onclick="return navigateTo('/settings')" title="Settings">
 <img alt="User" class="w-8 h-8 rounded-full object-cover ring-2 ring-primary-fixed" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbsCBaIju0fQ_a8Ix8ckQ-KxMEALzspAqj5bECDzEupOD0EKC7s-JGVerFtUCMPb4w_-uMp_bMeJ5jev38-jr3rRT9AkKnd6qR8lhHmItBafI8zGwQmCymegGsDbIIMwD2M7yqNL77aHX9DAFby0rXcXRRRthr0V2BK_K6HaBjn5VG51CK4cDM4YkWcDeJ7WC_QkmnwjjdSgAotIZkbO_cLv-__aAO59kFWwY2Kob6GJAXJf5eGhOhvv6dDh0N7M9KJ796heSUqj4u"/>
 <div>
-<span class="text-sm font-bold text-[#001e41] font-headline block">Dr. Sarah Chen</span>
+<span id="navbar-user-name" class="text-sm font-bold text-[#001e41] font-headline block"></span>
 <span id="navbar-user-role" class="text-[10px] text-outline/50">Admin</span>
 </div>
 </div>
@@ -258,7 +258,7 @@
 <!-- Role Selection Grid -->
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
 <!-- ICT Officer Card -->
-<button class="group relative flex flex-col items-start p-8 rounded-48px bg-surface-container-lowest transition-all duration-300 hover:translate-y-[-4px] text-left border-2 border-transparent hover:border-primary/10 shadow-[0_10px_30px_rgba(0,0,0,0.02)]">
+<button data-role="ict" class="role-card group relative flex flex-col items-start p-8 rounded-48px bg-surface-container-lowest transition-all duration-300 hover:translate-y-[-4px] text-left border-2 border-transparent hover:border-primary/10 shadow-[0_10px_30px_rgba(0,0,0,0.02)]" onclick="selectRole(this,'ict')">
 <div class="w-14 h-14 rounded-2xl bg-primary-container/10 flex items-center justify-center text-primary mb-6 group-hover:scale-110 transition-transform">
 <span class="material-symbols-outlined text-3xl" data-icon="terminal">terminal</span>
 </div>
@@ -268,30 +268,29 @@
 <span class="px-3 py-1 bg-surface-container rounded-full text-[10px] font-bold uppercase tracking-wider text-outline">System Admin</span>
 <span class="px-3 py-1 bg-surface-container rounded-full text-[10px] font-bold uppercase tracking-wider text-outline">DevOps</span>
 </div>
-<div class="absolute top-6 right-6 opacity-0 group-focus:opacity-100 group-active:opacity-100 transition-opacity">
+<div class="absolute top-6 right-6 opacity-0 transition-opacity">
 <span class="material-symbols-outlined text-primary" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
 </div>
 </button>
-<!-- Clinician Card (Active/Focus Example) -->
-<button class="group relative flex flex-col items-start p-8 rounded-48px bg-surface-container-lowest transition-all duration-300 border-2 border-primary active-role-ring text-left shadow-xl shadow-primary/5">
-<div class="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center text-white mb-6">
+<!-- Clinician Card -->
+<button data-role="doctor" class="role-card group relative flex flex-col items-start p-8 rounded-48px bg-surface-container-lowest transition-all duration-300 hover:translate-y-[-4px] text-left border-2 border-transparent hover:border-primary/10 shadow-[0_10px_30px_rgba(0,0,0,0.02)]" onclick="selectRole(this,'doctor')">
+<div class="w-14 h-14 rounded-2xl bg-primary-container/10 flex items-center justify-center text-primary mb-6 group-hover:scale-110 transition-transform">
 <span class="material-symbols-outlined text-3xl" data-icon="stethoscope">stethoscope</span>
 </div>
 <div class="flex items-center gap-2 mb-2">
 <h3 class="font-headline font-bold text-xl text-primary">Clinician</h3>
-<span class="bg-secondary-container text-on-secondary-container text-[10px] px-2 py-0.5 rounded-full font-bold uppercase">Standard</span>
 </div>
 <p class="text-sm text-on-surface-variant leading-relaxed mb-6">Patient records, diagnostic imaging tools, and clinical messaging authorization.</p>
 <div class="mt-auto flex gap-2">
 <span class="px-3 py-1 bg-primary-fixed text-on-primary-fixed rounded-full text-[10px] font-bold uppercase tracking-wider">HL7 Access</span>
 <span class="px-3 py-1 bg-primary-fixed text-on-primary-fixed rounded-full text-[10px] font-bold uppercase tracking-wider">PACS/RIS</span>
 </div>
-<div class="absolute top-6 right-6 opacity-100">
+<div class="absolute top-6 right-6 opacity-0 transition-opacity">
 <span class="material-symbols-outlined text-primary" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
 </div>
 </button>
 <!-- Staff Card -->
-<button class="group relative flex flex-col items-start p-8 rounded-48px bg-surface-container-lowest transition-all duration-300 hover:translate-y-[-4px] text-left border-2 border-transparent hover:border-primary/10 shadow-[0_10px_30px_rgba(0,0,0,0.02)]">
+<button data-role="staff" class="role-card group relative flex flex-col items-start p-8 rounded-48px bg-surface-container-lowest transition-all duration-300 hover:translate-y-[-4px] text-left border-2 border-transparent hover:border-primary/10 shadow-[0_10px_30px_rgba(0,0,0,0.02)]" onclick="selectRole(this,'staff')">
 <div class="w-14 h-14 rounded-2xl bg-primary-container/10 flex items-center justify-center text-primary mb-6 group-hover:scale-110 transition-transform">
 <span class="material-symbols-outlined text-3xl" data-icon="badge">badge</span>
 </div>
@@ -301,12 +300,12 @@
 <span class="px-3 py-1 bg-surface-container rounded-full text-[10px] font-bold uppercase tracking-wider text-outline">Scheduling</span>
 <span class="px-3 py-1 bg-surface-container rounded-full text-[10px] font-bold uppercase tracking-wider text-outline">Billing</span>
 </div>
-<div class="absolute top-6 right-6 opacity-0 group-focus:opacity-100 group-active:opacity-100 transition-opacity">
+<div class="absolute top-6 right-6 opacity-0 transition-opacity">
 <span class="material-symbols-outlined text-primary" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
 </div>
 </button>
 <!-- Admin Card -->
-<button class="group relative flex flex-col items-start p-8 rounded-48px bg-surface-container-lowest transition-all duration-300 hover:translate-y-[-4px] text-left border-2 border-transparent hover:border-primary/10 shadow-[0_10px_30px_rgba(0,0,0,0.02)]">
+<button data-role="admin" class="role-card group relative flex flex-col items-start p-8 rounded-48px bg-surface-container-lowest transition-all duration-300 hover:translate-y-[-4px] text-left border-2 border-transparent hover:border-primary/10 shadow-[0_10px_30px_rgba(0,0,0,0.02)]" onclick="selectRole(this,'admin')">
 <div class="w-14 h-14 rounded-2xl bg-primary-container/10 flex items-center justify-center text-primary mb-6 group-hover:scale-110 transition-transform">
 <span class="material-symbols-outlined text-3xl" data-icon="shield_person">shield_person</span>
 </div>
@@ -316,22 +315,22 @@
 <span class="px-3 py-1 bg-tertiary-fixed text-on-tertiary-fixed rounded-full text-[10px] font-bold uppercase tracking-wider">Root Access</span>
 <span class="px-3 py-1 bg-tertiary-fixed text-on-tertiary-fixed rounded-full text-[10px] font-bold uppercase tracking-wider">Security</span>
 </div>
-<div class="absolute top-6 right-6 opacity-0 group-focus:opacity-100 group-active:opacity-100 transition-opacity">
+<div class="absolute top-6 right-6 opacity-0 transition-opacity">
 <span class="material-symbols-outlined text-primary" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
 </div>
 </button>
 </div>
 <!-- Action Footer -->
 <div class="flex items-center justify-between pt-12 border-t border-outline-variant/20">
-<button class="flex items-center gap-2 px-8 py-4 rounded-xl font-headline font-bold text-primary hover:bg-surface-container transition-colors">
+<button onclick="goToStep1()" class="flex items-center gap-2 px-8 py-4 rounded-xl font-headline font-bold text-primary hover:bg-surface-container transition-colors">
 <span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
                 Back to Identity
             </button>
 <div class="flex gap-4">
-<button class="px-8 py-4 rounded-xl font-headline font-bold text-outline hover:text-primary transition-colors">Save Draft</button>
-<button class="flex items-center gap-3 px-10 py-4 rounded-xl font-headline font-bold text-white bg-gradient-to-br from-primary to-primary-container shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform active:scale-[0.98]">
-                    Configure Security
-                    <span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+<button id="provision-role-submit-btn" onclick="handleProvisionStep2()" class="flex items-center gap-3 px-10 py-4 rounded-xl font-headline font-bold text-white bg-gradient-to-br from-primary to-primary-container shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform active:scale-[0.98]" disabled>
+                <span id="provision-role-text">Select a role to continue</span>
+                <span id="provision-role-icon" class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+                <span id="provision-role-spinner" class="hidden" style="display:none"><svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg></span>
 </button>
 </div>
 </div>
@@ -502,47 +501,16 @@ document.addEventListener('DOMContentLoaded', function() {
 <div class="flex items-center justify-between px-6 py-4 border-b border-outline-variant/30">
 <div class="flex items-center gap-3">
 <h3 class="text-lg font-bold text-[#001e41] font-headline">Notifications</h3>
-<span class="text-xs bg-error text-white px-2 py-0.5 rounded-full font-medium" id="notif-count">3</span>
+<span class="text-xs bg-error text-white px-2 py-0.5 rounded-full font-medium" id="notif-count">0</span>
 </div>
 <button onclick="closeNotificationDrawer()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-higher transition-colors">
 <span class="material-symbols-outlined text-on-surface-variant">close</span>
 </button>
 </div>
 <div class="flex-1 overflow-y-auto" id="notif-list">
-<div class="px-6 py-4 hover:bg-surface-container-low transition-colors cursor-pointer border-b border-outline-variant/10">
-<div class="flex items-start gap-3">
-<span class="material-symbols-outlined text-primary mt-0.5">assignment</span>
-<div class="flex-1 min-w-0">
-<p class="text-sm font-semibold text-[#001e41]">Ticket #1042 Resolved</p>
-<p class="text-xs text-on-surface-variant mt-0.5">Your reported network issue in Ward 3 has been resolved.</p>
-<p class="text-[10px] text-on-surface-variant/60 mt-1">2 min ago</p>
-</div>
-<span class="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-2"></span>
-</div>
-</div>
-<div class="px-6 py-4 hover:bg-surface-container-low transition-colors cursor-pointer border-b border-outline-variant/10">
-<div class="flex items-start gap-3">
-<span class="material-symbols-outlined text-[#f59e0b] mt-0.5">warning</span>
-<div class="flex-1 min-w-0">
-<p class="text-sm font-semibold text-[#001e41]">System Maintenance</p>
-<p class="text-xs text-on-surface-variant mt-0.5">Scheduled downtime on Sunday 02:00-04:00 AM for server updates.</p>
-<p class="text-[10px] text-on-surface-variant/60 mt-1">1 hour ago</p>
-</div>
-<span class="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-2"></span>
-</div>
-</div>
-<div class="px-6 py-4 hover:bg-surface-container-low transition-colors cursor-pointer border-b border-outline-variant/10">
-<div class="flex items-start gap-3">
-<span class="material-symbols-outlined text-green-600 mt-0.5">check_circle</span>
-<div class="flex-1 min-w-0">
-<p class="text-sm font-semibold text-[#001e41]">New Software Update</p>
-<p class="text-xs text-on-surface-variant mt-0.5">EMR system v3.2 is ready for installation. Contact ICT for deployment.</p>
-<p class="text-[10px] text-on-surface-variant/60 mt-1">3 hours ago</p>
-</div>
-<span class="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-2"></span>
-</div>
-</div>
-</div>
+<div class="px-6 py-8 text-center">
+<p class="text-sm text-on-surface-variant">No new notifications</p>
+</div></div>
 <div class="px-6 py-3 border-t border-outline-variant/30 text-center">
 <button class="text-sm text-primary font-medium hover:underline" onclick="markAllNotificationsRead()">Mark all as read</button>
 </div>
@@ -718,5 +686,54 @@ document.addEventListener('click', function(e) {
 window.addEventListener('message', function(e) {
     if (e.data.type === 'closeModal') closeNewTicketModal();
 });
+
+var selectedRole = null;
+function selectRole(el, role) {
+    var cards = document.querySelectorAll('.role-card');
+    for (var i = 0; i < cards.length; i++) {
+        cards[i].classList.remove('border-primary', 'active-role-ring');
+        cards[i].style.borderColor = 'transparent';
+        cards[i].style.boxShadow = '';
+        var check = cards[i].querySelector('.absolute.top-6.right-6');
+        if (check) check.classList.add('opacity-0');
+    }
+    el.classList.add('border-primary', 'active-role-ring');
+    el.style.borderColor = '#001e41';
+    var check = el.querySelector('.absolute.top-6.right-6');
+    if (check) check.classList.remove('opacity-0');
+    selectedRole = role;
+    var btn = document.getElementById('provision-role-submit-btn');
+    var txt = document.getElementById('provision-role-text');
+    btn.disabled = false;
+    btn.style.opacity = '1';
+    txt.textContent = 'Configure Security';
+}
+function goToStep1() {
+    window.parent.postMessage({ type: 'navigate', path: '/admin/provision/personal' }, '*');
+}
+function handleProvisionStep2() {
+    if (!selectedRole) return;
+    var btn = document.getElementById('provision-role-submit-btn');
+    var txt = document.getElementById('provision-role-text');
+    var icon = document.getElementById('provision-role-icon');
+    var spinner = document.getElementById('provision-role-spinner');
+    btn.disabled = true;
+    txt.textContent = 'Saving...';
+    icon.style.display = 'none';
+    spinner.style.display = 'inline-block';
+    try {
+        var existing = JSON.parse(localStorage.getItem('ci_provision_data') || '{}');
+        existing.role = selectedRole;
+        localStorage.setItem('ci_provision_data', JSON.stringify(existing));
+        setTimeout(function() {
+            window.parent.postMessage({ type: 'navigate', path: '/admin/provision/security' }, '*');
+        }, 300);
+    } catch(e) {
+        txt.textContent = 'Configure Security';
+        icon.style.display = 'inline-block';
+        spinner.style.display = 'none';
+        btn.disabled = false;
+    }
+}
 </script>
 </body></html>

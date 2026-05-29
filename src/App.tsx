@@ -63,14 +63,17 @@ function AppContent() {
         try {
           const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
           if (userDoc.exists()) {
-            role = userDoc.data().user_role || "staff";
+            const d = userDoc.data();
+            role = d.user_role || "staff";
+            try {
+              localStorage.setItem("clinicalUser", JSON.stringify({ uid: firebaseUser.uid, email: firebaseUser.email, role, fullName: d.fullName || d.displayName || "" }));
+              sessionStorage.setItem("clinicalUser", JSON.stringify({ uid: firebaseUser.uid, email: firebaseUser.email, role, fullName: d.fullName || d.displayName || "" }));
+            } catch {}
+            setAuthUser({ uid: firebaseUser.uid, email: firebaseUser.email, role });
+            return;
           }
         } catch {}
-        setAuthUser({
-          uid: firebaseUser.uid,
-          email: firebaseUser.email,
-          role,
-        });
+        setAuthUser({ uid: firebaseUser.uid, email: firebaseUser.email, role });
         try {
           localStorage.setItem("clinicalUser", JSON.stringify({ uid: firebaseUser.uid, email: firebaseUser.email, role }));
           sessionStorage.setItem("clinicalUser", JSON.stringify({ uid: firebaseUser.uid, email: firebaseUser.email, role }));
@@ -104,11 +107,23 @@ function AppContent() {
       snap.forEach((d) => users.push({ uid: d.id, ...d.data() }));
       try { localStorage.setItem("ci_provisioned_users", JSON.stringify(users)); } catch {}
     });
+    const unsubTickets = onSnapshot(collection(db, "tickets"), (snap) => {
+      const tickets: Record<string, unknown>[] = [];
+      snap.forEach((d) => tickets.push({ id: d.id, ...d.data() }));
+      try { localStorage.setItem("ci_tickets", JSON.stringify(tickets)); } catch {}
+    });
+    const unsubNotifications = onSnapshot(collection(db, "notifications"), (snap) => {
+      const notifs: Record<string, unknown>[] = [];
+      snap.forEach((d) => notifs.push({ id: d.id, ...d.data() }));
+      try { localStorage.setItem("ci_notifications", JSON.stringify(notifs)); } catch {}
+    });
     return () => {
       unsubAppSettings();
       unsubKbArticles();
       unsubUserTypes();
       unsubUsers();
+      unsubTickets();
+      unsubNotifications();
     };
   }, []);
 

@@ -133,7 +133,7 @@
             var raw = localStorage.getItem('clinicalUser') || sessionStorage.getItem('clinicalUser');
             if (raw) {
                 var user = JSON.parse(raw);
-                var roleEl = document.getElementById('navbar-user-role');
+                var nameEl = document.getElementById(\x27navbar-user-name\x27); if (nameEl \x26\x26 user.fullName) nameEl.textContent = user.fullName; var roleEl = document.getElementById(\x27navbar-user-role\x27);
                 if (roleEl && user.role) roleEl.textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
             }
         } catch(e) {}
@@ -144,7 +144,7 @@
         applySettings();
     }
 })();
-</script>
+;function loadNotifications(){try{var n=JSON.parse(localStorage.getItem("ci_notifications")||"[]");var el=document.getElementById("notif-list");var ct=document.getElementById("notif-count");if(!el)return;if(n.length===0){el.innerHTML="<div class=\"px-6 py-8 text-center\"><p class=\"text-sm text-on-surface-variant\">No new notifications</p></div>";if(ct)ct.textContent="0";return}var h="";for(var i=0;i<n.length;i++){var item=n[i];var icon=item.icon||"assignment";var color=item.color||"text-primary";var time=item.createdAt?new Date(item.createdAt.seconds*1000).toLocaleString():"just now";h+="<div class=\"px-6 py-4 hover:bg-surface-container-low transition-colors cursor-pointer border-b border-outline-variant/10\"><div class=\"flex items-start gap-3\"><span class=\"material-symbols-outlined "+color+" mt-0.5\">"+icon+"</span><div class=\"flex-1 min-w-0\"><p class=\"text-sm font-semibold text-[#001e41]\">"+(item.title||"Notification")+"</p><p class=\"text-xs text-on-surface-variant mt-0.5\">"+(item.message||"")+"</p><p class=\"text-[10px] text-on-surface-variant/60 mt-1\">"+time+"</p></div></div></div>"}el.innerHTML=h;if(ct)ct.textContent=n.length}catch(e){}}loadNotifications();</script>
 <nav class="flex-1 space-y-1 overflow-y-auto">
 <a class="flex items-center gap-3 px-4 py-3 text-[#44474e] opacity-80 font-medium text-sm hover:bg-[#eaeef2] transition-all duration-300 rounded-lg group" href="javascript:void(0)" onclick="return navigateTo('/ict-support')">
 <span class="material-symbols-outlined group-hover:scale-110 transition-transform">dashboard</span>
@@ -231,7 +231,7 @@
 <div class="flex items-center gap-3 pl-4 border-l border-outline-variant/30 cursor-pointer" onclick="return navigateTo('/settings')" title="Settings">
 <img alt="User" class="w-8 h-8 rounded-full object-cover ring-2 ring-primary-fixed" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbsCBaIju0fQ_a8Ix8ckQ-KxMEALzspAqj5bECDzEupOD0EKC7s-JGVerFtUCMPb4w_-uMp_bMeJ5jev38-jr3rRT9AkKnd6qR8lhHmItBafI8zGwQmCymegGsDbIIMwD2M7yqNL77aHX9DAFby0rXcXRRRthr0V2BK_K6HaBjn5VG51CK4cDM4YkWcDeJ7WC_QkmnwjjdSgAotIZkbO_cLv-__aAO59kFWwY2Kob6GJAXJf5eGhOhvv6dDh0N7M9KJ796heSUqj4u"/>
 <div>
-<span class="text-sm font-bold text-[#001e41] font-headline block">Dr. Sarah Chen</span>
+<span id="navbar-user-name" class="text-sm font-bold text-[#001e41] font-headline block"></span>
 <span id="navbar-user-role" class="text-[10px] text-outline/50">Admin</span>
 </div>
 </div>
@@ -262,7 +262,7 @@
 </div>
 <div class="flex items-center gap-2 text-on-surface-variant font-medium text-sm bg-surface-container px-4 py-2 rounded-full">
 <span class="material-symbols-outlined text-sm" data-icon="schedule">schedule</span>
-                Last Updated: 14:38 EST
+                
             </div>
 </header>
 <!-- Critical Alert Banner -->
@@ -274,8 +274,8 @@
 <span class="material-symbols-outlined text-4xl" data-icon="emergency_home" style="font-variation-settings: 'FILL' 1;">emergency_home</span>
 </div>
 <div>
-<span class="text-xs font-bold uppercase tracking-widest opacity-80">System Alert: Critical Tier 1</span>
-<h2 class="text-2xl font-headline font-bold">PACS Imaging System Outage - Level 1 Critical</h2>
+<span class="text-xs font-bold uppercase tracking-widest opacity-80"></span>
+<h2 class="text-2xl font-headline font-bold"></h2>
 </div>
 </div>
 <div class="flex gap-3">
@@ -294,7 +294,7 @@
 <div class="bg-surface-container-lowest p-6 rounded-xl shadow-sm flex flex-col justify-between h-48 group hover:bg-surface-bright transition-all cursor-pointer">
 <div class="flex justify-between items-start">
 <span class="material-symbols-outlined text-secondary" data-icon="medical_information">medical_information</span>
-<span class="bg-secondary-container text-on-secondary-container text-[10px] font-bold px-2 py-1 rounded-full uppercase">Operational</span>
+<span class="bg-secondary-container text-on-secondary-container text-[10px] font-bold px-2 py-1 rounded-full uppercase"></span>
 </div>
 <div>
 <p class="text-on-surface-variant text-xs font-medium">EPIC EMR</p>
@@ -305,19 +305,19 @@
 <div class="urgency-breathe p-6 rounded-xl shadow-sm flex flex-col justify-between h-48 border-2 border-error/20 cursor-pointer">
 <div class="flex justify-between items-start">
 <span class="material-symbols-outlined text-error" data-icon="radiology">radiology</span>
-<span class="bg-error text-on-error text-[10px] font-bold px-2 py-1 rounded-full uppercase">Major Outage</span>
+<span class="bg-error text-on-error text-[10px] font-bold px-2 py-1 rounded-full uppercase"></span>
 </div>
 <div>
 <p class="text-error font-medium text-xs">PACS Imaging</p>
 <h3 class="font-headline font-bold text-lg text-primary">Diagnostic Viewer</h3>
-<p class="text-[10px] text-error font-bold mt-2">Downtime active for 42m</p>
+<p class="text-[10px] text-error font-bold mt-2"></p>
 </div>
 </div>
 <!-- Inpatient Wi-Fi -->
 <div class="bg-surface-container-lowest p-6 rounded-xl shadow-sm flex flex-col justify-between h-48 hover:bg-surface-bright transition-all cursor-pointer">
 <div class="flex justify-between items-start">
 <span class="material-symbols-outlined text-tertiary-container" data-icon="wifi_tethering">wifi_tethering</span>
-<span class="bg-tertiary-fixed text-on-tertiary-fixed-variant text-[10px] font-bold px-2 py-1 rounded-full uppercase">Degraded</span>
+<span class="bg-tertiary-fixed text-on-tertiary-fixed-variant text-[10px] font-bold px-2 py-1 rounded-full uppercase"></span>
 </div>
 <div>
 <p class="text-on-surface-variant text-xs font-medium">Network Services</p>
@@ -328,7 +328,7 @@
 <div class="bg-surface-container-lowest p-6 rounded-xl shadow-sm flex flex-col justify-between h-48 hover:bg-surface-bright transition-all cursor-pointer">
 <div class="flex justify-between items-start">
 <span class="material-symbols-outlined text-secondary" data-icon="pill">pill</span>
-<span class="bg-secondary-container text-on-secondary-container text-[10px] font-bold px-2 py-1 rounded-full uppercase">Operational</span>
+<span class="bg-secondary-container text-on-secondary-container text-[10px] font-bold px-2 py-1 rounded-full uppercase"></span>
 </div>
 <div>
 <p class="text-on-surface-variant text-xs font-medium">Pharmacy Ops</p>
@@ -343,78 +343,14 @@
 <span class="text-sm font-medium text-primary cursor-pointer hover:underline">View All Documentation</span>
 </div>
 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-<a class="flex items-center gap-4 p-4 border border-outline-variant/15 rounded-lg hover:bg-surface-container-low transition-colors group" href="#">
-<div class="bg-primary-container p-2 rounded-lg text-white">
-<span class="material-symbols-outlined" data-icon="description">description</span>
-</div>
-<div>
-<h4 class="font-bold text-sm text-primary">Downtime Protocol v4</h4>
-<p class="text-xs text-on-surface-variant">Last Revision: 2023-11</p>
-</div>
-</a>
-<a class="flex items-center gap-4 p-4 border border-outline-variant/15 rounded-lg hover:bg-surface-container-low transition-colors group" href="#">
-<div class="bg-primary-container p-2 rounded-lg text-white">
-<span class="material-symbols-outlined" data-icon="edit_note">edit_note</span>
-</div>
-<div>
-<h4 class="font-bold text-sm text-primary">Manual Charting Guide</h4>
-<p class="text-xs text-on-surface-variant">Ward Administration</p>
-</div>
-</a>
-<a class="flex items-center gap-4 p-4 border border-outline-variant/15 rounded-lg hover:bg-surface-container-low transition-colors group" href="#">
-<div class="bg-primary-container p-2 rounded-lg text-white">
-<span class="material-symbols-outlined" data-icon="settings_backup_restore">settings_backup_restore</span>
-</div>
-<div>
-<h4 class="font-bold text-sm text-primary">System Recovery Plan</h4>
-<p class="text-xs text-on-surface-variant">Tier 1 Critical Services</p>
-</div>
-</a>
+<p class="text-sm text-on-surface-variant col-span-full">No protocols available</p>
 </div>
 </div>
 <!-- Incident Timeline -->
 <div class="bg-surface-container-lowest p-8 rounded-xl shadow-sm">
 <h3 class="font-headline font-bold text-xl text-primary mb-8">Incident Timeline</h3>
 <div class="space-y-8 relative">
-<!-- Connecting Line -->
-<div class="absolute left-[19px] top-2 bottom-2 w-0.5 bg-surface-container-high"></div>
-<div class="flex gap-6 relative">
-<div class="z-10 bg-error w-10 h-10 rounded-full flex items-center justify-center text-white ring-4 ring-white">
-<span class="material-symbols-outlined text-sm" data-icon="warning" style="font-variation-settings: 'FILL' 1;">warning</span>
-</div>
-<div class="flex-1">
-<div class="flex items-center gap-2 mb-1">
-<span class="font-headline font-bold text-primary">14:22</span>
-<span class="text-xs font-bold uppercase tracking-wider text-error">Critical Event</span>
-</div>
-<p class="text-on-surface-variant leading-relaxed">PACS Server Node Failover initiated. Secondary SAN synchronization error detected. Core imaging services offline.</p>
-<div class="mt-2 text-xs font-medium text-outline">Action by: ICT_Lead_Systems</div>
-</div>
-</div>
-<div class="flex gap-6 relative">
-<div class="z-10 bg-surface-container-high w-10 h-10 rounded-full flex items-center justify-center text-primary ring-4 ring-white">
-<span class="material-symbols-outlined text-sm" data-icon="update">update</span>
-</div>
-<div class="flex-1">
-<div class="flex items-center gap-2 mb-1">
-<span class="font-headline font-bold text-primary">14:10</span>
-<span class="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Investigation</span>
-</div>
-<p class="text-on-surface-variant leading-relaxed">Intermittent latency reported by Radiology South Wing. Network team investigating possible packet loss on switch cluster B-12.</p>
-</div>
-</div>
-<div class="flex gap-6 relative">
-<div class="z-10 bg-surface-container-high w-10 h-10 rounded-full flex items-center justify-center text-primary ring-4 ring-white">
-<span class="material-symbols-outlined text-sm" data-icon="notifications">notifications</span>
-</div>
-<div class="flex-1">
-<div class="flex items-center gap-2 mb-1">
-<span class="font-headline font-bold text-primary">13:55</span>
-<span class="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Maintenance</span>
-</div>
-<p class="text-on-surface-variant leading-relaxed">Scheduled patch for Pharmacy Pyxis terminals successfully completed on floors 4 and 5.</p>
-</div>
-</div>
+<p class="text-sm text-on-surface-variant">No incidents recorded</p>
 </div>
 </div>
 </div>
@@ -465,7 +401,7 @@
 <img alt="On-Call Specialist" class="w-12 h-12 rounded-lg object-cover" data-alt="close-up of a healthcare administrator in a clean hospital environment looking focused and professional" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBHsLX5jJGoS60hi8B-JMDUTMQHXuGsz_M4P61ek4Crexw084nZCkDp0E5QX3zFKQtvCz4LnUNqmhKdgFgmhgCeE_0y8H5QgkcOL1QGQefPy4sA84FGstMyFpRmVBl0WbkjxABWwMigdKZDyTdpnUGH3jbNhRnkzzwMpeFPZLGDw2c96oGx0-qPpyvuP9eBozSJ1Xqgd80z9rcl2tip3r1YrMAfB6OyOBYBfVX4sudYpDFPycRasXZ41eNemHIGjNp6Clm9S1MTPPj0"/>
 <div>
 <p class="text-xs opacity-70">On-Call Administrator</p>
-<h4 class="font-bold">Dr. Sarah Vance</h4>
+<h4 class="font-bold"></h4>
 </div>
 </div>
 <button class="w-full py-3 bg-white text-primary font-bold rounded-lg text-sm hover:shadow-lg transition-all active:scale-95">
@@ -480,7 +416,7 @@
 <div>
 <div class="flex justify-between text-xs font-bold mb-2 uppercase tracking-tighter">
 <span class="text-on-surface-variant">System Uptime</span>
-<span class="text-error">94.2%</span>
+<span class="text-error"></span>
 </div>
 <div class="w-full h-2 bg-surface-container rounded-full overflow-hidden">
 <div class="h-full bg-error" style="width: 94%"></div>
@@ -489,7 +425,7 @@
 <div>
 <div class="flex justify-between text-xs font-bold mb-2 uppercase tracking-tighter">
 <span class="text-on-surface-variant">WAN Utilization</span>
-<span class="text-primary">68%</span>
+<span class="text-primary"></span>
 </div>
 <div class="w-full h-2 bg-surface-container rounded-full overflow-hidden">
 <div class="h-full bg-primary" style="width: 68%"></div>
@@ -498,7 +434,7 @@
 <div>
 <div class="flex justify-between text-xs font-bold mb-2 uppercase tracking-tighter">
 <span class="text-on-surface-variant">Resolved P1 (24h)</span>
-<span class="text-secondary">4 / 5</span>
+<span class="text-secondary"></span>
 </div>
 <div class="w-full h-2 bg-surface-container rounded-full overflow-hidden">
 <div class="h-full bg-secondary" style="width: 80%"></div>
@@ -679,47 +615,16 @@ document.addEventListener('DOMContentLoaded', function() {
 <div class="flex items-center justify-between px-6 py-4 border-b border-outline-variant/30">
 <div class="flex items-center gap-3">
 <h3 class="text-lg font-bold text-[#001e41] font-headline">Notifications</h3>
-<span class="text-xs bg-error text-white px-2 py-0.5 rounded-full font-medium" id="notif-count">3</span>
+<span class="text-xs bg-error text-white px-2 py-0.5 rounded-full font-medium" id="notif-count">0</span>
 </div>
 <button onclick="closeNotificationDrawer()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-higher transition-colors">
 <span class="material-symbols-outlined text-on-surface-variant">close</span>
 </button>
 </div>
 <div class="flex-1 overflow-y-auto" id="notif-list">
-<div class="px-6 py-4 hover:bg-surface-container-low transition-colors cursor-pointer border-b border-outline-variant/10">
-<div class="flex items-start gap-3">
-<span class="material-symbols-outlined text-primary mt-0.5">assignment</span>
-<div class="flex-1 min-w-0">
-<p class="text-sm font-semibold text-[#001e41]">Ticket #1042 Resolved</p>
-<p class="text-xs text-on-surface-variant mt-0.5">Your reported network issue in Ward 3 has been resolved.</p>
-<p class="text-[10px] text-on-surface-variant/60 mt-1">2 min ago</p>
-</div>
-<span class="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-2"></span>
-</div>
-</div>
-<div class="px-6 py-4 hover:bg-surface-container-low transition-colors cursor-pointer border-b border-outline-variant/10">
-<div class="flex items-start gap-3">
-<span class="material-symbols-outlined text-[#f59e0b] mt-0.5">warning</span>
-<div class="flex-1 min-w-0">
-<p class="text-sm font-semibold text-[#001e41]">System Maintenance</p>
-<p class="text-xs text-on-surface-variant mt-0.5">Scheduled downtime on Sunday 02:00-04:00 AM for server updates.</p>
-<p class="text-[10px] text-on-surface-variant/60 mt-1">1 hour ago</p>
-</div>
-<span class="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-2"></span>
-</div>
-</div>
-<div class="px-6 py-4 hover:bg-surface-container-low transition-colors cursor-pointer border-b border-outline-variant/10">
-<div class="flex items-start gap-3">
-<span class="material-symbols-outlined text-green-600 mt-0.5">check_circle</span>
-<div class="flex-1 min-w-0">
-<p class="text-sm font-semibold text-[#001e41]">New Software Update</p>
-<p class="text-xs text-on-surface-variant mt-0.5">EMR system v3.2 is ready for installation. Contact ICT for deployment.</p>
-<p class="text-[10px] text-on-surface-variant/60 mt-1">3 hours ago</p>
-</div>
-<span class="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-2"></span>
-</div>
-</div>
-</div>
+<div class="px-6 py-8 text-center">
+<p class="text-sm text-on-surface-variant">No new notifications</p>
+</div></div>
 <div class="px-6 py-3 border-t border-outline-variant/30 text-center">
 <button class="text-sm text-primary font-medium hover:underline" onclick="markAllNotificationsRead()">Mark all as read</button>
 </div>

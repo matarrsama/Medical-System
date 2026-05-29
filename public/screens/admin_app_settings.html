@@ -113,14 +113,20 @@
                 var mf = document.getElementById('main-footer');
                 if (mf) mf.innerHTML = (settings.version || 'v1.0.0') + ' \u00A9 ' + year + ' ' + settings.footerText;
             }
+            var he = document.getElementById('help-email');
+            if (he) he.textContent = settings.contactEmail || 'Not configured';
             var raw = localStorage.getItem('clinicalUser') || sessionStorage.getItem('clinicalUser');
             if (raw) {
                 var user = JSON.parse(raw);
+                var nameEl = document.getElementById('navbar-user-name');
+                if (nameEl && user.fullName) nameEl.textContent = user.fullName;
                 var roleEl = document.getElementById('navbar-user-role');
                 if (roleEl && user.role) roleEl.textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
             }
         } catch(e) {}
     }
+    function loadNotifications(){try{var n=JSON.parse(localStorage.getItem("ci_notifications")||"[]");var el=document.getElementById("notif-list");var ct=document.getElementById("notif-count");if(!el)return;if(n.length===0){el.innerHTML="<div class=\"px-6 py-8 text-center\"><p class=\"text-sm text-on-surface-variant\">No new notifications</p></div>";if(ct)ct.textContent="0";return}var h="";for(var i=0;i<n.length;i++){var item=n[i];var icon=item.icon||"assignment";var color=item.color||"text-primary";var time=item.createdAt?new Date(item.createdAt.seconds*1000).toLocaleString():"just now";h+="<div class=\"px-6 py-4 hover:bg-surface-container-low transition-colors cursor-pointer border-b border-outline-variant/10\"><div class=\"flex items-start gap-3\"><span class=\"material-symbols-outlined "+color+" mt-0.5\">"+icon+"</span><div class=\"flex-1 min-w-0\"><p class=\"text-sm font-semibold text-[#001e41]\">"+(item.title||"Notification")+"</p><p class=\"text-xs text-on-surface-variant mt-0.5\">"+(item.message||"")+"</p><p class=\"text-[10px] text-on-surface-variant/60 mt-1\">"+time+"</p></div></div></div>"}el.innerHTML=h;if(ct)ct.textContent=n.length}catch(e){}}
+    loadNotifications();
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', applySettings);
     } else {
@@ -202,8 +208,8 @@
 <div class="flex items-center gap-3 pl-4 border-l border-outline-variant/30 cursor-pointer" onclick="return navigateTo('/settings')" title="Settings">
 <img alt="User" class="w-8 h-8 rounded-full object-cover ring-2 ring-primary-fixed" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbsCBaIju0fQ_a8Ix8ckQ-KxMEALzspAqj5bECDzEupOD0EKC7s-JGVerFtUCMPb4w_-uMp_bMeJ5jev38-jr3rRT9AkKnd6qR8lhHmItBafI8zGwQmCymegGsDbIIMwD2M7yqNL77aHX9DAFby0rXcXRRRthr0V2BK_K6HaBjn5VG51CK4cDM4YkWcDeJ7WC_QkmnwjjdSgAotIZkbO_cLv-__aAO59kFWwY2Kob6GJAXJf5eGhOhvv6dDh0N7M9KJ796heSUqj4u"/>
 <div>
-<span class="text-sm font-bold text-[#001e41] font-headline block">Dr. Sarah Chen</span>
-<span id="navbar-user-role" class="text-[10px] text-outline/50">Admin</span>
+<span id="navbar-user-name" class="text-sm font-bold text-[#001e41] font-headline block"></span>
+<span id="navbar-user-role" class="text-[10px] text-outline/50"></span>
 </div>
 </div>
 </div>
@@ -299,11 +305,11 @@
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 <div class="space-y-1.5">
 <label class="text-[11px] font-bold text-outline uppercase tracking-widest ml-1">Contact Email</label>
-<input id="setting-contact-email" class="w-full bg-surface-container-highest border border-outline-variant/50 focus:border-primary focus:ring-2 focus:ring-primary/5 rounded-xl px-4 py-3 text-sm font-medium transition-all" type="email" value="ict-support@clinicalintel.com"/>
+<input id="setting-contact-email" class="w-full bg-surface-container-highest border border-outline-variant/50 focus:border-primary focus:ring-2 focus:ring-primary/5 rounded-xl px-4 py-3 text-sm font-medium transition-all" type="email" placeholder="support@example.com"/>
 </div>
 <div class="space-y-1.5">
 <label class="text-[11px] font-bold text-outline uppercase tracking-widest ml-1">Version</label>
-<input id="setting-version" class="w-full bg-surface-container-highest border border-outline-variant/50 focus:border-primary focus:ring-2 focus:ring-primary/5 rounded-xl px-4 py-3 text-sm font-medium transition-all" type="text" value="v4.12.0-STABLE"/>
+<input id="setting-version" class="w-full bg-surface-container-highest border border-outline-variant/50 focus:border-primary focus:ring-2 focus:ring-primary/5 rounded-xl px-4 py-3 text-sm font-medium transition-all" type="text" placeholder="e.g. v1.0.0"/>
 </div>
 </div>
 </div>
@@ -376,13 +382,13 @@
 <script>
 var APP_SETTINGS_KEY = 'ci_app_settings';
 var DEFAULT_SETTINGS = {
-    appName: 'Clinical Intelligence',
+    appName: 'Clinical Intelligence Platform',
     tagline: 'Central Medical ICT Platform',
     footerText: 'Clinical Intelligence Platform — All rights reserved',
     primaryColor: '#001e41',
     themeMode: 'light',
-    contactEmail: 'ict-support@clinicalintel.com',
-    version: 'v4.12.0-STABLE',
+    contactEmail: '',
+    version: 'v1.0.0',
     logoData: ''
 };
 function loadAppSettings() {
@@ -674,45 +680,15 @@ document.addEventListener('DOMContentLoaded', function() {
 <div class="flex items-center justify-between px-6 py-4 border-b border-outline-variant/30">
 <div class="flex items-center gap-3">
 <h3 class="text-lg font-bold text-[#001e41] font-headline">Notifications</h3>
-<span class="text-xs bg-error text-white px-2 py-0.5 rounded-full font-medium" id="notif-count">3</span>
+<span class="text-xs bg-error text-white px-2 py-0.5 rounded-full font-medium" id="notif-count">0</span>
 </div>
 <button onclick="closeNotificationDrawer()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-higher transition-colors">
 <span class="material-symbols-outlined text-on-surface-variant">close</span>
 </button>
 </div>
 <div class="flex-1 overflow-y-auto" id="notif-list">
-<div class="px-6 py-4 hover:bg-surface-container-low transition-colors cursor-pointer border-b border-outline-variant/10">
-<div class="flex items-start gap-3">
-<span class="material-symbols-outlined text-primary mt-0.5">assignment</span>
-<div class="flex-1 min-w-0">
-<p class="text-sm font-semibold text-[#001e41]">Ticket #1042 Resolved</p>
-<p class="text-xs text-on-surface-variant mt-0.5">Your reported network issue in Ward 3 has been resolved.</p>
-<p class="text-[10px] text-on-surface-variant/60 mt-1">2 min ago</p>
-</div>
-<span class="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-2"></span>
-</div>
-</div>
-<div class="px-6 py-4 hover:bg-surface-container-low transition-colors cursor-pointer border-b border-outline-variant/10">
-<div class="flex items-start gap-3">
-<span class="material-symbols-outlined text-[#f59e0b] mt-0.5">warning</span>
-<div class="flex-1 min-w-0">
-<p class="text-sm font-semibold text-[#001e41]">System Maintenance</p>
-<p class="text-xs text-on-surface-variant mt-0.5">Scheduled downtime on Sunday 02:00-04:00 AM for server updates.</p>
-<p class="text-[10px] text-on-surface-variant/60 mt-1">1 hour ago</p>
-</div>
-<span class="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-2"></span>
-</div>
-</div>
-<div class="px-6 py-4 hover:bg-surface-container-low transition-colors cursor-pointer border-b border-outline-variant/10">
-<div class="flex items-start gap-3">
-<span class="material-symbols-outlined text-green-600 mt-0.5">check_circle</span>
-<div class="flex-1 min-w-0">
-<p class="text-sm font-semibold text-[#001e41]">New Software Update</p>
-<p class="text-xs text-on-surface-variant mt-0.5">EMR system v3.2 is ready for installation. Contact ICT for deployment.</p>
-<p class="text-[10px] text-on-surface-variant/60 mt-1">3 hours ago</p>
-</div>
-<span class="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-2"></span>
-</div>
+<div class="px-6 py-8 text-center">
+<p class="text-sm text-on-surface-variant">No new notifications</p>
 </div>
 </div>
 <div class="px-6 py-3 border-t border-outline-variant/30 text-center">
@@ -764,7 +740,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <span class="material-symbols-outlined text-[#001e41]">mail</span>
 <div>
 <p class="text-sm font-medium text-[#001e41]">Email</p>
-<p class="text-[10px] text-on-surface-variant">ict-support@clinicalintel.com</p>
+<p id="help-email" class="text-[10px] text-on-surface-variant">Loading...</p>
 </div>
 </div>
 <div class="flex items-center gap-3 px-4 py-3 rounded-xl bg-surface-container-low">

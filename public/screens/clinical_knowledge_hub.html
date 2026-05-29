@@ -143,7 +143,7 @@
             var raw = localStorage.getItem('clinicalUser') || sessionStorage.getItem('clinicalUser');
             if (raw) {
                 var user = JSON.parse(raw);
-                var roleEl = document.getElementById('navbar-user-role');
+                var nameEl = document.getElementById(\x27navbar-user-name\x27); if (nameEl \x26\x26 user.fullName) nameEl.textContent = user.fullName; var roleEl = document.getElementById(\x27navbar-user-role\x27);
                 if (roleEl && user.role) roleEl.textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
             }
         } catch(e) {}
@@ -154,7 +154,7 @@
         applySettings();
     }
 })();
-</script>
+;function loadNotifications(){try{var n=JSON.parse(localStorage.getItem("ci_notifications")||"[]");var el=document.getElementById("notif-list");var ct=document.getElementById("notif-count");if(!el)return;if(n.length===0){el.innerHTML="<div class=\"px-6 py-8 text-center\"><p class=\"text-sm text-on-surface-variant\">No new notifications</p></div>";if(ct)ct.textContent="0";return}var h="";for(var i=0;i<n.length;i++){var item=n[i];var icon=item.icon||"assignment";var color=item.color||"text-primary";var time=item.createdAt?new Date(item.createdAt.seconds*1000).toLocaleString():"just now";h+="<div class=\"px-6 py-4 hover:bg-surface-container-low transition-colors cursor-pointer border-b border-outline-variant/10\"><div class=\"flex items-start gap-3\"><span class=\"material-symbols-outlined "+color+" mt-0.5\">"+icon+"</span><div class=\"flex-1 min-w-0\"><p class=\"text-sm font-semibold text-[#001e41]\">"+(item.title||"Notification")+"</p><p class=\"text-xs text-on-surface-variant mt-0.5\">"+(item.message||"")+"</p><p class=\"text-[10px] text-on-surface-variant/60 mt-1\">"+time+"</p></div></div></div>"}el.innerHTML=h;if(ct)ct.textContent=n.length}catch(e){}}loadNotifications();</script>
 <nav class="flex-1 space-y-1 overflow-y-auto">
 <a class="flex items-center gap-3 px-4 py-3 text-[#44474e] opacity-80 font-medium text-sm hover:bg-[#eaeef2] transition-all duration-300 rounded-lg group" href="javascript:void(0)" onclick="return navigateTo('/ict-support')">
 <span class="material-symbols-outlined group-hover:scale-110 transition-transform">dashboard</span>
@@ -241,7 +241,7 @@
 <div class="flex items-center gap-3 pl-4 border-l border-outline-variant/30 cursor-pointer" onclick="return navigateTo('/settings')" title="Settings">
 <img alt="User" class="w-8 h-8 rounded-full object-cover ring-2 ring-primary-fixed" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbsCBaIju0fQ_a8Ix8ckQ-KxMEALzspAqj5bECDzEupOD0EKC7s-JGVerFtUCMPb4w_-uMp_bMeJ5jev38-jr3rRT9AkKnd6qR8lhHmItBafI8zGwQmCymegGsDbIIMwD2M7yqNL77aHX9DAFby0rXcXRRRthr0V2BK_K6HaBjn5VG51CK4cDM4YkWcDeJ7WC_QkmnwjjdSgAotIZkbO_cLv-__aAO59kFWwY2Kob6GJAXJf5eGhOhvv6dDh0N7M9KJ796heSUqj4u"/>
 <div>
-<span class="text-sm font-bold text-[#001e41] font-headline block">Dr. Sarah Chen</span>
+<span id="navbar-user-name" class="text-sm font-bold text-[#001e41] font-headline block"></span>
 <span id="navbar-user-role" class="text-[10px] text-outline/50">Admin</span>
 </div>
 </div>
@@ -306,37 +306,33 @@
 <div class="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/40 to-transparent"></div>
 </div>
 <div class="relative z-10 p-10">
-<span class="inline-block px-3 py-1 bg-secondary-container text-on-secondary-container rounded-full text-[10px] font-bold uppercase tracking-widest mb-4">Security Protocol</span>
-<h3 class="font-headline text-3xl font-extrabold mb-4 leading-tight tracking-tight">Resetting Hospital Passwords</h3>
-<p class="text-white/80 max-w-md mb-8 leading-relaxed font-medium">Step-by-step identity verification for clinical systems access.</p>
-<div class="flex items-center gap-6 text-xs font-bold text-white/70">
-<span class="flex items-center gap-2"><span class="material-symbols-outlined text-sm">schedule</span> 4 min read</span>
-<span class="flex items-center gap-2"><span class="material-symbols-outlined text-sm">visibility</span> 2.4k views</span>
-</div>
+<span class="inline-block px-3 py-1 bg-secondary-container text-on-secondary-container rounded-full text-[10px] font-bold uppercase tracking-widest mb-4">Featured</span>
+<h3 class="font-headline text-3xl font-extrabold mb-4 leading-tight tracking-tight">No articles yet</h3>
+<p class="text-white/80 max-w-md mb-8 leading-relaxed font-medium">Featured guides will appear here once published.</p>
 </div>
 </div>
 <div class="space-y-8">
 <!-- Side Featured 1 -->
 <div class="group bg-white rounded-3xl p-8 flex flex-col border border-surface-container shadow-sm cursor-pointer bento-card h-full">
 <div class="w-12 h-12 rounded-2xl bg-secondary-fixed flex items-center justify-center text-on-secondary-fixed mb-6 group-hover:bg-secondary-fixed-dim transition-colors">
-<span class="material-symbols-outlined">wifi</span>
+<span class="material-symbols-outlined">article</span>
 </div>
-<h3 class="font-headline text-xl font-bold text-primary mb-3 tracking-tight">Guest Wi-Fi Setup</h3>
-<p class="text-on-surface-variant text-sm mb-auto leading-relaxed">Quick access guide for patient and visitor connectivity.</p>
+<h3 class="font-headline text-xl font-bold text-primary mb-3 tracking-tight">No articles yet</h3>
+<p class="text-on-surface-variant text-sm mb-auto leading-relaxed">Featured guides will appear here once published.</p>
 <div class="flex items-center justify-between mt-8 pt-6 border-t border-surface-container">
-<span class="text-[10px] font-bold text-outline-variant uppercase tracking-widest">Network</span>
+<span class="text-[10px] font-bold text-outline-variant uppercase tracking-widest">Category</span>
 <span class="material-symbols-outlined text-primary group-hover:translate-x-1 transition-transform">arrow_forward</span>
 </div>
 </div>
 <!-- Side Featured 2 -->
 <div class="group bg-white rounded-3xl p-8 flex flex-col border border-surface-container shadow-sm cursor-pointer bento-card h-full">
 <div class="w-12 h-12 rounded-2xl bg-tertiary-fixed flex items-center justify-center text-on-tertiary-fixed mb-6 group-hover:bg-tertiary-fixed-dim transition-colors">
-<span class="material-symbols-outlined">shopping_cart</span>
+<span class="material-symbols-outlined">article</span>
 </div>
-<h3 class="font-headline text-xl font-bold text-primary mb-3 tracking-tight">Hardware Requests</h3>
-<p class="text-on-surface-variant text-sm mb-auto leading-relaxed">Official process for clinical devices and peripherals.</p>
+<h3 class="font-headline text-xl font-bold text-primary mb-3 tracking-tight">No articles yet</h3>
+<p class="text-on-surface-variant text-sm mb-auto leading-relaxed">Featured guides will appear here once published.</p>
 <div class="flex items-center justify-between mt-8 pt-6 border-t border-surface-container">
-<span class="text-[10px] font-bold text-outline-variant uppercase tracking-widest">Requests</span>
+<span class="text-[10px] font-bold text-outline-variant uppercase tracking-widest">Category</span>
 <span class="material-symbols-outlined text-primary group-hover:translate-x-1 transition-transform">arrow_forward</span>
 </div>
 </div>
@@ -353,7 +349,7 @@
 <div class="w-12 h-12 rounded-2xl bg-surface-container flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
 <span class="material-symbols-outlined">medical_information</span>
 </div>
-<span class="text-[10px] font-bold text-primary bg-primary/5 px-2.5 py-1 rounded-full uppercase tracking-tighter">12 Docs</span>
+<span class="text-[10px] font-bold text-primary bg-primary/5 px-2.5 py-1 rounded-full uppercase tracking-tighter">-- Docs</span>
 </div>
 <h4 class="font-headline font-bold text-primary mb-3 tracking-tight">EMR Support</h4>
 <p class="text-xs text-on-surface-variant leading-relaxed">Epic, Cerner, and clinical software fixes.</p>
@@ -363,7 +359,7 @@
 <div class="w-12 h-12 rounded-2xl bg-surface-container flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
 <span class="material-symbols-outlined">settings_suggest</span>
 </div>
-<span class="text-[10px] font-bold text-primary bg-primary/5 px-2.5 py-1 rounded-full uppercase tracking-tighter">24 Docs</span>
+<span class="text-[10px] font-bold text-primary bg-primary/5 px-2.5 py-1 rounded-full uppercase tracking-tighter">-- Docs</span>
 </div>
 <h4 class="font-headline font-bold text-primary mb-3 tracking-tight">Hardware</h4>
 <p class="text-xs text-on-surface-variant leading-relaxed">Printers, scanners, and workstations.</p>
@@ -373,7 +369,7 @@
 <div class="w-12 h-12 rounded-2xl bg-surface-container flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
 <span class="material-symbols-outlined">lan</span>
 </div>
-<span class="text-[10px] font-bold text-primary bg-primary/5 px-2.5 py-1 rounded-full uppercase tracking-tighter">18 Docs</span>
+<span class="text-[10px] font-bold text-primary bg-primary/5 px-2.5 py-1 rounded-full uppercase tracking-tighter">-- Docs</span>
 </div>
 <h4 class="font-headline font-bold text-primary mb-3 tracking-tight">Networking</h4>
 <p class="text-xs text-on-surface-variant leading-relaxed">VPN, Wi-Fi, and server permissions.</p>
@@ -383,7 +379,7 @@
 <div class="w-12 h-12 rounded-2xl bg-surface-container flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
 <span class="material-symbols-outlined">add_to_drive</span>
 </div>
-<span class="text-[10px] font-bold text-primary bg-primary/5 px-2.5 py-1 rounded-full uppercase tracking-tighter">31 Docs</span>
+<span class="text-[10px] font-bold text-primary bg-primary/5 px-2.5 py-1 rounded-full uppercase tracking-tighter">-- Docs</span>
 </div>
 <h4 class="font-headline font-bold text-primary mb-3 tracking-tight">Software</h4>
 <p class="text-xs text-on-surface-variant leading-relaxed">Licenses and new application installs.</p>
@@ -396,38 +392,8 @@
 <div class="lg:col-span-2">
 <h2 class="font-headline text-2xl font-bold text-primary mb-8 tracking-tight">Trending Solutions</h2>
 <div class="space-y-4">
-<div class="group flex items-center gap-8 p-6 rounded-3xl bg-white border border-surface-container hover:border-primary/20 transition-all cursor-pointer shadow-sm">
-<div class="text-3xl font-black text-surface-container-highest group-hover:text-primary/10 transition-colors">01</div>
-<div class="flex-1">
-<h5 class="font-bold text-primary tracking-tight">Syncing hospital email to mobile devices</h5>
-<div class="flex items-center gap-3 mt-1.5">
-<span class="text-[10px] font-bold text-primary-container bg-primary-fixed/30 px-2.5 py-0.5 rounded-full uppercase tracking-tighter">Mobility</span>
-<span class="text-xs text-outline font-medium">Updated 2 days ago</span>
-</div>
-</div>
-<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">chevron_right</span>
-</div>
-<div class="group flex items-center gap-8 p-6 rounded-3xl bg-white border border-surface-container hover:border-primary/20 transition-all cursor-pointer shadow-sm">
-<div class="text-3xl font-black text-surface-container-highest group-hover:text-primary/10 transition-colors">02</div>
-<div class="flex-1">
-<h5 class="font-bold text-primary tracking-tight">Troubleshooting Epic Charting slowdowns</h5>
-<div class="flex items-center gap-3 mt-1.5">
-<span class="text-[10px] font-bold text-primary-container bg-primary-fixed/30 px-2.5 py-0.5 rounded-full uppercase tracking-tighter">Clinicals</span>
-<span class="text-xs text-outline font-medium">Updated 1 week ago</span>
-</div>
-</div>
-<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">chevron_right</span>
-</div>
-<div class="group flex items-center gap-8 p-6 rounded-3xl bg-white border border-surface-container hover:border-primary/20 transition-all cursor-pointer shadow-sm">
-<div class="text-3xl font-black text-surface-container-highest group-hover:text-primary/10 transition-colors">03</div>
-<div class="flex-1">
-<h5 class="font-bold text-primary tracking-tight">Remote Desktop Protocol (RDP) from Home</h5>
-<div class="flex items-center gap-3 mt-1.5">
-<span class="text-[10px] font-bold text-primary-container bg-primary-fixed/30 px-2.5 py-0.5 rounded-full uppercase tracking-tighter">Remote</span>
-<span class="text-xs text-outline font-medium">Updated 1 month ago</span>
-</div>
-</div>
-<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">chevron_right</span>
+<div class="flex-1 text-center py-2">
+<p class="text-sm text-on-surface-variant">No trending solutions yet</p>
 </div>
 </div>
 </div>
@@ -639,47 +605,16 @@ document.addEventListener('DOMContentLoaded', function() {
 <div class="flex items-center justify-between px-6 py-4 border-b border-outline-variant/30">
 <div class="flex items-center gap-3">
 <h3 class="text-lg font-bold text-[#001e41] font-headline">Notifications</h3>
-<span class="text-xs bg-error text-white px-2 py-0.5 rounded-full font-medium" id="notif-count">3</span>
+<span class="text-xs bg-error text-white px-2 py-0.5 rounded-full font-medium" id="notif-count">0</span>
 </div>
 <button onclick="closeNotificationDrawer()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-higher transition-colors">
 <span class="material-symbols-outlined text-on-surface-variant">close</span>
 </button>
 </div>
 <div class="flex-1 overflow-y-auto" id="notif-list">
-<div class="px-6 py-4 hover:bg-surface-container-low transition-colors cursor-pointer border-b border-outline-variant/10">
-<div class="flex items-start gap-3">
-<span class="material-symbols-outlined text-primary mt-0.5">assignment</span>
-<div class="flex-1 min-w-0">
-<p class="text-sm font-semibold text-[#001e41]">Ticket #1042 Resolved</p>
-<p class="text-xs text-on-surface-variant mt-0.5">Your reported network issue in Ward 3 has been resolved.</p>
-<p class="text-[10px] text-on-surface-variant/60 mt-1">2 min ago</p>
-</div>
-<span class="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-2"></span>
-</div>
-</div>
-<div class="px-6 py-4 hover:bg-surface-container-low transition-colors cursor-pointer border-b border-outline-variant/10">
-<div class="flex items-start gap-3">
-<span class="material-symbols-outlined text-[#f59e0b] mt-0.5">warning</span>
-<div class="flex-1 min-w-0">
-<p class="text-sm font-semibold text-[#001e41]">System Maintenance</p>
-<p class="text-xs text-on-surface-variant mt-0.5">Scheduled downtime on Sunday 02:00-04:00 AM for server updates.</p>
-<p class="text-[10px] text-on-surface-variant/60 mt-1">1 hour ago</p>
-</div>
-<span class="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-2"></span>
-</div>
-</div>
-<div class="px-6 py-4 hover:bg-surface-container-low transition-colors cursor-pointer border-b border-outline-variant/10">
-<div class="flex items-start gap-3">
-<span class="material-symbols-outlined text-green-600 mt-0.5">check_circle</span>
-<div class="flex-1 min-w-0">
-<p class="text-sm font-semibold text-[#001e41]">New Software Update</p>
-<p class="text-xs text-on-surface-variant mt-0.5">EMR system v3.2 is ready for installation. Contact ICT for deployment.</p>
-<p class="text-[10px] text-on-surface-variant/60 mt-1">3 hours ago</p>
-</div>
-<span class="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-2"></span>
-</div>
-</div>
-</div>
+<div class="px-6 py-8 text-center">
+<p class="text-sm text-on-surface-variant">No new notifications</p>
+</div></div>
 <div class="px-6 py-3 border-t border-outline-variant/30 text-center">
 <button class="text-sm text-primary font-medium hover:underline" onclick="markAllNotificationsRead()">Mark all as read</button>
 </div>

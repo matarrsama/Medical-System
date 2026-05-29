@@ -1,4 +1,4 @@
-import { type FC, useState } from "react";
+import { type FC, useEffect, useRef, useState } from "react";
 
 interface ScreenFrameProps {
   screenId: string;
@@ -6,14 +6,6 @@ interface ScreenFrameProps {
 }
 
 const loadingStyles = `
-@keyframes ci-pulse {
-  0%, 100% { opacity: 0.4; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.08); }
-}
-@keyframes ci-fade-in {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
-}
 @keyframes ci-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
@@ -22,6 +14,17 @@ const loadingStyles = `
 
 const ScreenFrame: FC<ScreenFrameProps> = ({ screenId, title }) => {
   const [loaded, setLoaded] = useState(false);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  useEffect(() => {
+    setLoaded(false);
+  }, [screenId]);
+
+  useEffect(() => {
+    if (loaded || !iframeRef.current) return;
+    const timer = setTimeout(() => setLoaded(true), 3000);
+    return () => clearTimeout(timer);
+  }, [loaded, screenId]);
 
   return (
     <div
@@ -35,7 +38,7 @@ const ScreenFrame: FC<ScreenFrameProps> = ({ screenId, title }) => {
     >
       <style>{loadingStyles}</style>
 
-      {/* Loading overlay */}
+      {/* Loading overlay shown only on first load or slow navigation */}
       {!loaded && (
         <div
           style={{
@@ -47,70 +50,25 @@ const ScreenFrame: FC<ScreenFrameProps> = ({ screenId, title }) => {
             alignItems: "center",
             justifyContent: "center",
             background: "#f6fafe",
-            gap: "20px",
+            gap: "16px",
           }}
         >
           <div
             style={{
-              width: "48px",
-              height: "48px",
-              borderRadius: "16px",
-              background: "linear-gradient(135deg, #001e41 0%, #17335a 100%)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              animation: "ci-pulse 1.4s ease-in-out infinite",
-              boxShadow: "0 4px 20px rgba(0, 30, 65, 0.15)",
+              width: "20px",
+              height: "20px",
+              border: "2px solid #dfe3e7",
+              borderTopColor: "#001e41",
+              borderRadius: "50%",
+              animation: "ci-spin 0.7s linear infinite",
             }}
-          >
-            <span
-              className="material-symbols-outlined"
-              style={{
-                color: "#ffffff",
-                fontSize: "24px",
-                fontVariationSettings: "'FILL' 1",
-              }}
-            >
-              shield_health
-            </span>
-          </div>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: "8px",
-              animation: "ci-fade-in 0.4s ease-out",
-            }}
-          >
-            <div
-              style={{
-                width: "20px",
-                height: "20px",
-                border: "2px solid #dfe3e7",
-                borderTopColor: "#001e41",
-                borderRadius: "50%",
-                animation: "ci-spin 0.7s linear infinite",
-              }}
-            />
-            <span
-              style={{
-                fontFamily: "Inter, sans-serif",
-                fontSize: "12px",
-                color: "#737780",
-                fontWeight: 500,
-                letterSpacing: "0.03em",
-              }}
-            >
-              Loading {title || screenId}...
-            </span>
-          </div>
+          />
         </div>
       )}
 
       {/* Iframe */}
       <iframe
-        key={screenId}
+        ref={iframeRef}
         src={`/screens/${screenId}.html`}
         title={title || screenId}
         onLoad={() => setLoaded(true)}
@@ -119,8 +77,6 @@ const ScreenFrame: FC<ScreenFrameProps> = ({ screenId, title }) => {
           height: "100%",
           border: "none",
           display: "block",
-          opacity: loaded ? 1 : 0,
-          transition: "opacity 0.3s ease-in-out",
         }}
         sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
         loading="eager"

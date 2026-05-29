@@ -133,7 +133,7 @@
 <div class="flex items-center gap-3 pl-4 border-l border-outline-variant/30 cursor-pointer" onclick="return navigateTo('/settings')" title="Settings">
 <img alt="User" class="w-8 h-8 rounded-full object-cover ring-2 ring-primary-fixed" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbsCBaIju0fQ_a8Ix8ckQ-KxMEALzspAqj5bECDzEupOD0EKC7s-JGVerFtUCMPb4w_-uMp_bMeJ5jev38-jr3rRT9AkKnd6qR8lhHmItBafI8zGwQmCymegGsDbIIMwD2M7yqNL77aHX9DAFby0rXcXRRRthr0V2BK_K6HaBjn5VG51CK4cDM4YkWcDeJ7WC_QkmnwjjdSgAotIZkbO_cLv-__aAO59kFWwY2Kob6GJAXJf5eGhOhvv6dDh0N7M9KJ796heSUqj4u"/>
 <div>
-<span class="text-sm font-bold text-[#001e41] font-headline block">Dr. Sarah Chen</span>
+<span id="navbar-user-name" class="text-sm font-bold text-[#001e41] font-headline block"></span>
 <span id="navbar-user-role" class="text-[10px] text-outline/50">Admin</span>
 </div>
 </div>
@@ -166,7 +166,7 @@
             var raw = localStorage.getItem('clinicalUser') || sessionStorage.getItem('clinicalUser');
             if (raw) {
                 var user = JSON.parse(raw);
-                var roleEl = document.getElementById('navbar-user-role');
+                var nameEl = document.getElementById(\x27navbar-user-name\x27); if (nameEl \x26\x26 user.fullName) nameEl.textContent = user.fullName; var roleEl = document.getElementById(\x27navbar-user-role\x27);
                 if (roleEl && user.role) roleEl.textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
             }
         } catch(e) {}
@@ -177,7 +177,7 @@
         applySettings();
     }
 })();
-</script>
+;function loadNotifications(){try{var n=JSON.parse(localStorage.getItem("ci_notifications")||"[]");var el=document.getElementById("notif-list");var ct=document.getElementById("notif-count");if(!el)return;if(n.length===0){el.innerHTML="<div class=\"px-6 py-8 text-center\"><p class=\"text-sm text-on-surface-variant\">No new notifications</p></div>";if(ct)ct.textContent="0";return}var h="";for(var i=0;i<n.length;i++){var item=n[i];var icon=item.icon||"assignment";var color=item.color||"text-primary";var time=item.createdAt?new Date(item.createdAt.seconds*1000).toLocaleString():"just now";h+="<div class=\"px-6 py-4 hover:bg-surface-container-low transition-colors cursor-pointer border-b border-outline-variant/10\"><div class=\"flex items-start gap-3\"><span class=\"material-symbols-outlined "+color+" mt-0.5\">"+icon+"</span><div class=\"flex-1 min-w-0\"><p class=\"text-sm font-semibold text-[#001e41]\">"+(item.title||"Notification")+"</p><p class=\"text-xs text-on-surface-variant mt-0.5\">"+(item.message||"")+"</p><p class=\"text-[10px] text-on-surface-variant/60 mt-1\">"+time+"</p></div></div></div>"}el.innerHTML=h;if(ct)ct.textContent=n.length}catch(e){}}loadNotifications();;function loadVersionBadge(){try{var s=JSON.parse(localStorage.getItem("ci_app_settings")||"{}");var el=document.getElementById("version-badge");if(el)el.textContent=s.version||""}catch(e){}}loadVersionBadge();</script>
 <nav class="flex-1 space-y-1 overflow-y-auto">
 <a class="flex items-center gap-3 px-4 py-3 text-[#44474e] opacity-80 font-medium text-sm hover:bg-[#eaeef2] transition-all duration-300 rounded-lg group" href="javascript:void(0)" onclick="return navigateTo('/ict-support')">
 <span class="material-symbols-outlined group-hover:scale-110 transition-transform">dashboard</span> Dashboard</a>
@@ -254,7 +254,7 @@
 </div>
 <div>
 <p class="text-[11px] font-bold text-primary/60 uppercase tracking-[0.2em] mb-1">Current Access Level</p>
-<h3 class="font-headline text-2xl font-extrabold text-primary tracking-tight">Marcus Holloway</h3>
+<h3 class="font-headline text-2xl font-extrabold text-primary tracking-tight"></h3>
 <div class="flex items-center gap-2 mt-1">
 <span class="text-sm font-semibold text-on-surface-variant">Senior ICT Officer</span>
 <span class="h-1 w-1 rounded-full bg-outline-variant"></span>
@@ -279,7 +279,7 @@
 </div>
 </div>
 <div>
-<h3 class="font-headline font-extrabold text-2xl text-primary tracking-tight">Marcus Holloway</h3>
+<h3 class="font-headline font-extrabold text-2xl text-primary tracking-tight"></h3>
 <p class="text-on-surface-variant font-medium">marcus.holloway@centralmedical.ict</p>
 <span class="inline-flex items-center gap-1.5 mt-3 px-4 py-1.5 bg-secondary-container text-on-secondary-container text-[11px] font-bold uppercase tracking-wider rounded-full">
 <span class="h-2 w-2 rounded-full bg-secondary animate-pulse"></span>
@@ -290,7 +290,7 @@
 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
 <div class="space-y-2">
 <label class="text-[11px] font-bold text-outline uppercase tracking-widest px-1">Full Name</label>
-<input class="w-full bg-surface-container border border-surface-container-highest/50 focus:border-primary focus:bg-white focus:ring-0 rounded-xl px-4 py-4 text-sm font-semibold text-primary transition-all" type="text" value="Marcus Holloway"/>
+<input class="w-full bg-surface-container border border-surface-container-highest/50 focus:border-primary focus:bg-white focus:ring-0 rounded-xl px-4 py-4 text-sm font-semibold text-primary transition-all" type="text" value=""/>
 </div>
 <div class="space-y-2">
 <label class="text-[11px] font-bold text-outline uppercase tracking-widest px-1">Role &amp; Designation</label>
@@ -479,7 +479,7 @@
 <div class="pt-6 border-t border-surface-container-highest">
 <div class="flex items-center justify-between text-[11px] font-bold text-on-surface-variant">
 <span class="uppercase tracking-widest">Core Version</span>
-<span class="bg-primary/5 text-primary px-3 py-1 rounded-full border border-primary/10 font-mono">v4.12.0</span>
+<span id="version-badge" class="text-[10px] font-bold text-primary bg-primary/5 px-2 py-0.5 rounded"></span>
 </div>
 </div>
 </div>
@@ -671,47 +671,16 @@ document.addEventListener('DOMContentLoaded', function() {
 <div class="flex items-center justify-between px-6 py-4 border-b border-outline-variant/30">
 <div class="flex items-center gap-3">
 <h3 class="text-lg font-bold text-[#001e41] font-headline">Notifications</h3>
-<span class="text-xs bg-error text-white px-2 py-0.5 rounded-full font-medium" id="notif-count">3</span>
+<span class="text-xs bg-error text-white px-2 py-0.5 rounded-full font-medium" id="notif-count">0</span>
 </div>
 <button onclick="closeNotificationDrawer()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-higher transition-colors">
 <span class="material-symbols-outlined text-on-surface-variant">close</span>
 </button>
 </div>
 <div class="flex-1 overflow-y-auto" id="notif-list">
-<div class="px-6 py-4 hover:bg-surface-container-low transition-colors cursor-pointer border-b border-outline-variant/10">
-<div class="flex items-start gap-3">
-<span class="material-symbols-outlined text-primary mt-0.5">assignment</span>
-<div class="flex-1 min-w-0">
-<p class="text-sm font-semibold text-[#001e41]">Ticket #1042 Resolved</p>
-<p class="text-xs text-on-surface-variant mt-0.5">Your reported network issue in Ward 3 has been resolved.</p>
-<p class="text-[10px] text-on-surface-variant/60 mt-1">2 min ago</p>
-</div>
-<span class="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-2"></span>
-</div>
-</div>
-<div class="px-6 py-4 hover:bg-surface-container-low transition-colors cursor-pointer border-b border-outline-variant/10">
-<div class="flex items-start gap-3">
-<span class="material-symbols-outlined text-[#f59e0b] mt-0.5">warning</span>
-<div class="flex-1 min-w-0">
-<p class="text-sm font-semibold text-[#001e41]">System Maintenance</p>
-<p class="text-xs text-on-surface-variant mt-0.5">Scheduled downtime on Sunday 02:00-04:00 AM for server updates.</p>
-<p class="text-[10px] text-on-surface-variant/60 mt-1">1 hour ago</p>
-</div>
-<span class="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-2"></span>
-</div>
-</div>
-<div class="px-6 py-4 hover:bg-surface-container-low transition-colors cursor-pointer border-b border-outline-variant/10">
-<div class="flex items-start gap-3">
-<span class="material-symbols-outlined text-green-600 mt-0.5">check_circle</span>
-<div class="flex-1 min-w-0">
-<p class="text-sm font-semibold text-[#001e41]">New Software Update</p>
-<p class="text-xs text-on-surface-variant mt-0.5">EMR system v3.2 is ready for installation. Contact ICT for deployment.</p>
-<p class="text-[10px] text-on-surface-variant/60 mt-1">3 hours ago</p>
-</div>
-<span class="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-2"></span>
-</div>
-</div>
-</div>
+<div class="px-6 py-8 text-center">
+<p class="text-sm text-on-surface-variant">No new notifications</p>
+</div></div>
 <div class="px-6 py-3 border-t border-outline-variant/30 text-center">
 <button class="text-sm text-primary font-medium hover:underline" onclick="markAllNotificationsRead()">Mark all as read</button>
 </div>

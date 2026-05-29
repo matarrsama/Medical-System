@@ -116,7 +116,7 @@
             var raw = localStorage.getItem('clinicalUser') || sessionStorage.getItem('clinicalUser');
             if (raw) {
                 var user = JSON.parse(raw);
-                var roleEl = document.getElementById('navbar-user-role');
+                var nameEl = document.getElementById(\x27navbar-user-name\x27); if (nameEl \x26\x26 user.fullName) nameEl.textContent = user.fullName; var roleEl = document.getElementById(\x27navbar-user-role\x27);
                 if (roleEl && user.role) roleEl.textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
             }
         } catch(e) {}
@@ -127,7 +127,7 @@
         applySettings();
     }
 })();
-</script>
+;function loadNotifications(){try{var n=JSON.parse(localStorage.getItem("ci_notifications")||"[]");var el=document.getElementById("notif-list");var ct=document.getElementById("notif-count");if(!el)return;if(n.length===0){el.innerHTML="<div class=\"px-6 py-8 text-center\"><p class=\"text-sm text-on-surface-variant\">No new notifications</p></div>";if(ct)ct.textContent="0";return}var h="";for(var i=0;i<n.length;i++){var item=n[i];var icon=item.icon||"assignment";var color=item.color||"text-primary";var time=item.createdAt?new Date(item.createdAt.seconds*1000).toLocaleString():"just now";h+="<div class=\"px-6 py-4 hover:bg-surface-container-low transition-colors cursor-pointer border-b border-outline-variant/10\"><div class=\"flex items-start gap-3\"><span class=\"material-symbols-outlined "+color+" mt-0.5\">"+icon+"</span><div class=\"flex-1 min-w-0\"><p class=\"text-sm font-semibold text-[#001e41]\">"+(item.title||"Notification")+"</p><p class=\"text-xs text-on-surface-variant mt-0.5\">"+(item.message||"")+"</p><p class=\"text-[10px] text-on-surface-variant/60 mt-1\">"+time+"</p></div></div></div>"}el.innerHTML=h;if(ct)ct.textContent=n.length}catch(e){}}loadNotifications();</script>
 <nav class="flex-1 space-y-1 overflow-y-auto">
 <a class="flex items-center gap-3 px-4 py-3 text-[#44474e] opacity-80 font-medium text-sm hover:bg-[#eaeef2] transition-all duration-300 rounded-lg group" href="javascript:void(0)" onclick="return navigateTo('/ict-support')">
 <span class="material-symbols-outlined group-hover:scale-110 transition-transform">dashboard</span>
@@ -214,7 +214,7 @@
 <div class="flex items-center gap-3 pl-4 border-l border-outline-variant/30 cursor-pointer" onclick="return navigateTo('/settings')" title="Settings">
 <img alt="User" class="w-8 h-8 rounded-full object-cover ring-2 ring-primary-fixed" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbsCBaIju0fQ_a8Ix8ckQ-KxMEALzspAqj5bECDzEupOD0EKC7s-JGVerFtUCMPb4w_-uMp_bMeJ5jev38-jr3rRT9AkKnd6qR8lhHmItBafI8zGwQmCymegGsDbIIMwD2M7yqNL77aHX9DAFby0rXcXRRRthr0V2BK_K6HaBjn5VG51CK4cDM4YkWcDeJ7WC_QkmnwjjdSgAotIZkbO_cLv-__aAO59kFWwY2Kob6GJAXJf5eGhOhvv6dDh0N7M9KJ796heSUqj4u"/>
 <div>
-<span class="text-sm font-bold text-[#001e41] font-headline block">Dr. Sarah Chen</span>
+<span id="navbar-user-name" class="text-sm font-bold text-[#001e41] font-headline block"></span>
 <span id="navbar-user-role" class="text-[10px] text-outline/50">Admin</span>
 </div>
 </div>
@@ -299,164 +299,12 @@
 </tr>
 </thead>
 <tbody class="divide-y divide-outline-variant/10">
-<!-- User 1 -->
-<tr class="hover:bg-surface-container-high/30 transition-colors group">
-<td class="px-6 py-5">
-<div class="flex items-center gap-4">
-<input class="rounded border-outline text-primary focus:ring-primary h-4 w-4" type="checkbox"/>
-<div class="flex items-center gap-3">
-<div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold">SM</div>
-<div>
-<p class="font-bold text-on-surface text-sm">Dr. Sarah Miller</p>
-<p class="text-[10px] text-on-surface-variant font-medium uppercase tracking-tight">ID: #44921-RAD</p>
-</div>
-</div>
-</div>
-</td>
-<td class="px-6 py-5">
-<span class="text-[10px] font-bold px-2 py-1 bg-primary-fixed text-on-primary-fixed-variant rounded-full">Radiology</span>
-</td>
-<td class="px-6 py-5">
-<select class="bg-transparent border-none text-xs font-semibold focus:ring-0 p-0 cursor-pointer hover:text-primary transition-colors">
-<option>Employee</option>
-<option selected="">ICT Officer</option>
-<option>Admin</option>
-</select>
-</td>
-<td class="px-6 py-5">
-<p class="text-xs text-on-surface-variant">2 mins ago</p>
-<p class="text-[10px] text-primary/60 font-medium">Workstation 04</p>
-</td>
-<td class="px-6 py-5">
-<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container text-[10px] font-black uppercase">
-<span class="w-1.5 h-1.5 rounded-full bg-on-secondary-container"></span>
-                                                Active
-                                            </span>
-</td>
-<td class="px-6 py-5 text-right">
-<button class="p-2 rounded-lg hover:bg-surface-container text-on-surface-variant opacity-0 group-hover:opacity-100 transition-all">
-<span class="material-symbols-outlined text-xl" data-icon="more_vert">more_vert</span>
-</button>
-</td>
-</tr>
-<!-- User 2 -->
-<tr class="hover:bg-surface-container-high/30 transition-colors group">
-<td class="px-6 py-5">
-<div class="flex items-center gap-4">
-<input class="rounded border-outline text-primary focus:ring-primary h-4 w-4" type="checkbox"/>
-<div class="flex items-center gap-3">
-<div class="w-10 h-10 rounded-full bg-tertiary-fixed flex items-center justify-center text-on-tertiary-fixed-variant font-bold">JK</div>
-<div>
-<p class="font-bold text-on-surface text-sm">James K. Thompson</p>
-<p class="text-[10px] text-on-surface-variant font-medium uppercase tracking-tight">ID: #11082-ER</p>
-</div>
-</div>
-</div>
-</td>
-<td class="px-6 py-5">
-<span class="text-[10px] font-bold px-2 py-1 bg-surface-container-highest text-on-surface-variant rounded-full">Emergency</span>
-</td>
-<td class="px-6 py-5">
-<select class="bg-transparent border-none text-xs font-semibold focus:ring-0 p-0 cursor-pointer hover:text-primary transition-colors">
-<option selected="">Employee</option>
-<option>ICT Officer</option>
-<option>Admin</option>
-</select>
-</td>
-<td class="px-6 py-5">
-<p class="text-xs text-on-surface-variant">14 hours ago</p>
-<p class="text-[10px] text-on-surface-variant/60 font-medium">Mobile Device</p>
-</td>
-<td class="px-6 py-5">
-<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-tertiary-fixed text-on-tertiary-container text-[10px] font-black uppercase">
-<span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span>
-                                                Pending
-                                            </span>
-</td>
-<td class="px-6 py-5 text-right">
-<button class="p-2 rounded-lg hover:bg-surface-container text-on-surface-variant opacity-0 group-hover:opacity-100 transition-all">
-<span class="material-symbols-outlined text-xl" data-icon="more_vert">more_vert</span>
-</button>
-</td>
-</tr>
-<!-- User 3 (Suspended) -->
-<tr class="hover:bg-surface-container-high/30 transition-colors group opacity-80">
-<td class="px-6 py-5">
-<div class="flex items-center gap-4">
-<input class="rounded border-outline text-primary focus:ring-primary h-4 w-4" type="checkbox"/>
-<div class="flex items-center gap-3">
-<div class="w-10 h-10 rounded-full bg-error-container flex items-center justify-center text-error font-bold">AW</div>
-<div>
-<p class="font-bold text-on-surface text-sm">Arthur Wright</p>
-<p class="text-[10px] text-on-surface-variant font-medium uppercase tracking-tight">ID: #99012-SUR</p>
-</div>
-</div>
-</div>
-</td>
-<td class="px-6 py-5">
-<span class="text-[10px] font-bold px-2 py-1 bg-surface-container-highest text-on-surface-variant rounded-full">Surgery</span>
-</td>
-<td class="px-6 py-5">
-<span class="text-xs font-semibold text-on-surface-variant/50">Restricted</span>
-</td>
-<td class="px-6 py-5">
-<p class="text-xs text-on-surface-variant">3 days ago</p>
-</td>
-<td class="px-6 py-5">
-<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-error-container text-error text-[10px] font-black uppercase">
-                                                Suspended
-                                            </span>
-</td>
-<td class="px-6 py-5 text-right">
-<button class="p-2 rounded-lg hover:bg-surface-container text-on-surface-variant opacity-0 group-hover:opacity-100 transition-all">
-<span class="material-symbols-outlined text-xl" data-icon="more_vert">more_vert</span>
-</button>
-</td>
-</tr>
-<!-- User 4 (Admin) -->
-<tr class="hover:bg-surface-container-high/30 transition-colors group bg-primary/5">
-<td class="px-6 py-5">
-<div class="flex items-center gap-4">
-<input class="rounded border-outline text-primary focus:ring-primary h-4 w-4" type="checkbox"/>
-<div class="flex items-center gap-3">
-<div class="w-10 h-10 rounded-full primary-gradient flex items-center justify-center text-white font-bold">EB</div>
-<div>
-<p class="font-bold text-on-surface text-sm">Elena Belova</p>
-<p class="text-[10px] text-on-surface-variant font-medium uppercase tracking-tight">ID: #00002-ADM</p>
-</div>
-</div>
-</div>
-</td>
-<td class="px-6 py-5">
-<span class="text-[10px] font-bold px-2 py-1 bg-primary text-white rounded-full">Systems Admin</span>
-</td>
-<td class="px-6 py-5">
-<select class="bg-transparent border-none text-xs font-semibold focus:ring-0 p-0 cursor-pointer text-primary">
-<option>Employee</option>
-<option>ICT Officer</option>
-<option selected="">Admin</option>
-</select>
-</td>
-<td class="px-6 py-5">
-<p class="text-xs text-on-surface-variant">Active now</p>
-</td>
-<td class="px-6 py-5">
-<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container text-[10px] font-black uppercase">
-<span class="w-1.5 h-1.5 rounded-full bg-on-secondary-container"></span>
-                                                Active
-                                            </span>
-</td>
-<td class="px-6 py-5 text-right">
-<button class="p-2 rounded-lg hover:bg-surface-container text-on-surface-variant opacity-0 group-hover:opacity-100 transition-all">
-<span class="material-symbols-outlined text-xl" data-icon="more_vert">more_vert</span>
-</button>
-</td>
-</tr>
+<tr><td colspan="6" class="px-6 py-12 text-center"><p class="text-sm text-on-surface-variant">No users to display. Data loading...</p></td></tr>
 </tbody>
 </table>
 <!-- PAGINATION -->
 <div class="p-6 bg-surface-container-low/30 flex items-center justify-between">
-<p class="text-xs font-medium text-on-surface-variant">Showing 4 of 1,240 hospital staff members</p>
+<p class="text-xs font-medium text-on-surface-variant">No data</p>
 <div class="flex items-center gap-1">
 <button class="w-8 h-8 rounded-lg flex items-center justify-center border border-outline-variant hover:bg-surface-container-high transition-colors"><span class="material-symbols-outlined text-sm" data-icon="chevron_left">chevron_left</span></button>
 <button class="w-8 h-8 rounded-lg flex items-center justify-center bg-primary text-white font-bold text-xs">1</button>
@@ -485,96 +333,7 @@
 </tr>
 </thead>
 <tbody class="divide-y divide-outline-variant/10">
-<!-- History Item 1 -->
-<tr class="hover:bg-white/40 transition-colors group">
-<td class="px-6 py-4">
-<div class="flex items-center gap-3">
-<span class="material-symbols-outlined text-primary/60 text-lg" data-icon="description">description</span>
-<span class="font-bold text-on-surface text-sm">User Access Audit Q1</span>
-</div>
-</td>
-<td class="px-6 py-4">
-<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase">
-<span class="material-symbols-outlined text-[14px] leading-none" data-icon="check_circle">check_circle</span>
-                                                Completed
-                                            </span>
-</td>
-<td class="px-6 py-4">
-<div class="flex items-center gap-2">
-<div class="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center text-[10px] font-bold">MH</div>
-<span class="text-xs font-medium text-on-surface">M. Holloway</span>
-</div>
-</td>
-<td class="px-6 py-4">
-<p class="text-xs text-on-surface-variant">Oct 24, 2023</p>
-<p class="text-[10px] text-on-surface-variant/60 font-medium">10:45 AM</p>
-</td>
-<td class="px-6 py-4 text-right">
-<button class="w-8 h-8 rounded-lg bg-surface-container-highest/50 hover:bg-primary hover:text-white flex items-center justify-center transition-all group/btn shadow-sm">
-<span class="material-symbols-outlined text-lg" data-icon="download">download</span>
-</button>
-</td>
-</tr>
-<!-- History Item 2 (Processing) -->
-<tr class="hover:bg-white/40 transition-colors group">
-<td class="px-6 py-4">
-<div class="flex items-center gap-3">
-<span class="material-symbols-outlined text-primary/60 text-lg" data-icon="assessment">assessment</span>
-<span class="font-bold text-on-surface text-sm">Monthly Departmental Usage</span>
-</div>
-</td>
-<td class="px-6 py-4">
-<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-[10px] font-black uppercase">
-<span class="material-symbols-outlined text-[14px] leading-none animate-spin-slow" data-icon="progress_activity">progress_activity</span>
-                                                Processing
-                                            </span>
-</td>
-<td class="px-6 py-4">
-<div class="flex items-center gap-2">
-<div class="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center text-[10px] font-bold">EB</div>
-<span class="text-xs font-medium text-on-surface">Elena Belova</span>
-</div>
-</td>
-<td class="px-6 py-4">
-<p class="text-xs text-on-surface-variant">Today</p>
-<p class="text-[10px] text-on-surface-variant/60 font-medium">09:15 AM</p>
-</td>
-<td class="px-6 py-4 text-right">
-<button class="w-8 h-8 rounded-lg bg-slate-100 text-slate-300 flex items-center justify-center cursor-not-allowed" disabled="">
-<span class="material-symbols-outlined text-lg" data-icon="download">download</span>
-</button>
-</td>
-</tr>
-<!-- History Item 3 -->
-<tr class="hover:bg-white/40 transition-colors group">
-<td class="px-6 py-4">
-<div class="flex items-center gap-3">
-<span class="material-symbols-outlined text-primary/60 text-lg" data-icon="shield_person">shield_person</span>
-<span class="font-bold text-on-surface text-sm">Security Clearance Audit</span>
-</div>
-</td>
-<td class="px-6 py-4">
-<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase">
-<span class="material-symbols-outlined text-[14px] leading-none" data-icon="check_circle">check_circle</span>
-                                                Completed
-                                            </span>
-</td>
-<td class="px-6 py-4">
-<div class="flex items-center gap-2">
-<div class="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center text-[10px] font-bold">MH</div>
-<span class="text-xs font-medium text-on-surface">M. Holloway</span>
-</div>
-</td>
-<td class="px-6 py-4">
-<p class="text-xs text-on-surface-variant">Oct 22, 2023</p>
-<p class="text-[10px] text-on-surface-variant/60 font-medium">04:30 PM</p>
-</td>
-<td class="px-6 py-4 text-right">
-<button class="w-8 h-8 rounded-lg bg-surface-container-highest/50 hover:bg-primary hover:text-white flex items-center justify-center transition-all shadow-sm">
-<span class="material-symbols-outlined text-lg" data-icon="download">download</span>
-</button>
-</td>
-</tr>
+<tr><td colspan="5" class="px-6 py-12 text-center"><p class="text-sm text-on-surface-variant">No export history available</p></td></tr>
 </tbody>
 </table>
 </div>
@@ -590,17 +349,17 @@
 <div class="mt-4 space-y-3">
 <div class="flex justify-between items-center">
 <span class="text-xs opacity-80">Admin Users</span>
-<span class="text-sm font-bold">12 / 1,240</span>
+<span class="text-sm font-bold">--</span>
 </div>
 <div class="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
-<div class="h-full bg-secondary-fixed w-[4%]"></div>
+<div class="h-full bg-secondary-fixed w-0"></div>
 </div>
 <div class="flex justify-between items-center">
 <span class="text-xs opacity-80">MFA Enrollment</span>
-<span class="text-sm font-bold">98.2%</span>
+<span class="text-sm font-bold">--</span>
 </div>
 <div class="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
-<div class="h-full bg-secondary-fixed w-[98.2%]"></div>
+<div class="h-full bg-secondary-fixed w-0"></div>
 </div>
 </div>
 </div>
@@ -615,41 +374,8 @@
 <div class="space-y-6 relative">
 <!-- Vertical timeline line -->
 <div class="absolute left-[15px] top-2 bottom-2 w-[1px] bg-outline-variant/30"></div>
-<!-- Audit Item 1 -->
-<div class="flex gap-4 relative">
-<div class="w-8 h-8 rounded-full bg-primary-fixed flex items-center justify-center text-primary z-10 shrink-0 border-4 border-surface-container-lowest">
-<span class="material-symbols-outlined text-sm" data-icon="security">security</span>
-</div>
-<div>
-<p class="text-xs leading-relaxed text-on-surface">
-<span class="font-bold">M. Holloway</span> changed <span class="font-bold">Dr. Sarah Miller</span> to <span class="text-primary font-bold">ICT Officer</span>.
-                                    </p>
-<p class="text-[10px] text-on-surface-variant/60 font-medium mt-1 uppercase">Today at 09:12 AM</p>
-</div>
-</div>
-<!-- Audit Item 2 -->
-<div class="flex gap-4 relative">
-<div class="w-8 h-8 rounded-full bg-error-container flex items-center justify-center text-error z-10 shrink-0 border-4 border-surface-container-lowest">
-<span class="material-symbols-outlined text-sm" data-icon="block">block</span>
-</div>
-<div>
-<p class="text-xs leading-relaxed text-on-surface">
-<span class="font-bold">System</span> suspended user <span class="font-bold">Arthur Wright</span> (Failed login attempts).
-                                    </p>
-<p class="text-[10px] text-on-surface-variant/60 font-medium mt-1 uppercase">Today at 04:30 AM</p>
-</div>
-</div>
-<!-- Audit Item 3 -->
-<div class="flex gap-4 relative">
-<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container z-10 shrink-0 border-4 border-surface-container-lowest">
-<span class="material-symbols-outlined text-sm" data-icon="vpn_key">vpn_key</span>
-</div>
-<div>
-<p class="text-xs leading-relaxed text-on-surface">
-<span class="font-bold">Elena Belova</span> reset password for <span class="font-bold">Nurse Kevin Hart</span>.
-                                    </p>
-<p class="text-[10px] text-on-surface-variant/60 font-medium mt-1 uppercase">Yesterday at 11:45 PM</p>
-</div>
+<div class="px-6 py-8 text-center">
+<p class="text-sm text-on-surface-variant">No audit log entries available</p>
 </div>
 </div>
 <button class="mt-8 w-full py-3 rounded-xl border border-outline-variant hover:bg-surface-container text-xs font-bold text-on-surface-variant transition-colors flex items-center justify-center gap-2">
@@ -824,47 +550,16 @@ document.addEventListener('DOMContentLoaded', function() {
 <div class="flex items-center justify-between px-6 py-4 border-b border-outline-variant/30">
 <div class="flex items-center gap-3">
 <h3 class="text-lg font-bold text-[#001e41] font-headline">Notifications</h3>
-<span class="text-xs bg-error text-white px-2 py-0.5 rounded-full font-medium" id="notif-count">3</span>
+<span class="text-xs bg-error text-white px-2 py-0.5 rounded-full font-medium" id="notif-count">0</span>
 </div>
 <button onclick="closeNotificationDrawer()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-higher transition-colors">
 <span class="material-symbols-outlined text-on-surface-variant">close</span>
 </button>
 </div>
 <div class="flex-1 overflow-y-auto" id="notif-list">
-<div class="px-6 py-4 hover:bg-surface-container-low transition-colors cursor-pointer border-b border-outline-variant/10">
-<div class="flex items-start gap-3">
-<span class="material-symbols-outlined text-primary mt-0.5">assignment</span>
-<div class="flex-1 min-w-0">
-<p class="text-sm font-semibold text-[#001e41]">Ticket #1042 Resolved</p>
-<p class="text-xs text-on-surface-variant mt-0.5">Your reported network issue in Ward 3 has been resolved.</p>
-<p class="text-[10px] text-on-surface-variant/60 mt-1">2 min ago</p>
-</div>
-<span class="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-2"></span>
-</div>
-</div>
-<div class="px-6 py-4 hover:bg-surface-container-low transition-colors cursor-pointer border-b border-outline-variant/10">
-<div class="flex items-start gap-3">
-<span class="material-symbols-outlined text-[#f59e0b] mt-0.5">warning</span>
-<div class="flex-1 min-w-0">
-<p class="text-sm font-semibold text-[#001e41]">System Maintenance</p>
-<p class="text-xs text-on-surface-variant mt-0.5">Scheduled downtime on Sunday 02:00-04:00 AM for server updates.</p>
-<p class="text-[10px] text-on-surface-variant/60 mt-1">1 hour ago</p>
-</div>
-<span class="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-2"></span>
-</div>
-</div>
-<div class="px-6 py-4 hover:bg-surface-container-low transition-colors cursor-pointer border-b border-outline-variant/10">
-<div class="flex items-start gap-3">
-<span class="material-symbols-outlined text-green-600 mt-0.5">check_circle</span>
-<div class="flex-1 min-w-0">
-<p class="text-sm font-semibold text-[#001e41]">New Software Update</p>
-<p class="text-xs text-on-surface-variant mt-0.5">EMR system v3.2 is ready for installation. Contact ICT for deployment.</p>
-<p class="text-[10px] text-on-surface-variant/60 mt-1">3 hours ago</p>
-</div>
-<span class="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-2"></span>
-</div>
-</div>
-</div>
+<div class="px-6 py-8 text-center">
+<p class="text-sm text-on-surface-variant">No new notifications</p>
+</div></div>
 <div class="px-6 py-3 border-t border-outline-variant/30 text-center">
 <button class="text-sm text-primary font-medium hover:underline" onclick="markAllNotificationsRead()">Mark all as read</button>
 </div>

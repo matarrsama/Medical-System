@@ -137,7 +137,7 @@
             var raw = localStorage.getItem('clinicalUser') || sessionStorage.getItem('clinicalUser');
             if (raw) {
                 var user = JSON.parse(raw);
-                var roleEl = document.getElementById('navbar-user-role');
+                var nameEl = document.getElementById(\x27navbar-user-name\x27); if (nameEl \x26\x26 user.fullName) nameEl.textContent = user.fullName; var roleEl = document.getElementById(\x27navbar-user-role\x27);
                 if (roleEl && user.role) roleEl.textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
             }
         } catch(e) {}
@@ -148,7 +148,7 @@
         applySettings();
     }
 })();
-</script>
+;function loadNotifications(){try{var n=JSON.parse(localStorage.getItem("ci_notifications")||"[]");var el=document.getElementById("notif-list");var ct=document.getElementById("notif-count");if(!el)return;if(n.length===0){el.innerHTML="<div class=\"px-6 py-8 text-center\"><p class=\"text-sm text-on-surface-variant\">No new notifications</p></div>";if(ct)ct.textContent="0";return}var h="";for(var i=0;i<n.length;i++){var item=n[i];var icon=item.icon||"assignment";var color=item.color||"text-primary";var time=item.createdAt?new Date(item.createdAt.seconds*1000).toLocaleString():"just now";h+="<div class=\"px-6 py-4 hover:bg-surface-container-low transition-colors cursor-pointer border-b border-outline-variant/10\"><div class=\"flex items-start gap-3\"><span class=\"material-symbols-outlined "+color+" mt-0.5\">"+icon+"</span><div class=\"flex-1 min-w-0\"><p class=\"text-sm font-semibold text-[#001e41]\">"+(item.title||"Notification")+"</p><p class=\"text-xs text-on-surface-variant mt-0.5\">"+(item.message||"")+"</p><p class=\"text-[10px] text-on-surface-variant/60 mt-1\">"+time+"</p></div></div></div>"}el.innerHTML=h;if(ct)ct.textContent=n.length}catch(e){}}loadNotifications();</script>
 <nav class="flex-1 space-y-1 overflow-y-auto">
 <a class="flex items-center gap-3 px-4 py-3 text-[#44474e] opacity-80 font-medium text-sm hover:bg-[#eaeef2] transition-all duration-300 rounded-lg group" href="javascript:void(0)" onclick="return navigateTo('/ict-support')">
 <span class="material-symbols-outlined group-hover:scale-110 transition-transform">dashboard</span>
@@ -248,7 +248,7 @@
 <div class="flex items-center gap-3 pl-4 border-l border-outline-variant/30 cursor-pointer" onclick="return navigateTo('/settings')" title="Settings">
 <img alt="User" class="w-8 h-8 rounded-full object-cover ring-2 ring-primary-fixed" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbsCBaIju0fQ_a8Ix8ckQ-KxMEALzspAqj5bECDzEupOD0EKC7s-JGVerFtUCMPb4w_-uMp_bMeJ5jev38-jr3rRT9AkKnd6qR8lhHmItBafI8zGwQmCymegGsDbIIMwD2M7yqNL77aHX9DAFby0rXcXRRRthr0V2BK_K6HaBjn5VG51CK4cDM4YkWcDeJ7WC_QkmnwjjdSgAotIZkbO_cLv-__aAO59kFWwY2Kob6GJAXJf5eGhOhvv6dDh0N7M9KJ796heSUqj4u"/>
 <div>
-<span class="text-sm font-bold text-[#001e41] font-headline block">Dr. Sarah Chen</span>
+<span id="navbar-user-name" class="text-sm font-bold text-[#001e41] font-headline block"></span>
 <span id="navbar-user-role" class="text-[10px] text-outline/50">Admin</span>
 </div>
 </div>
@@ -261,8 +261,7 @@
 <div class="bg-surface-container-lowest p-6 rounded-2xl shadow-sm border-l-4 border-blue-500 flex justify-between items-center group hover:scale-[1.02] transition-transform">
 <div>
 <p class="text-on-surface-variant text-sm font-medium mb-1">Unassigned Tickets</p>
-<h2 class="text-3xl font-extrabold text-on-surface font-headline">24</h2>
-<p class="text-blue-600 text-xs mt-2 font-bold">+5 from last hour</p>
+                    <h2 class="text-3xl font-extrabold text-on-surface font-headline">0</h2>
 </div>
 <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
 <span class="material-symbols-outlined">assignment_late</span>
@@ -271,8 +270,7 @@
 <div class="bg-surface-container-lowest p-6 rounded-2xl shadow-sm border-l-4 border-error flex justify-between items-center group hover:scale-[1.02] transition-transform">
 <div>
 <p class="text-on-surface-variant text-sm font-medium mb-1">Pending Critical Issues</p>
-<h2 class="text-3xl font-extrabold text-on-surface font-headline">07</h2>
-<p class="text-error text-xs mt-2 font-bold">Needs Immediate Action</p>
+                    <h2 class="text-3xl font-extrabold text-on-surface font-headline">0</h2>
 </div>
 <div class="w-12 h-12 bg-error-container rounded-xl flex items-center justify-center text-error group-hover:bg-error group-hover:text-white transition-colors">
 <span class="material-symbols-outlined" data-weight="fill">priority_high</span>
@@ -281,8 +279,7 @@
 <div class="bg-surface-container-lowest p-6 rounded-2xl shadow-sm border-l-4 border-secondary flex justify-between items-center group hover:scale-[1.02] transition-transform">
 <div>
 <p class="text-on-surface-variant text-sm font-medium mb-1">Avg Resolution Time</p>
-<h2 class="text-3xl font-extrabold text-on-surface font-headline">1h 42m</h2>
-<p class="text-secondary text-xs mt-2 font-bold">12% faster than yesterday</p>
+                    <h2 class="text-3xl font-extrabold text-on-surface font-headline">--</h2>
 </div>
 <div class="w-12 h-12 bg-secondary-container rounded-xl flex items-center justify-center text-secondary group-hover:bg-secondary group-hover:text-white transition-colors">
 <span class="material-symbols-outlined">timer</span>
@@ -329,151 +326,14 @@
 <th class="px-6 py-4 text-xs font-extrabold text-on-surface-variant uppercase tracking-wider text-right">Actions</th>
 </tr>
 </thead>
-<tbody class="divide-y divide-slate-50">
-<!-- Critical Ticket Row -->
-<tr class="pulse-critical hover:bg-slate-50/80 transition-colors group">
-<td class="px-6 py-5 font-mono text-xs font-bold text-primary">#ICT-9402</td>
-<td class="px-6 py-5">
-<p class="font-bold text-on-surface text-sm">PACS System Latency in Trauma Bay</p>
-<p class="text-xs text-on-surface-variant mt-1">Reported 12m ago
-</td>
-<td class="px-6 py-5">
-<span class="px-3 py-1 bg-primary-fixed text-on-primary-fixed-variant rounded-full text-[10px] font-bold uppercase tracking-wider">Radiology</span>
-</td>
-<td class="px-6 py-5">
-<span class="flex items-center gap-1.5 text-error font-bold text-xs">
-<span class="w-2 h-2 rounded-full bg-error animate-pulse"></span>
-                                        Critical
-                                    </span>
-</td>
-<td class="px-6 py-5">
-<span class="text-xs text-slate-400 italic">Unassigned</span>
-</td>
-<td class="px-6 py-5">
-<span class="px-3 py-1 bg-error-container text-on-error-container rounded-full text-[10px] font-bold uppercase">New</span>
-</td>
-<td class="px-6 py-5 text-right">
-<div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-<button class="p-2 bg-primary text-white rounded-lg hover:scale-110 transition-transform" title="Assign to Me">
-<span class="material-symbols-outlined text-sm">person_add</span>
-</button>
-<button class="p-2 bg-surface-container text-primary rounded-lg hover:scale-110 transition-transform" title="View Details">
-<span class="material-symbols-outlined text-sm">visibility</span>
-</button>
-</div>
-</td>
-</tr>
-<!-- Standard Row -->
-<tr class="hover:bg-slate-50 transition-colors group">
-<td class="px-6 py-5 font-mono text-xs font-bold text-primary">#ICT-9398</td>
-<td class="px-6 py-5">
-<p class="font-bold text-on-surface text-sm">HIS Login Failure - Nursing Station 4</p>
-<p class="text-xs text-on-surface-variant mt-1">Reported 45m ago
-</td>
-<td class="px-6 py-5">
-<span class="px-3 py-1 bg-primary-fixed text-on-primary-fixed-variant rounded-full text-[10px] font-bold uppercase tracking-wider">Emergency</span>
-</td>
-<td class="px-6 py-5">
-<span class="flex items-center gap-1.5 text-on-tertiary-container font-bold text-xs">
-<span class="w-2 h-2 rounded-full bg-on-tertiary-container"></span>
-                                        High
-                                    </span>
-</td>
-<td class="px-6 py-5">
-<div class="flex items-center gap-2">
-<img class="w-6 h-6 rounded-full object-cover" data-alt="portrait of a young tech professional with a clean modern look" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD96tuW_TeOQ151bFjJWTY7RKbQ1VrQN25WTpVEPAqMSyjB4m9Nm-Nnz-P6E9RbqCQsZF21qw6s4PL4D9ahNHBJBfpugo4R_MHJrhQzlbu-7xX_X2Khl7Vhh2kmpdcD9D2dj2p-CfwekRa0bNU9OMeImOqU6vaOBmpLbrdEfGC99vvzdEf-cLWjMwDEZef1M86YzuJ1HuUx3UlLqmqwatei-9jbc_fEdFouqGqbqIsYAt0lXKo3QbcpmSe7rGciKv9QZH3dIhcd-QgX"/>
-<span class="text-xs font-semibold text-on-surface">Alex Rivera</span>
-</div>
-</td>
-<td class="px-6 py-5">
-<span class="px-3 py-1 bg-secondary-container text-on-secondary-container rounded-full text-[10px] font-bold uppercase">In Progress</span>
-</td>
-<td class="px-6 py-5 text-right">
-<div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-<button class="p-2 bg-surface-container text-primary rounded-lg hover:scale-110 transition-transform">
-<span class="material-symbols-outlined text-sm">edit</span>
-</button>
-<button class="p-2 bg-surface-container text-primary rounded-lg hover:scale-110 transition-transform">
-<span class="material-symbols-outlined text-sm">visibility</span>
-</button>
-</div>
-</td>
-</tr>
-<!-- Third Row -->
-<tr class="hover:bg-slate-50 transition-colors group">
-<td class="px-6 py-5 font-mono text-xs font-bold text-primary">#ICT-9395</td>
-<td class="px-6 py-5">
-<p class="font-bold text-on-surface text-sm">Smart Pump Firmware Update Required</p>
-<p class="text-xs text-on-surface-variant mt-1">Reported 2h ago
-</td>
-<td class="px-6 py-5">
-<span class="px-3 py-1 bg-primary-fixed text-on-primary-fixed-variant rounded-full text-[10px] font-bold uppercase tracking-wider">Cardiology</span>
-</td>
-<td class="px-6 py-5">
-<span class="flex items-center gap-1.5 text-slate-500 font-bold text-xs">
-<span class="w-2 h-2 rounded-full bg-slate-400"></span>
-                                        Medium
-                                    </span>
-</td>
-<td class="px-6 py-5">
-<div class="flex items-center gap-2">
-<img class="w-6 h-6 rounded-full object-cover" data-alt="professional woman in a clinical environment looking focused" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDEtc2Xxw7AEVZJKmSP-GRo0TkVyfeR--yuJFYpXodzUC1RfnWNID12Ww5UuybZrrEBzA__Nc1sR8K9ZHp6CV9nkn775YDHCG1K7g1Va5H5R_T1mRo3V02nQ-XuY6YP-VhH8eVj86tX2tsydtDoaAqqZqYjAiafSykBn__6FW7N1DQtRnaWuDhJohWoMTkVb2bALSOaxK7n4UMEYoJVK6zaJDXFP6JHJ5m5GRjWB31tk-CWamEbGjVkPCmcuORdwgrVDum5YlgarEJA"/>
-<span class="text-xs font-semibold text-on-surface">Sarah Chen</span>
-</div>
-</td>
-<td class="px-6 py-5">
-<span class="px-3 py-1 bg-tertiary-fixed text-on-tertiary-fixed-variant rounded-full text-[10px] font-bold uppercase">Pending Vendor</span>
-</td>
-<td class="px-6 py-5 text-right">
-<div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-<button class="p-2 bg-surface-container text-primary rounded-lg hover:scale-110 transition-transform">
-<span class="material-symbols-outlined text-sm">edit</span>
-</button>
-<button class="p-2 bg-surface-container text-primary rounded-lg hover:scale-110 transition-transform">
-<span class="material-symbols-outlined text-sm">visibility</span>
-</button>
-</div>
-</td>
-</tr>
-<!-- Resolved Row -->
-<tr class="hover:bg-slate-50 transition-colors group opacity-60">
-<td class="px-6 py-5 font-mono text-xs font-bold text-primary">#ICT-9390</td>
-<td class="px-6 py-5">
-<p class="font-bold text-on-surface text-sm line-through decoration-slate-300">New Workstation Setup - L3 Admin</p>
-<p class="text-xs text-on-surface-variant mt-1">Resolved 1h ago
-</td>
-<td class="px-6 py-5">
-<span class="px-3 py-1 bg-slate-200 text-slate-600 rounded-full text-[10px] font-bold uppercase tracking-wider">Admin</span>
-</td>
-<td class="px-6 py-5">
-<span class="flex items-center gap-1.5 text-slate-400 font-bold text-xs">
-<span class="w-2 h-2 rounded-full bg-slate-300"></span>
-                                        Low
-                                    </span>
-</td>
-<td class="px-6 py-5">
-<div class="flex items-center gap-2">
-<img class="w-6 h-6 rounded-full object-cover" data-alt="male technician with a friendly smile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjv5EyGuuDGibkqARRtUBC4NiR2bsnz-s2zGZxJz3zfsqmh5OHvsdzuCLo2Jxu3VAT4YYmZYyRA_nPFuz0fdMwpJQH_DdBm0rruO8bq3GHw7De3oO6zsuw7KkeGCTG94Y1KBXVW073Hj66DpKGHFGNkHvRfIoEZIh996EAyea_6sHy9zs2H_pCo3LkW1RzAc2RTGehZd3v5JdBQwmLR6UIDRmVOtG0jOXNLus8oYeZuavf_dN3rb0Inwm8t9F5J6GeLGgYSMOMdgkb"/>
-<span class="text-xs font-semibold text-on-surface">Mark Hudson</span>
-</div>
-</td>
-<td class="px-6 py-5">
-<span class="px-3 py-1 bg-slate-100 text-slate-500 rounded-full text-[10px] font-bold uppercase">Resolved</span>
-</td>
-<td class="px-6 py-5 text-right">
-<div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-<button class="p-2 bg-surface-container text-primary rounded-lg hover:scale-110 transition-transform">
-<span class="material-symbols-outlined text-sm">visibility</span>
-</button>
-</div>
-</td>
-</tr>
-</tbody>
+            <tbody class="divide-y divide-slate-50">
+                <tr><td colspan="7" class="px-6 py-12 text-center text-sm text-outline">No tickets to display</td></tr>
+            </tbody>
 </table>
 </div>
 <!-- Pagination -->
 <div class="px-8 py-4 bg-slate-50 flex justify-between items-center border-t border-slate-100">
-<p class="text-xs font-medium text-on-surface-variant">Showing <span class="font-bold">1-10</span> of <span class="font-bold">142</span> tickets</p>
+<p class="text-xs font-medium text-on-surface-variant">No tickets to display</p>
 <div class="flex gap-2">
 <button class="p-2 rounded-lg border border-slate-200 hover:bg-white disabled:opacity-50" disabled="">
 <span class="material-symbols-outlined text-sm">chevron_left</span>
@@ -651,47 +511,16 @@ document.addEventListener('DOMContentLoaded', function() {
 <div class="flex items-center justify-between px-6 py-4 border-b border-outline-variant/30">
 <div class="flex items-center gap-3">
 <h3 class="text-lg font-bold text-[#001e41] font-headline">Notifications</h3>
-<span class="text-xs bg-error text-white px-2 py-0.5 rounded-full font-medium" id="notif-count">3</span>
+<span class="text-xs bg-error text-white px-2 py-0.5 rounded-full font-medium" id="notif-count">0</span>
 </div>
 <button onclick="closeNotificationDrawer()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-higher transition-colors">
 <span class="material-symbols-outlined text-on-surface-variant">close</span>
 </button>
 </div>
 <div class="flex-1 overflow-y-auto" id="notif-list">
-<div class="px-6 py-4 hover:bg-surface-container-low transition-colors cursor-pointer border-b border-outline-variant/10">
-<div class="flex items-start gap-3">
-<span class="material-symbols-outlined text-primary mt-0.5">assignment</span>
-<div class="flex-1 min-w-0">
-<p class="text-sm font-semibold text-[#001e41]">Ticket #1042 Resolved</p>
-<p class="text-xs text-on-surface-variant mt-0.5">Your reported network issue in Ward 3 has been resolved.</p>
-<p class="text-[10px] text-on-surface-variant/60 mt-1">2 min ago</p>
-</div>
-<span class="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-2"></span>
-</div>
-</div>
-<div class="px-6 py-4 hover:bg-surface-container-low transition-colors cursor-pointer border-b border-outline-variant/10">
-<div class="flex items-start gap-3">
-<span class="material-symbols-outlined text-[#f59e0b] mt-0.5">warning</span>
-<div class="flex-1 min-w-0">
-<p class="text-sm font-semibold text-[#001e41]">System Maintenance</p>
-<p class="text-xs text-on-surface-variant mt-0.5">Scheduled downtime on Sunday 02:00-04:00 AM for server updates.</p>
-<p class="text-[10px] text-on-surface-variant/60 mt-1">1 hour ago</p>
-</div>
-<span class="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-2"></span>
-</div>
-</div>
-<div class="px-6 py-4 hover:bg-surface-container-low transition-colors cursor-pointer border-b border-outline-variant/10">
-<div class="flex items-start gap-3">
-<span class="material-symbols-outlined text-green-600 mt-0.5">check_circle</span>
-<div class="flex-1 min-w-0">
-<p class="text-sm font-semibold text-[#001e41]">New Software Update</p>
-<p class="text-xs text-on-surface-variant mt-0.5">EMR system v3.2 is ready for installation. Contact ICT for deployment.</p>
-<p class="text-[10px] text-on-surface-variant/60 mt-1">3 hours ago</p>
-</div>
-<span class="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-2"></span>
-</div>
-</div>
-</div>
+<div class="px-6 py-8 text-center">
+<p class="text-sm text-on-surface-variant">No new notifications</p>
+</div></div>
 <div class="px-6 py-3 border-t border-outline-variant/30 text-center">
 <button class="text-sm text-primary font-medium hover:underline" onclick="markAllNotificationsRead()">Mark all as read</button>
 </div>
