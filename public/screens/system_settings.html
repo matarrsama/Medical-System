@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Clinical Intelligence - Settings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-secondary": "#ffffff",
+                        "tertiary": "#371300",
+                        "primary-fixed": "#d6e3ff",
+                        "surface-container-highest": "#f3f4f6",
+                        "on-secondary-fixed": "#002020",
+                        "on-primary-fixed": "#001b3c",
+                        "on-tertiary-fixed-variant": "#773200",
+                        "surface-container-low": "#ffffff",
+                        "outline-variant": "#e5e7eb",
+                        "surface-tint": "#455f88",
+                        "primary": "#001e41",
+                        "on-primary-fixed-variant": "#2d476f",
+                        "inverse-surface": "#2c3134",
+                        "on-secondary-container": "#13696a",
+                        "surface": "#fcfcfd",
+                        "on-primary-container": "#839cc9",
+                        "secondary-container": "#e0f2f2",
+                        "primary-container": "#f0f4f8",
+                        "tertiary-fixed-dim": "#ffb68f",
+                        "tertiary-container": "#592300",
+                        "secondary-fixed-dim": "#89d3d4",
+                        "surface-container-high": "#f9fafb",
+                        "on-tertiary-container": "#f17a2f",
+                        "inverse-on-surface": "#edf1f5",
+                        "secondary-fixed": "#a5eff0",
+                        "on-secondary-fixed-variant": "#004f50",
+                        "tertiary-fixed": "#ffdbca",
+                        "on-error-container": "#93000a",
+                        "error": "#ba1a1a",
+                        "on-surface-variant": "#64748b",
+                        "on-background": "#1e293b",
+                        "surface-bright": "#ffffff",
+                        "secondary": "#13696a",
+                        "on-tertiary": "#ffffff",
+                        "error-container": "#fee2e2",
+                        "surface-dim": "#f1f5f9",
+                        "surface-container-lowest": "#ffffff",
+                        "on-surface": "#1e293b",
+                        "on-error": "#ffffff",
+                        "outline": "#94a3b8",
+                        "surface-variant": "#f8fafc",
+                        "surface-container": "#ffffff",
+                        "on-tertiary-fixed": "#331100",
+                        "inverse-primary": "#adc7f7",
+                        "primary-fixed-dim": "#adc7f7",
+                        "background": "#ffffff",
+                        "on-primary": "#ffffff"
+                    },
+                    fontFamily: {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.375rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .primary-gradient { background: linear-gradient(135deg, #001e41 0%, #17335a 100%); }
+.premium-shadow {
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05), 0 0 0 1px rgb(0 0 0 / 0.02);
+        }
+        .premium-card {
+            background: #ffffff;
+            border: 1px solid rgba(229, 231, 235, 0.5);
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .skeleton-pulse {
+            animation: shimmer 1.5s ease-in-out infinite;
+            background: linear-gradient(90deg, #e4e9ed 25%, #f0f4f8 50%, #e4e9ed 75%);
+            background-size: 200% 100%;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface min-h-screen">
+<!-- SideNavBar (Desktop Only) -->
+<aside class="fixed left-0 top-16 bottom-0 w-64 bg-[#f6fafe] dark:bg-[#171c1f] flex flex-col py-4 px-4 gap-2 z-40 overflow-hidden">
+
+<script>
+(function() {
+    function applySettings() {
+        try {
+            var settings = JSON.parse(localStorage.getItem('ci_app_settings') || '{}');
+            var year = new Date().getFullYear();
+            if (settings.appName) {
+                var na = document.getElementById('navbar-app-name');
+                if (na) na.textContent = settings.appName;
+            }
+            if (settings.tagline) {
+                var nt = document.getElementById('navbar-tagline');
+                if (nt) nt.textContent = settings.tagline;
+            }
+            if (settings.footerText) {
+                var hf = document.getElementById('help-footer');
+                if (hf) hf.innerHTML = (settings.version || 'v1.0.0') + ' \u00A9 ' + year + ' ' + settings.footerText;
+                var mf = document.getElementById('main-footer');
+                if (mf) mf.innerHTML = (settings.version || 'v1.0.0') + ' \u00A9 ' + year + ' ' + settings.footerText;
+            }
+            var raw = localStorage.getItem('clinicalUser') || sessionStorage.getItem('clinicalUser');
+            if (raw) {
+                var user = JSON.parse(raw);
+                var roleEl = document.getElementById('navbar-user-role');
+                if (roleEl && user.role) roleEl.textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
+            }
+        } catch(e) {}
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', applySettings);
+    } else {
+        applySettings();
+    }
+})();
+</script>
+<nav class="flex-1 space-y-1 overflow-y-auto">
+<a class="flex items-center gap-3 px-4 py-3 text-[#44474e] opacity-80 font-medium text-sm hover:bg-[#eaeef2] transition-all duration-300 rounded-lg group" href="javascript:void(0)" onclick="return navigateTo('/ict-support')">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">dashboard</span> Dashboard</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-white text-[#001e41] rounded-lg shadow-sm font-semibold text-sm transition-all duration-300" href="javascript:void(0)" onclick="return navigateTo('/my-tickets')">
+<span class="material-symbols-outlined">confirmation_number</span> Tickets</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#44474e] opacity-80 font-medium text-sm hover:bg-[#eaeef2] transition-all duration-300 rounded-lg group" href="javascript:void(0)" onclick="return navigateTo('/knowledge-base')">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">auto_stories</span> Knowledge Base</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#44474e] opacity-80 font-medium text-sm hover:bg-[#eaeef2] transition-all duration-300 rounded-lg group" href="javascript:void(0)" onclick="return navigateTo('/ict-analytics')">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">analytics</span> Analytics</a>
+<a id="nav-admin" class="flex items-center gap-3 px-4 py-3 text-[#44474e] opacity-80 font-medium text-sm hover:bg-[#eaeef2] transition-all duration-300 rounded-lg group" href="javascript:void(0)" onclick="return navigateTo('/admin/users')">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">admin_panel_settings</span>
+                User Mgmt
+            </a>
+<a id="nav-app-settings" class="flex items-center gap-3 px-4 py-3 text-[#44474e] opacity-80 font-medium text-sm hover:bg-[#eaeef2] transition-all duration-300 rounded-lg group" href="javascript:void(0)" onclick="return navigateTo('/admin/app-settings')">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">brand_awareness</span> App Settings</a>
+<a id="nav-settings" class="flex items-center gap-3 px-4 py-3 text-[#44474e] opacity-80 font-medium text-sm hover:bg-[#eaeef2] transition-all duration-300 rounded-lg group" href="javascript:void(0)" onclick="return navigateTo('/settings')">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">settings</span> Settings</a>
+</nav>
+<script>
+(function() {
+    function isAdminOrIct() {
+        try {
+            var raw = localStorage.getItem('clinicalUser') || sessionStorage.getItem('clinicalUser');
+            if (raw) {
+                var role = JSON.parse(raw).role;
+                return role === 'admin' || role === 'ict' || role === 'hospital_administrator';
+            }
+        } catch(e) {}
+        return false;
+    }
+    if (!isAdminOrIct()) {
+        var els = document.querySelectorAll('#nav-admin, #nav-app-settings');
+        for (var i = 0; i < els.length; i++) {
+            if (els[i]) els[i].style.display = 'none';
+        }
+    }
+})();
+</script>
+<div class="mt-auto">
+<button class="w-full primary-gradient text-white font-headline font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-md hover:shadow-lg active:scale-95 transition-all" onclick="return openNewTicketModal()">
+<span class="material-symbols-outlined">add</span> New Ticket</button>
+<button onclick="signOut()" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 mt-2 text-red-500/70 hover:text-red-500 hover:bg-red-50 rounded-lg text-sm font-medium transition-all active:scale-95">
+<span class="material-symbols-outlined text-lg">logout</span>
+                Sign Out
+            </button>
+</div>
+</aside>
+<!-- TopAppBar Anchor -->
+<header class="fixed top-0 right-0 left-0 z-50 h-16 bg-[#f6fafe]/80 backdrop-blur-lg flex items-center justify-between px-8 shadow-sm">
+<a href="javascript:void(0)" onclick="return navigateTo('/ict-support')" class="flex items-center gap-3 mr-4 cursor-pointer flex-shrink-0">
+<div class="w-9 h-9 rounded-xl primary-gradient flex items-center justify-center text-white shadow-md flex-shrink-0">
+<span class="material-symbols-outlined text-lg">medical_services</span>
+</div>
+<div class="hidden md:block">
+<h1 id="navbar-app-name" class="font-headline font-bold text-sm text-[#001e41] leading-tight">ICT Support</h1>
+<p id="navbar-tagline" class="text-[9px] uppercase tracking-widest text-outline">Central Medical ICT</p>
+</div>
+</a>
+<div class="flex items-center gap-4">
+<div class="relative flex items-center">
+  <span class="material-symbols-outlined absolute left-3 text-outline" style="font-size: 18px;">search</span>
+  <input id="global-search" type="text" readonly placeholder="Search tickets, knowledge base..." class="w-80 pl-9 pr-8 py-2 bg-surface-container-low border border-outline-variant/30 rounded-lg text-sm text-on-surface placeholder-on-surface-variant/60 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all">
+  <span class="absolute right-2.5 text-[10px] font-medium text-outline bg-surface-container-highest px-1.5 py-0.5 rounded border border-outline-variant/20 pointer-events-none">/</span>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative group">
+<span id="notification-bell" class="material-symbols-outlined text-[#44474e] cursor-pointer" onclick="openNotificationDrawer()">notifications</span>
+<span class="absolute -top-1 -right-1 w-2 h-2 bg-error rounded-full"></span>
+</div>
+<span id="help-button" class="material-symbols-outlined text-[#44474e] cursor-pointer" onclick="openHelpDrawer()">help_outline</span>
+<div class="flex items-center gap-3 pl-4 border-l border-outline-variant/30 cursor-pointer" onclick="return navigateTo('/settings')" title="Settings">
+<img alt="User" class="w-8 h-8 rounded-full object-cover ring-2 ring-primary-fixed" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbsCBaIju0fQ_a8Ix8ckQ-KxMEALzspAqj5bECDzEupOD0EKC7s-JGVerFtUCMPb4w_-uMp_bMeJ5jev38-jr3rRT9AkKnd6qR8lhHmItBafI8zGwQmCymegGsDbIIMwD2M7yqNL77aHX9DAFby0rXcXRRRthr0V2BK_K6HaBjn5VG51CK4cDM4YkWcDeJ7WC_QkmnwjjdSgAotIZkbO_cLv-__aAO59kFWwY2Kob6GJAXJf5eGhOhvv6dDh0N7M9KJ796heSUqj4u"/>
+<div>
+<span class="text-sm font-bold text-[#001e41] font-headline block">Dr. Sarah Chen</span>
+<span id="navbar-user-role" class="text-[10px] text-outline/50">Admin</span>
+</div>
+</div>
+</div>
+<div class="bg-[#dfe3e7]/30 h-[1px] w-full absolute bottom-0 left-0"></div>
+</header>
+<!-- Main Canvas -->
+<main class="ml-64 pt-16 pb-20 px-6 md:px-12 max-w-7xl mx-auto relative">
+<div id="page-skeleton" class="absolute inset-0 z-40 bg-background p-8 transition-opacity duration-500">
+  <div class="skeleton-pulse h-8 w-72 mb-8"></div>
+  <div class="skeleton-pulse h-4 w-full mb-4"></div>
+  <div class="skeleton-pulse h-4 w-3/4 mb-4"></div>
+  <div class="grid grid-cols-3 gap-6 mb-6">
+    <div class="skeleton-pulse h-28 rounded-xl"></div>
+    <div class="skeleton-pulse h-28 rounded-xl"></div>
+    <div class="skeleton-pulse h-28 rounded-xl"></div>
+  </div>
+  <div class="skeleton-pulse h-48 w-full rounded-xl"></div>
+</div>
+<header class="mb-10">
+<h1 class="font-headline text-3xl font-extrabold text-primary tracking-tight mb-1">Settings</h1>
+<p class="text-on-surface-variant font-body text-sm">Manage your profile, system preferences, and security protocols.</p>
+</header>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+<!-- Main Configuration Section -->
+<section class="lg:col-span-8 space-y-6">
+<!-- Profile Information Card -->
+<div class="premium-card p-8 rounded-2xl">
+<div class="flex flex-col md:flex-row md:items-center gap-6 mb-8 pb-8 border-b border-outline-variant/30">
+<div class="relative group w-fit">
+<div class="h-24 w-24 rounded-2xl overflow-hidden border-2 border-surface-container-highest shadow-inner">
+<img class="h-full w-full object-cover" data-alt="Marcus Holloway avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCNFGIKMojkdm0PtdIrjnczRRTehVuNswpxFqKhgYkhP51RsOLCNHOS8ADcfwQWlWGV59s5nuSERgUISRt5fr2WjWKeh1G6CFGLwwMWsrR9_xhcAalLynHS8EWPsyZd72OKsUmRZ00vMhWguMpwIpLjAazh8PifhzCG32MwCRtXjfkBWNklxhzvrZyneDoTvCycyAvuWbbdilAIAPNuWXyYUUBDvIqHoMyp-vYVPzX84BQIjoTX6-goH6e5O5ZZ55TTUW0fndmEXk4I"/>
+</div>
+<button class="absolute -bottom-2 -right-2 h-8 w-8 bg-primary rounded-full flex items-center justify-center text-white shadow-lg border-2 border-white hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[16px]">photo_camera</span>
+</button>
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-3 mb-1">
+<h3 class="font-headline font-bold text-2xl text-primary tracking-tight">Marcus Holloway</h3>
+<span class="px-2 py-0.5 bg-secondary-container text-on-secondary-container text-[10px] font-bold uppercase tracking-wider rounded-md">On Duty</span>
+</div>
+<p class="text-on-surface-variant text-sm font-medium">Senior ICT Officer � Infrastructure &amp; Systems</p>
+<p class="text-xs text-outline mt-1">Last login: 2 hours ago from San Francisco, US</p>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="space-y-1.5">
+<label class="text-[11px] font-bold text-outline uppercase tracking-widest ml-1">Full Name</label>
+<input class="w-full bg-surface-container-highest border border-outline-variant/50 focus:border-primary focus:ring-2 focus:ring-primary/5 rounded-xl px-4 py-3 text-sm font-medium transition-all" type="text" value="Marcus Holloway"/>
+</div>
+<div class="space-y-1.5">
+<label class="text-[11px] font-bold text-outline uppercase tracking-widest ml-1">Employee ID</label>
+<input class="w-full bg-surface-container-highest border border-outline-variant/50 focus:border-primary focus:ring-2 focus:ring-primary/5 rounded-xl px-4 py-3 text-sm font-medium transition-all" type="text" value="ICT-99420-MH"/>
+</div>
+<div class="space-y-1.5 md:col-span-2">
+<label class="text-[11px] font-bold text-outline uppercase tracking-widest ml-1">Department</label>
+<select class="w-full bg-surface-container-highest border border-outline-variant/50 focus:border-primary focus:ring-2 focus:ring-primary/5 rounded-xl px-4 py-3 text-sm font-medium transition-all appearance-none">
+<option>Central Medical ICT</option>
+<option>Radiology IT</option>
+<option>Emergency Systems</option>
+<option>Patient Records</option>
+</select>
+</div>
+</div>
+</div>
+<!-- Notification Preferences Card -->
+<div class="premium-card p-8 rounded-2xl">
+<div class="flex items-center gap-3 mb-6">
+<span class="material-symbols-outlined text-primary bg-primary/5 p-2 rounded-lg">notifications</span>
+<h3 class="font-headline font-bold text-xl text-primary tracking-tight">Notification Preferences</h3>
+</div>
+<div class="space-y-4">
+<div class="flex items-center justify-between p-4 bg-surface-container-high rounded-xl border border-outline-variant/20">
+<div>
+<p class="font-semibold text-primary text-sm">Email Notifications</p>
+<p class="text-xs text-on-surface-variant">Daily activity summary and critical ticket alerts</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-10 h-5 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-container-high rounded-xl border border-outline-variant/20">
+<div>
+<p class="font-semibold text-primary text-sm">Real-time Browser Push</p>
+<p class="text-xs text-on-surface-variant">Instant alerts while you're working in the browser</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-10 h-5 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<div class="flex items-center justify-between p-4 bg-error-container/10 rounded-xl border border-error/10">
+<div>
+<p class="font-semibold text-primary text-sm">Critical SMS Escalation</p>
+<p class="text-xs text-on-surface-variant">Direct SMS for P1 Critical Medical System Failures</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox"/>
+<div class="w-10 h-5 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+</div>
+</section>
+<!-- Sidebar Configs -->
+<aside class="lg:col-span-4 space-y-6">
+<!-- Security Card -->
+<div class="premium-card p-6 rounded-2xl">
+<div class="flex items-center gap-3 mb-5">
+<span class="material-symbols-outlined text-primary bg-primary/5 p-2 rounded-lg">security</span>
+<h3 class="font-headline font-bold text-lg text-primary tracking-tight">Security</h3>
+</div>
+<div class="space-y-3">
+<button class="w-full flex items-center justify-between px-4 py-3 bg-surface-container-high hover:bg-surface-container-highest border border-outline-variant/30 transition-colors rounded-xl text-sm font-semibold text-primary">
+                        Change Password
+                        <span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+<div class="p-4 bg-primary/5 rounded-xl border border-primary/10">
+<div class="flex items-center justify-between mb-2">
+<span class="text-xs font-bold text-primary">Two-Factor (2FA)</span>
+<span class="px-2 py-0.5 bg-primary text-white text-[9px] font-bold rounded">ENABLED</span>
+</div>
+<p class="text-[10px] text-on-surface-variant leading-relaxed">Secured via Authenticator and biometric passkey.</p>
+</div>
+</div>
+</div>
+<!-- System Configuration Card -->
+<div class="premium-card p-6 rounded-2xl">
+<div class="flex items-center gap-3 mb-5">
+<span class="material-symbols-outlined text-primary bg-primary/5 p-2 rounded-lg">settings_suggest</span>
+<h3 class="font-headline font-bold text-lg text-primary tracking-tight">System</h3>
+</div>
+<div class="space-y-5">
+<div class="space-y-2">
+<label class="text-[10px] font-bold text-outline uppercase tracking-widest px-1">Interface Theme</label>
+<div class="grid grid-cols-2 gap-2 p-1 bg-surface-container-highest rounded-xl">
+<button class="flex items-center justify-center gap-2 py-2 px-3 bg-white shadow-sm rounded-lg text-primary text-xs font-bold transition-all">
+<span class="material-symbols-outlined text-sm">light_mode</span>
+                                Light
+                            </button>
+<button class="flex items-center justify-center gap-2 py-2 px-3 hover:bg-white/50 transition-colors rounded-lg text-on-surface-variant text-xs font-semibold">
+<span class="material-symbols-outlined text-sm">dark_mode</span>
+                                Dark
+                            </button>
+</div>
+</div>
+<div class="space-y-2">
+<label class="text-[10px] font-bold text-outline uppercase tracking-widest px-1">Language</label>
+<select class="w-full bg-surface-container-highest border border-outline-variant/30 focus:ring-2 focus:ring-primary/5 rounded-xl px-3 py-2.5 text-xs font-semibold transition-all shadow-sm">
+<option>English (Medical Standard)</option>
+<option>Deutsch</option>
+<option>Fran?ais</option>
+<option>Espa?ol</option>
+</select>
+</div>
+<div class="pt-4 border-t border-outline-variant/30 flex items-center justify-between">
+<span class="text-[10px] font-bold text-outline uppercase tracking-widest">Version</span>
+<span class="text-[10px] font-bold text-primary bg-primary/5 px-2 py-0.5 rounded">v4.12.0-STABLE</span>
+</div>
+</div>
+</div>
+<!-- Danger Zone -->
+<button class="w-full py-3.5 border border-error/20 text-error hover:bg-error/5 transition-colors rounded-xl font-headline font-bold text-sm">
+                Logout of All Devices
+            </button>
+</aside>
+</div>
+<!-- Floating Action Area -->
+<div class="fixed bottom-8 right-8 left-8 md:left-auto md:w-80 flex flex-col gap-4 z-50">
+<button class="w-full h-14 bg-primary text-white rounded-2xl font-headline font-bold text-base shadow-2xl shadow-primary/30 flex items-center justify-center gap-3 active:scale-95 hover:bg-primary/95 transition-all">
+<span class="material-symbols-outlined">save</span>
+            Save All Changes
+        </button>
+</div>
+<footer class="text-center text-[10px] text-outline/40 py-5 border-t border-outline-variant/10 mt-12"><p id="main-footer">Clinical Intelligence Platform &copy; 2026</p></footer>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-white/95 backdrop-blur-xl flex items-center justify-around px-4 z-40 border-t border-outline-variant/30">
+<button class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px] font-medium">Home</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined">confirmation_number</span>
+<span class="text-[10px] font-medium">Tickets</span>
+</button>
+<div class="h-12 w-12 bg-primary -mt-8 rounded-2xl flex items-center justify-center text-white shadow-lg active:scale-90 transition-transform">
+<span class="material-symbols-outlined">add</span>
+</div>
+<button class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-[10px] font-medium">Stats</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span class="text-[10px] font-bold">Settings</span>
+</button>
+</nav>
+<script>
+
+var SEARCH_ITEMS = [
+    { label: 'Dashboard', path: '/ict-support', icon: 'dashboard', keywords: 'dashboard support home ict' },
+    { label: 'My Tickets', path: '/my-tickets', icon: 'confirmation_number', keywords: 'tickets my tickets requests' },
+    { label: 'Knowledge Base', path: '/knowledge-base', icon: 'auto_stories', keywords: 'knowledge base docs documentation' },
+    { label: 'Analytics', path: '/ict-analytics', icon: 'analytics', keywords: 'analytics statistics reports charts' },
+    { label: 'User Management', path: '/admin/users', icon: 'admin_panel_settings', keywords: 'users admin management provision' },
+    { label: 'App Settings', path: '/admin/app-settings', icon: 'brand_awareness', keywords: 'app settings branding theme logo' },
+    { label: 'Settings', path: '/settings', icon: 'settings', keywords: 'settings profile preferences password' },
+    { label: 'Emergency Ops', path: '/emergency', icon: 'emergency', keywords: 'emergency critical urgent alerts' },
+];
+function performSearch(query) {
+    var el = document.getElementById('search-results');
+    if (!query || query.trim().length < 2) {
+        el.innerHTML = '<div class="p-8 text-center text-sm text-on-surface-variant"><span class="material-symbols-outlined text-3xl mb-2 block text-outline/40">search</span>Type to start searching...</div>';
+        return;
+    }
+    var q = query.toLowerCase().trim();
+    var results = [];
+    for (var i = 0; i < SEARCH_ITEMS.length; i++) {
+        var item = SEARCH_ITEMS[i];
+        if (item.label.toLowerCase().indexOf(q) !== -1 || item.keywords.indexOf(q) !== -1) {
+            results.push(item);
+        }
+    }
+    if (results.length === 0) {
+        el.innerHTML = '<div class="p-8 text-center text-sm text-on-surface-variant"><span class="material-symbols-outlined text-3xl mb-2 block text-outline/40">search_off</span>No results found</div>';
+        return;
+    }
+    var html = '';
+    for (var i = 0; i < results.length; i++) {
+        html += '<button class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-surface-container-low transition-all text-left group" onclick="window.parent.postMessage({ type: \'navigate\', path: \'' + results[i].path + '\' }, \'*\'); closeSearchOverlay();">' +
+            '<span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">' + results[i].icon + '</span>' +
+            '<div class="flex-1 min-w-0"><p class="text-sm font-medium text-[#001e41]">' + results[i].label + '</p></div>' +
+            '<span class="text-[10px] text-outline/60 font-mono">' + results[i].path + '</span>' +
+            '</button>';
+    }
+    el.innerHTML = html;
+}
+function openSearchOverlay() {
+    document.getElementById('search-overlay').classList.remove('hidden');
+    document.getElementById('search-overlay').classList.add('flex');
+    document.body.style.overflow = 'hidden';
+    setTimeout(function() {
+        document.getElementById('search-input').focus();
+    }, 100);
+}
+function closeSearchOverlay() {
+    document.getElementById('search-overlay').classList.add('hidden');
+    document.getElementById('search-overlay').classList.remove('flex');
+    document.body.style.overflow = '';
+}
+function cacheSave(key, data) {
+    try { localStorage.setItem('ci_cache_' + key, JSON.stringify(data)); } catch(e) {}
+}
+function cacheLoad(key, fallback) {
+    try { var d = localStorage.getItem('ci_cache_' + key); return d ? JSON.parse(d) : null; } catch(e) {}
+    return fallback;
+}
+function cacheClear() {
+    try {
+        var keysToRemove = [];
+        for (var k in localStorage) { if (localStorage.hasOwnProperty(k) && k.indexOf('ci_cache_') === 0) keysToRemove.push(k); }
+        for (var i = 0; i < keysToRemove.length; i++) localStorage.removeItem(keysToRemove[i]);
+    } catch(e) {}
+}
+function signOut() {
+    showSignOutModal();
+}
+function navigateTo(path) {
+    window.parent.postMessage({ type: 'navigate', path: path }, '*');
+    return false;
+}
+
+</script>
+<script>
+(function() {
+    var links = document.querySelectorAll("nav a");
+    for (var i = 0; i < links.length; i++) {
+        links[i].classList.remove("bg-white", "text-[#001e41]", "rounded-lg", "shadow-sm", "font-semibold");
+        links[i].classList.add("text-[#44474e]", "opacity-80");
+    }
+    try {
+    var path = (window.parent.location.pathname || window.location.pathname).toLowerCase();
+    var navMap = {
+        "admin/app": "/admin/app-settings",
+        dashboard: "/ict-support",
+        ticket: "/my-tickets",
+        request: "/my-tickets",
+        knowledge: "/knowledge-base",
+        analytics: "/ict-analytics",
+        setting: "/settings",
+        admin: "/admin/users",
+        provision: "/settings",
+        role: "/settings",
+        ucu: "/settings",
+        system: "/settings",
+        user: "/admin/users",
+        emergency: "/ict-support",
+        support: "/ict-support",
+        queue: "/ict-support",
+        clinical: "/knowledge-base",
+    };
+    var target = "";
+    for (var key in navMap) {
+        if (path.indexOf(key) !== -1) { target = navMap[key]; break; }
+    }
+    if (!target) return;
+    for (var i = 0; i < links.length; i++) {
+        var oc = links[i].getAttribute("onclick") || "";
+        if (oc.indexOf(target) !== -1) {
+            links[i].classList.add("bg-white", "text-[#001e41]", "rounded-lg", "shadow-sm", "font-semibold");
+            links[i].classList.remove("text-[#44474e]", "opacity-80");
+        }
+    }
+    } catch(e) {}
+})();
+document.addEventListener('DOMContentLoaded', function() {
+    var skeleton = document.getElementById('page-skeleton');
+    if (skeleton) {
+        setTimeout(function() {
+            skeleton.style.opacity = '0';
+            setTimeout(function() { skeleton.remove(); }, 500);
+        }, 400);
+    }
+});
+</script>
+<!-- Sign Out Confirmation Modal -->
+<div id="signout-modal" class="fixed inset-0 z-[400] hidden items-center justify-center bg-black/30 backdrop-blur-sm" onclick="if(event.target===this)cancelSignOut()">
+<div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 mx-4">
+<div class="flex flex-col items-center text-center gap-3">
+<div class="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center">
+<span class="material-symbols-outlined text-red-500 text-2xl" style="font-variation-settings:'FILL' 1">logout</span>
+</div>
+<h3 class="text-lg font-bold text-[#001e41] font-headline">Sign Out</h3>
+<p class="text-sm text-on-surface-variant">Are you sure you want to sign out? You will need to log in again to access the system.</p>
+<div class="flex gap-3 w-full mt-2">
+<button onclick="cancelSignOut()" class="flex-1 px-4 py-2.5 rounded-xl border border-outline-variant text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low transition-all">Cancel</button>
+<button onclick="confirmSignOut()" class="flex-1 px-4 py-2.5 rounded-xl bg-red-500 text-white text-sm font-semibold hover:bg-red-600 transition-all shadow-lg shadow-red-500/20">Sign Out</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Notification Drawer -->
+<div id="notification-drawer" class="fixed inset-0 z-[300] hidden">
+<div id="notification-backdrop" class="absolute inset-0 bg-black/30 backdrop-blur-sm" onclick="closeNotificationDrawer()"></div>
+<div class="absolute top-0 right-0 w-96 h-full bg-white shadow-2xl flex flex-col" style="overscroll-behavior: contain;">
+<div class="flex items-center justify-between px-6 py-4 border-b border-outline-variant/30">
+<div class="flex items-center gap-3">
+<h3 class="text-lg font-bold text-[#001e41] font-headline">Notifications</h3>
+<span class="text-xs bg-error text-white px-2 py-0.5 rounded-full font-medium" id="notif-count">3</span>
+</div>
+<button onclick="closeNotificationDrawer()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-higher transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">close</span>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto" id="notif-list">
+<div class="px-6 py-4 hover:bg-surface-container-low transition-colors cursor-pointer border-b border-outline-variant/10">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary mt-0.5">assignment</span>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-semibold text-[#001e41]">Ticket #1042 Resolved</p>
+<p class="text-xs text-on-surface-variant mt-0.5">Your reported network issue in Ward 3 has been resolved.</p>
+<p class="text-[10px] text-on-surface-variant/60 mt-1">2 min ago</p>
+</div>
+<span class="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-2"></span>
+</div>
+</div>
+<div class="px-6 py-4 hover:bg-surface-container-low transition-colors cursor-pointer border-b border-outline-variant/10">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-[#f59e0b] mt-0.5">warning</span>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-semibold text-[#001e41]">System Maintenance</p>
+<p class="text-xs text-on-surface-variant mt-0.5">Scheduled downtime on Sunday 02:00-04:00 AM for server updates.</p>
+<p class="text-[10px] text-on-surface-variant/60 mt-1">1 hour ago</p>
+</div>
+<span class="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-2"></span>
+</div>
+</div>
+<div class="px-6 py-4 hover:bg-surface-container-low transition-colors cursor-pointer border-b border-outline-variant/10">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-green-600 mt-0.5">check_circle</span>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-semibold text-[#001e41]">New Software Update</p>
+<p class="text-xs text-on-surface-variant mt-0.5">EMR system v3.2 is ready for installation. Contact ICT for deployment.</p>
+<p class="text-[10px] text-on-surface-variant/60 mt-1">3 hours ago</p>
+</div>
+<span class="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-2"></span>
+</div>
+</div>
+</div>
+<div class="px-6 py-3 border-t border-outline-variant/30 text-center">
+<button class="text-sm text-primary font-medium hover:underline" onclick="markAllNotificationsRead()">Mark all as read</button>
+</div>
+</div>
+</div>
+<!-- Help Drawer -->
+<div id="help-drawer" class="fixed inset-0 z-[300] hidden">
+<div id="help-backdrop" class="absolute inset-0 bg-black/30 backdrop-blur-sm" onclick="closeHelpDrawer()"></div>
+<div class="absolute top-0 right-0 w-96 h-full bg-white shadow-2xl flex flex-col" style="overscroll-behavior: contain;">
+<div class="flex items-center justify-between px-6 py-4 border-b border-outline-variant/30">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">help</span>
+<h3 class="text-lg font-bold text-[#001e41] font-headline">Help & Support</h3>
+</div>
+<button onclick="closeHelpDrawer()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-higher transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">close</span>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto p-6 space-y-6">
+<div class="space-y-2">
+<p class="text-[10px] uppercase tracking-widest text-on-surface-variant font-semibold">Quick Actions</p>
+<button class="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-surface-container-low hover:bg-surface-container-higher transition-colors text-left">
+<span class="material-symbols-outlined text-[#001e41]">description</span>
+<div>
+<p class="text-sm font-medium text-[#001e41]">User Guide</p>
+<p class="text-[10px] text-on-surface-variant">Learn how to use the platform</p>
+</div>
+</button>
+<button class="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-surface-container-low hover:bg-surface-container-higher transition-colors text-left">
+<span class="material-symbols-outlined text-[#001e41]">quiz</span>
+<div>
+<p class="text-sm font-medium text-[#001e41]">FAQs</p>
+<p class="text-[10px] text-on-surface-variant">Frequently asked questions</p>
+</div>
+</button>
+<button class="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-surface-container-low hover:bg-surface-container-higher transition-colors text-left">
+<span class="material-symbols-outlined text-[#001e41]">keyboard</span>
+<div>
+<p class="text-sm font-medium text-[#001e41]">Keyboard Shortcuts</p>
+<p class="text-[10px] text-on-surface-variant">Ctrl+N to create a new ticket</p>
+</div>
+</button>
+</div>
+<div class="space-y-2">
+<p class="text-[10px] uppercase tracking-widest text-on-surface-variant font-semibold">Contact Support</p>
+<div class="flex items-center gap-3 px-4 py-3 rounded-xl bg-surface-container-low">
+<span class="material-symbols-outlined text-[#001e41]">mail</span>
+<div>
+<p class="text-sm font-medium text-[#001e41]">Email</p>
+<p class="text-[10px] text-on-surface-variant">ict-support@clinicalintel.com</p>
+</div>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 rounded-xl bg-surface-container-low">
+<span class="material-symbols-outlined text-[#001e41]">phone</span>
+<div>
+<p class="text-sm font-medium text-[#001e41]">Phone</p>
+<p class="text-[10px] text-on-surface-variant">+1 (555) 123-4567</p>
+</div>
+</div>
+</div>
+</div>
+<div class="px-6 py-3 border-t border-outline-variant/30">
+<p id="help-footer" class="text-[10px] text-on-surface-variant/60 text-center">v1.0.0 Clinical Intelligence Platform</p>
+</div>
+</div>
+</div>
+
+<!-- Global Search Overlay -->
+<div id="search-overlay" class="fixed inset-0 z-[500] hidden items-start justify-center pt-[15vh] bg-black/40 backdrop-blur-sm" onclick="if(event.target===this)closeSearchOverlay()">
+<div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-4 overflow-hidden">
+<div class="p-4 border-b border-outline-variant/30">
+<input id="search-input" type="text" placeholder="Search tickets, knowledge base..." class="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/30 rounded-xl text-sm text-on-surface placeholder-on-surface-variant/60 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all" autocomplete="off">
+</div>
+<div id="search-results" class="max-h-96 overflow-y-auto p-2">
+<div class="text-center py-8 text-sm text-on-surface-variant/60">
+<span class="material-symbols-outlined text-3xl block mb-2">search</span>
+Type to start searching...
+</div>
+</div>
+</div>
+</div>
+<div id="new-ticket-overlay" class="fixed inset-0 z-[200] bg-black/40 backdrop-blur-sm hidden items-center justify-center p-4 transition-all duration-300">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden relative">
+    <button onclick="closeNewTicketModal()" class="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-surface-container-hover hover:bg-surface-container-higher transition-colors">
+      <span class="material-symbols-outlined text-on-surface-variant">close</span>
+    </button>
+    <iframe id="new-ticket-iframe" src="/screens/new_ticket_modal.html" class="w-full h-[80vh] border-0" sandbox="allow-scripts allow-same-origin"></iframe>
+  </div>
+</div>
+<script>
+function showSignOutModal() {
+    document.getElementById('signout-modal').classList.remove('hidden');
+    document.getElementById('signout-modal').classList.add('flex');
+    document.body.style.overflow = 'hidden';
+}
+function confirmSignOut() {
+    localStorage.removeItem('clinicalUser');
+    sessionStorage.removeItem('clinicalUser');
+    cacheClear();
+    window.parent.postMessage({ type: 'signout' }, '*');
+}
+function cancelSignOut() {
+    document.getElementById('signout-modal').classList.add('hidden');
+    document.getElementById('signout-modal').classList.remove('flex');
+    document.body.style.overflow = '';
+}
+function openNotificationDrawer() {
+    document.getElementById('notification-drawer').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+function closeNotificationDrawer() {
+    document.getElementById('notification-drawer').classList.add('hidden');
+    document.body.style.overflow = '';
+}
+function markAllNotificationsRead() {
+    var dots = document.querySelectorAll('#notif-list .w-2.h-2.bg-primary');
+    for (var i = 0; i < dots.length; i++) { dots[i].classList.remove('bg-primary'); dots[i].classList.add('bg-outline-variant'); }
+    var count = document.getElementById('notif-count');
+    if (count) count.textContent = '0';
+    var dot = document.getElementById('notification-dot');
+    if (dot) dot.classList.add('hidden');
+}
+function openHelpDrawer() {
+    document.getElementById('help-drawer').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+function closeHelpDrawer() {
+    document.getElementById('help-drawer').classList.add('hidden');
+    document.body.style.overflow = '';
+}
+function openNewTicketModal() {
+    document.getElementById('new-ticket-overlay').classList.remove('hidden');
+    document.getElementById('new-ticket-overlay').classList.add('flex');
+    document.body.style.overflow = 'hidden';
+    return false;
+}
+function closeNewTicketModal() {
+    document.getElementById('new-ticket-overlay').classList.add('hidden');
+    document.getElementById('new-ticket-overlay').classList.remove('flex');
+    document.body.style.overflow = '';
+}
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        if (!document.getElementById('search-overlay').classList.contains('hidden')) closeSearchOverlay();
+        if (!document.getElementById('notification-drawer').classList.contains('hidden')) closeNotificationDrawer();
+        if (!document.getElementById('help-drawer').classList.contains('hidden')) closeHelpDrawer();
+        if (!document.getElementById('signout-modal').classList.contains('hidden')) cancelSignOut();
+    }
+    if (e.key === '/' && !['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) {
+        e.preventDefault();
+        openSearchOverlay();
+    }
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
+        e.preventDefault();
+        openSearchOverlay();
+    }
+});
+document.getElementById('global-search').addEventListener('focus', function() {
+    openSearchOverlay();
+});
+document.getElementById('search-input').addEventListener('input', function() {
+    performSearch(this.value);
+});
+document.getElementById('global-search').addEventListener('focus', function() {
+    openSearchOverlay();
+});
+document.getElementById('search-input').addEventListener('input', function() {
+    performSearch(this.value);
+});
+document.addEventListener('click', function(e) {
+    if (e.target.id === 'new-ticket-overlay') closeNewTicketModal();
+});
+window.addEventListener('message', function(e) {
+    if (e.data.type === 'closeModal') closeNewTicketModal();
+});
+</script>
+</body></html>

@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Tickets | Clinical Intelligence</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "background": "#f6fafe",
+              "on-surface": "#171c1f",
+              "on-primary-fixed": "#001b3c",
+              "surface-container-lowest": "#ffffff",
+              "secondary-container": "#a2eded",
+              "outline": "#737780",
+              "on-tertiary": "#ffffff",
+              "on-primary-container": "#839cc9",
+              "surface-bright": "#f6fafe",
+              "on-surface-variant": "#43474f",
+              "on-secondary-container": "#1a6d6e",
+              "error": "#ba1a1a",
+              "on-background": "#171c1f",
+              "on-error-container": "#93000a",
+              "primary-container": "#17335a",
+              "tertiary-fixed": "#ffdbca",
+              "primary-fixed-dim": "#adc7f7",
+              "surface-dim": "#d6dade",
+              "on-error": "#ffffff",
+              "surface-container": "#eaeef2",
+              "outline-variant": "#c3c6d1",
+              "on-primary": "#ffffff",
+              "secondary-fixed": "#a5eff0",
+              "on-secondary-fixed-variant": "#004f50",
+              "surface-container-low": "#f0f4f8",
+              "tertiary": "#371300",
+              "inverse-primary": "#adc7f7",
+              "on-tertiary-fixed": "#331100",
+              "inverse-surface": "#2c3134",
+              "on-secondary-fixed": "#002020",
+              "surface-container-highest": "#dfe3e7",
+              "error-container": "#ffdad6",
+              "surface-container-high": "#e4e9ed",
+              "on-secondary": "#ffffff",
+              "primary-fixed": "#d6e3ff",
+              "tertiary-container": "#592300",
+              "secondary": "#13696a",
+              "secondary-fixed-dim": "#89d3d4",
+              "surface-variant": "#dfe3e7",
+              "tertiary-fixed-dim": "#ffb68f",
+              "surface": "#f6fafe",
+              "surface-tint": "#455f88",
+              "on-primary-fixed-variant": "#2d476f",
+              "on-tertiary-container": "#f17a2f",
+              "primary": "#001e41",
+              "inverse-on-surface": "#edf1f5",
+              "on-tertiary-fixed-variant": "#773200"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(23, 51, 90, 0.05);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .primary-gradient {
+            background: linear-gradient(135deg, #001e41 0%, #17335a 100%);
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .skeleton-pulse {
+            animation: shimmer 1.5s ease-in-out infinite;
+            background: linear-gradient(90deg, #e4e9ed 25%, #f0f4f8 50%, #e4e9ed 75%);
+            background-size: 200% 100%;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body class="bg-background font-body text-on-surface antialiased">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-16 bottom-0 w-64 bg-[#f6fafe] dark:bg-[#171c1f] flex flex-col py-4 px-4 gap-2 z-40 overflow-hidden">
+<script>
+(function() {
+    function applySettings() {
+        try {
+            var settings = JSON.parse(localStorage.getItem('ci_app_settings') || '{}');
+            var year = new Date().getFullYear();
+            if (settings.appName) {
+                var na = document.getElementById('navbar-app-name');
+                if (na) na.textContent = settings.appName;
+            }
+            if (settings.tagline) {
+                var nt = document.getElementById('navbar-tagline');
+                if (nt) nt.textContent = settings.tagline;
+            }
+            if (settings.footerText) {
+                var hf = document.getElementById('help-footer');
+                if (hf) hf.innerHTML = (settings.version || 'v1.0.0') + ' \u00A9 ' + year + ' ' + settings.footerText;
+                var mf = document.getElementById('main-footer');
+                if (mf) mf.innerHTML = (settings.version || 'v1.0.0') + ' \u00A9 ' + year + ' ' + settings.footerText;
+            }
+            var raw = localStorage.getItem('clinicalUser') || sessionStorage.getItem('clinicalUser');
+            if (raw) {
+                var user = JSON.parse(raw);
+                var roleEl = document.getElementById('navbar-user-role');
+                if (roleEl && user.role) roleEl.textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
+            }
+        } catch(e) {}
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', applySettings);
+    } else {
+        applySettings();
+    }
+})();
+</script>
+<nav class="flex-1 space-y-1 overflow-y-auto">
+<a class="flex items-center gap-3 px-4 py-3 text-[#44474e] opacity-80 font-medium text-sm hover:bg-[#eaeef2] transition-all duration-300 rounded-lg group" href="javascript:void(0)" onclick="return navigateTo('/ict-support')">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 bg-white text-[#001e41] rounded-lg shadow-sm font-semibold text-sm transition-all duration-300" href="javascript:void(0)" onclick="return navigateTo('/my-tickets')">
+<span class="material-symbols-outlined">confirmation_number</span>
+                Tickets
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#44474e] opacity-80 font-medium text-sm hover:bg-[#eaeef2] transition-all duration-300 rounded-lg group" href="javascript:void(0)" onclick="return navigateTo('/knowledge-base')">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">auto_stories</span>
+                Knowledge Base
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#44474e] opacity-80 font-medium text-sm hover:bg-[#eaeef2] transition-all duration-300 rounded-lg group" href="javascript:void(0)" onclick="return navigateTo('/ict-analytics')">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">analytics</span>
+                Analytics
+            </a>
+<a id="nav-admin" class="flex items-center gap-3 px-4 py-3 text-[#44474e] opacity-80 font-medium text-sm hover:bg-[#eaeef2] transition-all duration-300 rounded-lg group" href="javascript:void(0)" onclick="return navigateTo('/admin/users')">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">admin_panel_settings</span>
+                User Mgmt
+            </a>
+<a id="nav-app-settings" class="flex items-center gap-3 px-4 py-3 text-[#44474e] opacity-80 font-medium text-sm hover:bg-[#eaeef2] transition-all duration-300 rounded-lg group" href="javascript:void(0)" onclick="return navigateTo('/admin/app-settings')">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">brand_awareness</span> App Settings</a>
+<a id="nav-settings" class="flex items-center gap-3 px-4 py-3 text-[#44474e] opacity-80 font-medium text-sm hover:bg-[#eaeef2] transition-all duration-300 rounded-lg group" href="javascript:void(0)" onclick="return navigateTo('/settings')">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">settings</span>
+                Settings
+            </a>
+</nav>
+<script>
+(function() {
+    function isAdminOrIct() {
+        try {
+            var raw = localStorage.getItem('clinicalUser') || sessionStorage.getItem('clinicalUser');
+            if (raw) {
+                var role = JSON.parse(raw).role;
+                return role === 'admin' || role === 'ict' || role === 'hospital_administrator';
+            }
+        } catch(e) {}
+        return false;
+    }
+    if (!isAdminOrIct()) {
+        var els = document.querySelectorAll('#nav-admin, #nav-app-settings');
+        for (var i = 0; i < els.length; i++) {
+            if (els[i]) els[i].style.display = 'none';
+        }
+    }
+})();
+</script>
+<div class="mt-auto">
+<button class="w-full primary-gradient text-white font-headline font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-md hover:shadow-lg active:scale-95 transition-all" onclick="return openNewTicketModal()">
+<span class="material-symbols-outlined">add</span>
+                New Ticket
+            </button>
+            <button onclick="signOut()" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 mt-2 text-red-500/70 hover:text-red-500 hover:bg-red-50 rounded-lg text-sm font-medium transition-all active:scale-95">
+<span class="material-symbols-outlined text-lg">logout</span>
+                Sign Out
+            </button>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-64 pt-16 min-h-screen relative">
+<div id="page-skeleton" class="absolute inset-0 z-40 bg-background p-8 transition-opacity duration-500">
+  <div class="skeleton-pulse h-8 w-72 mb-8"></div>
+  <div class="skeleton-pulse h-4 w-full mb-4"></div>
+  <div class="skeleton-pulse h-4 w-3/4 mb-4"></div>
+  <div class="grid grid-cols-3 gap-6 mb-6">
+    <div class="skeleton-pulse h-28 rounded-xl"></div>
+    <div class="skeleton-pulse h-28 rounded-xl"></div>
+    <div class="skeleton-pulse h-28 rounded-xl"></div>
+  </div>
+  <div class="skeleton-pulse h-48 w-full rounded-xl"></div>
+</div>
+<!-- TopAppBar Anchor -->
+<header class="fixed top-0 right-0 left-0 z-50 h-16 bg-[#f6fafe]/80 backdrop-blur-lg flex items-center justify-between px-8 shadow-sm">
+<a href="javascript:void(0)" onclick="return navigateTo('/ict-support')" class="flex items-center gap-3 mr-4 cursor-pointer flex-shrink-0">
+<div class="w-9 h-9 rounded-xl primary-gradient flex items-center justify-center text-white shadow-md flex-shrink-0">
+<span class="material-symbols-outlined text-lg">medical_services</span>
+</div>
+<div class="hidden md:block">
+<h1 id="navbar-app-name" class="font-headline font-bold text-sm text-[#001e41] leading-tight">ICT Support</h1>
+<p id="navbar-tagline" class="text-[9px] uppercase tracking-widest text-outline">Central Medical ICT</p>
+</div>
+</a>
+<div class="flex items-center gap-4">
+<div class="relative flex items-center">
+  <span class="material-symbols-outlined absolute left-3 text-outline" style="font-size: 18px;">search</span>
+  <input id="global-search" type="text" readonly placeholder="Search tickets, knowledge base..." class="w-80 pl-9 pr-8 py-2 bg-surface-container-low border border-outline-variant/30 rounded-lg text-sm text-on-surface placeholder-on-surface-variant/60 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all">
+  <span class="absolute right-2.5 text-[10px] font-medium text-outline bg-surface-container-highest px-1.5 py-0.5 rounded border border-outline-variant/20 pointer-events-none">/</span>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative group">
+<span id="notification-bell" class="material-symbols-outlined text-[#44474e] cursor-pointer" onclick="openNotificationDrawer()">notifications</span>
+<span class="absolute -top-1 -right-1 w-2 h-2 bg-error rounded-full"></span>
+</div>
+<span id="help-button" class="material-symbols-outlined text-[#44474e] cursor-pointer" onclick="openHelpDrawer()">help_outline</span>
+<div class="flex items-center gap-3 pl-4 border-l border-outline-variant/30 cursor-pointer" onclick="return navigateTo('/settings')" title="Settings">
+<img alt="User" class="w-8 h-8 rounded-full object-cover ring-2 ring-primary-fixed" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbsCBaIju0fQ_a8Ix8ckQ-KxMEALzspAqj5bECDzEupOD0EKC7s-JGVerFtUCMPb4w_-uMp_bMeJ5jev38-jr3rRT9AkKnd6qR8lhHmItBafI8zGwQmCymegGsDbIIMwD2M7yqNL77aHX9DAFby0rXcXRRRthr0V2BK_K6HaBjn5VG51CK4cDM4YkWcDeJ7WC_QkmnwjjdSgAotIZkbO_cLv-__aAO59kFWwY2Kob6GJAXJf5eGhOhvv6dDh0N7M9KJ796heSUqj4u"/>
+<div>
+<span class="text-sm font-bold text-[#001e41] font-headline block">Dr. Sarah Chen</span>
+<span id="navbar-user-role" class="text-[10px] text-outline/50">Admin</span>
+</div>
+</div>
+</div>
+<div class="bg-[#dfe3e7]/30 h-[1px] w-full absolute bottom-0 left-0"></div>
+</header>
+<!-- Content Canvas -->
+<div class="pt-24 px-8 pb-12">
+<!-- Header Section -->
+<div class="flex items-end justify-between mb-10">
+<div>
+<nav class="flex items-center gap-2 text-xs text-outline mb-2">
+<span>Support</span>
+<span class="material-symbols-outlined text-[10px]">chevron_right</span>
+<span class="text-primary font-medium">Ticket Management</span>
+</nav>
+<h2 class="text-4xl font-headline font-extrabold text-primary tracking-tight">Active Inquiries</h2>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex bg-surface-container-low p-1 rounded-xl">
+<button class="px-4 py-2 text-sm font-semibold bg-white text-primary rounded-lg shadow-sm">All</button>
+<button class="px-4 py-2 text-sm font-medium text-outline hover:text-primary transition-colors">Personal</button>
+<button class="px-4 py-2 text-sm font-medium text-outline hover:text-primary transition-colors">Department</button>
+</div>
+<button class="flex items-center gap-2 px-4 py-2.5 bg-surface-container-highest text-primary font-bold rounded-xl text-sm hover:bg-outline-variant/40 transition-colors">
+<span class="material-symbols-outlined text-lg">filter_list</span>
+                        Filters
+                    </button>
+</div>
+</div>
+<!-- Dashboard Stats Summary (Bento Lite) -->
+<div class="grid grid-cols-4 gap-6 mb-10">
+<div class="bg-white p-6 rounded-2xl shadow-sm border border-surface-container flex items-center justify-between">
+<div>
+<p class="text-xs font-bold text-outline uppercase tracking-wider mb-1">Open Tickets</p>
+<h3 class="text-3xl font-headline font-extrabold text-primary">24</h3>
+</div>
+<div class="w-12 h-12 bg-primary-fixed rounded-xl flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-2xl">pending_actions</span>
+</div>
+</div>
+<div class="bg-white p-6 rounded-2xl shadow-sm border border-surface-container flex items-center justify-between">
+<div>
+<p class="text-xs font-bold text-outline uppercase tracking-wider mb-1">In Progress</p>
+<h3 class="text-3xl font-headline font-extrabold text-primary">12</h3>
+</div>
+<div class="w-12 h-12 bg-secondary-fixed rounded-xl flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-2xl">sync</span>
+</div>
+</div>
+<div class="bg-white p-6 rounded-2xl shadow-sm border border-surface-container flex items-center justify-between">
+<div>
+<p class="text-xs font-bold text-outline uppercase tracking-wider mb-1">Urgent (P1)</p>
+<h3 class="text-3xl font-headline font-extrabold text-error">03</h3>
+</div>
+<div class="w-12 h-12 bg-error-container rounded-xl flex items-center justify-center text-error animate-pulse">
+<span class="material-symbols-outlined text-2xl">priority_high</span>
+</div>
+</div>
+<div class="bg-white p-6 rounded-2xl shadow-sm border border-surface-container flex items-center justify-between">
+<div>
+<p class="text-xs font-bold text-outline uppercase tracking-wider mb-1">Solved Today</p>
+<h3 class="text-3xl font-headline font-extrabold text-secondary">08</h3>
+</div>
+<div class="w-12 h-12 bg-secondary-fixed rounded-xl flex items-center justify-center text-on-secondary-fixed-variant">
+<span class="material-symbols-outlined text-2xl">task_alt</span>
+</div>
+</div>
+</div>
+<!-- Table Container -->
+<div class="bg-white rounded-3xl shadow-sm overflow-hidden border border-surface-container">
+<div class="px-8 py-6 border-b border-surface-container flex items-center justify-between bg-surface-bright/50">
+<h4 class="font-headline font-bold text-primary flex items-center gap-2">
+                        Current Queue
+                        <span class="px-2 py-0.5 bg-primary-fixed text-primary text-[10px] rounded-full uppercase">Updated 2m ago</span>
+</h4>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2">
+<span class="text-xs text-outline font-medium">Status:</span>
+<select class="text-xs font-bold text-primary border-none bg-surface-container-low rounded-lg focus:ring-1 focus:ring-primary/20 py-1.5 px-3 pr-8">
+<option>All Status</option>
+<option>Open</option>
+<option>In Progress</option>
+<option>Resolved</option>
+</select>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-xs text-outline font-medium">Urgency:</span>
+<select class="text-xs font-bold text-primary border-none bg-surface-container-low rounded-lg focus:ring-1 focus:ring-primary/20 py-1.5 px-3 pr-8">
+<option>All Priorities</option>
+<option>High</option>
+<option>Medium</option>
+<option>Low</option>
+</select>
+</div>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low/50">
+<th class="px-8 py-4 text-[11px] font-extrabold text-outline uppercase tracking-widest">Ticket ID</th>
+<th class="px-8 py-4 text-[11px] font-extrabold text-outline uppercase tracking-widest">Subject</th>
+<th class="px-8 py-4 text-[11px] font-extrabold text-outline uppercase tracking-widest text-center">Urgency</th>
+<th class="px-8 py-4 text-[11px] font-extrabold text-outline uppercase tracking-widest">Status</th>
+<th class="px-8 py-4 text-[11px] font-extrabold text-outline uppercase tracking-widest">Created</th>
+<th class="px-8 py-4 text-[11px] font-extrabold text-outline uppercase tracking-widest text-right">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container">
+<!-- Row 1: Urgent -->
+<tr class="hover:bg-surface-container-low/30 transition-colors group">
+<td class="px-8 py-5 text-sm font-bold text-primary">#ICT-9402</td>
+<td class="px-8 py-5">
+<div class="flex flex-col">
+<span class="text-sm font-semibold text-primary">DICOM Server Timeout - Radiology</span>
+<span class="text-[11px] text-outline flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">local_hospital</span>
+                                            Imaging Services
+                                        </span>
+</div>
+</td>
+<td class="px-8 py-5">
+<div class="flex justify-center">
+<span class="px-3 py-1 bg-error-container text-on-error-container text-[11px] font-bold rounded-full uppercase tracking-tighter">High</span>
+</div>
+</td>
+<td class="px-8 py-5">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-error animate-pulse"></span>
+<span class="text-sm font-medium text-on-surface">Open</span>
+</div>
+</td>
+<td class="px-8 py-5">
+<div class="flex flex-col">
+<span class="text-sm text-primary">Oct 24, 08:12</span>
+<span class="text-[10px] text-outline font-medium">3 hours ago</span>
+</div>
+</td>
+<td class="px-8 py-5 text-right">
+<a class="inline-flex items-center text-primary text-sm font-bold hover:underline gap-1 group-hover:translate-x-1 transition-transform" href="#">
+                                        View Details
+                                        <span class="material-symbols-outlined text-lg">chevron_right</span>
+</a>
+</td>
+</tr>
+<!-- Row 2: In Progress -->
+<tr class="hover:bg-surface-container-low/30 transition-colors group">
+<td class="px-8 py-5 text-sm font-bold text-primary">#ICT-9398</td>
+<td class="px-8 py-5">
+<div class="flex flex-col">
+<span class="text-sm font-semibold text-primary">Electronic Health Record (EHR) Lag</span>
+<span class="text-[11px] text-outline flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">emergency</span>
+                                            ER Department
+                                        </span>
+</div>
+</td>
+<td class="px-8 py-5">
+<div class="flex justify-center">
+<span class="px-3 py-1 bg-tertiary-fixed text-on-tertiary-fixed-variant text-[11px] font-bold rounded-full uppercase tracking-tighter">Medium</span>
+</div>
+</td>
+<td class="px-8 py-5">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="text-sm font-medium text-on-surface">In Progress</span>
+</div>
+</td>
+<td class="px-8 py-5">
+<div class="flex flex-col">
+<span class="text-sm text-primary">Oct 24, 07:45</span>
+<span class="text-[10px] text-outline font-medium">4 hours ago</span>
+</div>
+</td>
+<td class="px-8 py-5 text-right">
+<a class="inline-flex items-center text-primary text-sm font-bold hover:underline gap-1 group-hover:translate-x-1 transition-transform" href="#">
+                                        View Details
+                                        <span class="material-symbols-outlined text-lg">chevron_right</span>
+</a>
+</td>
+</tr>
+<!-- Row 3: Standard -->
+<tr class="hover:bg-surface-container-low/30 transition-colors group">
+<td class="px-8 py-5 text-sm font-bold text-primary">#ICT-9382</td>
+<td class="px-8 py-5">
+<div class="flex flex-col">
+<span class="text-sm font-semibold text-primary">Printer Configuration - Nurse Station 4</span>
+<span class="text-[11px] text-outline flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">ward</span>
+                                            Acute Care
+                                        </span>
+</div>
+</td>
+<td class="px-8 py-5">
+<div class="flex justify-center">
+<span class="px-3 py-1 bg-surface-container-highest text-on-surface-variant text-[11px] font-bold rounded-full uppercase tracking-tighter">Low</span>
+</div>
+</td>
+<td class="px-8 py-5">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-outline"></span>
+<span class="text-sm font-medium text-on-surface">Open</span>
+</div>
+</td>
+<td class="px-8 py-5">
+<div class="flex flex-col">
+<span class="text-sm text-primary">Oct 23, 16:30</span>
+<span class="text-[10px] text-outline font-medium">Yesterday</span>
+</div>
+</td>
+<td class="px-8 py-5 text-right">
+<a class="inline-flex items-center text-primary text-sm font-bold hover:underline gap-1 group-hover:translate-x-1 transition-transform" href="#">
+                                        View Details
+                                        <span class="material-symbols-outlined text-lg">chevron_right</span>
+</a>
+</td>
+</tr>
+<!-- Row 4: Resolved -->
+<tr class="hover:bg-surface-container-low/30 transition-colors group">
+<td class="px-8 py-5 text-sm font-bold text-primary opacity-60">#ICT-9355</td>
+<td class="px-8 py-5">
+<div class="flex flex-col opacity-60">
+<span class="text-sm font-semibold text-primary">Password Reset - Pharmacy</span>
+<span class="text-[11px] text-outline flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">medication</span>
+                                            Pharmacy Lab
+                                        </span>
+</div>
+</td>
+<td class="px-8 py-5">
+<div class="flex justify-center opacity-60">
+<span class="px-3 py-1 bg-surface-container-highest text-on-surface-variant text-[11px] font-bold rounded-full uppercase tracking-tighter">Low</span>
+</div>
+</td>
+<td class="px-8 py-5">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary-fixed-dim"></span>
+<span class="text-sm font-medium text-on-surface-variant">Resolved</span>
+</div>
+</td>
+<td class="px-8 py-5">
+<div class="flex flex-col opacity-60">
+<span class="text-sm text-primary">Oct 23, 11:20</span>
+<span class="text-[10px] text-outline font-medium">Yesterday</span>
+</div>
+</td>
+<td class="px-8 py-5 text-right">
+<a class="inline-flex items-center text-primary text-sm font-bold hover:underline gap-1 group-hover:translate-x-1 transition-transform" href="#">
+                                        View Details
+                                        <span class="material-symbols-outlined text-lg">chevron_right</span>
+</a>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="px-8 py-4 bg-surface-container-low/30 border-t border-surface-container flex items-center justify-between">
+<p class="text-xs text-outline font-medium">Showing <span class="text-primary font-bold">1-4</span> of <span class="text-primary font-bold">48</span> tickets</p>
+<div class="flex items-center gap-2">
+<button class="p-2 rounded-lg hover:bg-surface-container transition-colors disabled:opacity-30" disabled="">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<div class="flex items-center gap-1">
+<button class="w-8 h-8 rounded-lg bg-primary text-white text-xs font-bold">1</button>
+<button class="w-8 h-8 rounded-lg hover:bg-surface-container text-primary text-xs font-bold transition-colors">2</button>
+<button class="w-8 h-8 rounded-lg hover:bg-surface-container text-primary text-xs font-bold transition-colors">3</button>
+<span class="px-2 text-outline">...</span>
+<button class="w-8 h-8 rounded-lg hover:bg-surface-container text-primary text-xs font-bold transition-colors">12</button>
+</div>
+<button class="p-2 rounded-lg hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Contextual Help / Insights (Asymmetric Layout) -->
+<div class="mt-12 flex gap-8">
+<div class="w-2/3 bg-primary-container p-8 rounded-[2rem] text-white relative overflow-hidden shadow-xl">
+<div class="relative z-10 flex gap-8">
+<div class="flex-1">
+<h4 class="text-2xl font-headline font-bold mb-3">Priority Management System</h4>
+<p class="text-on-primary-container text-sm leading-relaxed mb-6">Our automated triage system prioritizes Radiology and Emergency Department inquiries based on patient safety protocols. Ensure P1 tags are utilized strictly for life-critical clinical system failures.</p>
+<button class="bg-secondary-fixed text-on-secondary-fixed font-bold px-6 py-2.5 rounded-xl text-sm hover:brightness-110 transition-all">Review Protocols</button>
+</div>
+<div class="w-1/3 flex items-center justify-center">
+<span class="material-symbols-outlined text-[120px] opacity-10 absolute -right-4 -bottom-4 rotate-12" style="font-variation-settings: 'FILL' 1;">medical_information</span>
+<div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10">
+<p class="text-[10px] uppercase font-bold text-secondary-fixed mb-1">Average Response</p>
+<p class="text-3xl font-headline font-black">12.5 <span class="text-sm font-medium opacity-60">min</span></p>
+</div>
+</div>
+</div>
+</div>
+<div class="w-1/3 bg-tertiary-fixed p-8 rounded-[2rem] border border-on-tertiary-fixed-variant/10">
+<div class="flex items-center gap-3 mb-4">
+<span class="material-symbols-outlined text-tertiary-container">tips_and_updates</span>
+<h4 class="font-headline font-bold text-tertiary-container">Pro Tip</h4>
+</div>
+<p class="text-on-tertiary-fixed-variant text-sm font-medium leading-relaxed">
+                        Use the "Live Chat" feature in the bottom right for immediate 2nd-level engineering support for #ICT-series clinical server outages.
+                    </p>
+<div class="mt-8 flex justify-end">
+<span class="text-[10px] uppercase tracking-tighter font-bold text-tertiary-container/40">Clinical Intelligence Ops</span>
+</div>
+</div>
+</div>
+</div>
+<footer class="text-center text-[10px] text-outline/40 py-5 border-t border-outline-variant/10 mt-12"><p id="main-footer">Clinical Intelligence Platform &copy; 2026</p></footer>
+</main>
+<!-- Floating Action for Context -->
+<div class="fixed bottom-8 right-8 flex flex-col items-end gap-3 z-50">
+<button class="primary-gradient text-white w-14 h-14 rounded-2xl shadow-2xl flex items-center justify-center group active:scale-90 transition-all hover:scale-105" onclick="createNewTicket()">
+<span class="material-symbols-outlined text-3xl group-hover:rotate-12 transition-transform" style="font-variation-settings: 'FILL' 1;">chat</span>
+</button>
+</div>
+<script>
+// Mock ticket data store
+let tickets = [
+    {
+        id: 'ICT-9402',
+        subject: 'DICOM Server Timeout - Radiology',
+        department: 'Imaging Services',
+        urgency: 'High',
+        status: 'Open',
+        created: 'Oct 24, 08:12',
+        timeAgo: '3 hours ago',
+        icon: 'local_hospital'
+    },
+    {
+        id: 'ICT-9398',
+        subject: 'Electronic Health Record (EHR) Lag',
+        department: 'ER Department',
+        urgency: 'Medium',
+        status: 'In Progress',
+        created: 'Oct 24, 07:45',
+        timeAgo: '4 hours ago',
+        icon: 'emergency'
+    },
+    {
+        id: 'ICT-9382',
+        subject: 'Printer Configuration - Nurse Station 4',
+        department: 'Acute Care',
+        urgency: 'Low',
+        status: 'Open',
+        created: 'Oct 23, 16:30',
+        timeAgo: 'Yesterday',
+        icon: 'ward'
+    },
+    {
+        id: 'ICT-9355',
+        subject: 'Password Reset - Pharmacy',
+        department: 'Pharmacy Lab',
+        urgency: 'Low',
+        status: 'Resolved',
+        created: 'Oct 23, 11:20',
+        timeAgo: 'Yesterday',
+        icon: 'medication'
+    }
+];
+// Function to create new ticket
+function createNewTicket() {
+    openNewTicketModal();
+}
+// Function to view ticket details
+function viewTicketDetails(ticketId) {
+    showNotification(`Loading ticket ${ticketId} details...`, 'success');
+    setTimeout(() => {
+        window.parent.postMessage({
+            type: 'navigate',
+            path: '/ticket-details'
+        }, '*');
+    }, 500);
+}
+// Filter functionality
+function filterTickets() {
+    const statusFilter = document.querySelector('select[option*="All Status"]').value;
+    const urgencyFilter = document.querySelector('select[option*="All Priorities"]').value;
+    
+    let filteredTickets = tickets;
+    
+    if (statusFilter !== 'All Status') {
+        filteredTickets = filteredTickets.filter(ticket => ticket.status === statusFilter);
+    }
+    
+    if (urgencyFilter !== 'All Priorities') {
+        filteredTickets = filteredTickets.filter(ticket => ticket.urgency === urgencyFilter);
+    }
+    
+    updateTicketTable(filteredTickets);
+    updateStats(filteredTickets);
+    cacheSave('ticketsData', tickets);
+}
+// Update ticket table
+function updateTicketTable(ticketList) {
+    const tbody = document.querySelector('tbody');
+    tbody.innerHTML = '';
+    
+    ticketList.forEach(ticket => {
+        const row = document.createElement('tr');
+        row.className = 'hover:bg-surface-container-low/30 transition-colors group';
+        row.innerHTML = `
+            <td class="px-8 py-5 text-sm font-bold text-primary">#${ticket.id}</td>
+            <td class="px-8 py-5">
+                <div class="flex flex-col">
+                    <span class="text-sm font-semibold text-primary">${ticket.subject}</span>
+                    <span class="text-[11px] text-outline flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[14px]">${ticket.icon}</span>
+                        ${ticket.department}
+                    </span>
+                </div>
+            </td>
+            <td class="px-8 py-5">
+                <div class="flex justify-center">
+                    <span class="px-3 py-1 ${getUrgencyClass(ticket.urgency)} text-[11px] font-bold rounded-full uppercase tracking-tighter">${ticket.urgency}</span>
+                </div>
+            </td>
+            <td class="px-8 py-5">
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full ${getStatusClass(ticket.status)} ${ticket.status === 'Open' ? 'animate-pulse' : ''}"></span>
+                    <span class="text-sm font-medium text-on-surface">${ticket.status}</span>
+                </div>
+            </td>
+            <td class="px-8 py-5">
+                <div class="flex flex-col">
+                    <span class="text-sm text-primary">${ticket.created}</span>
+                    <span class="text-[10px] text-outline font-medium">${ticket.timeAgo}</span>
+                </div>
+            </td>
+            <td class="px-8 py-5 text-right">
+                <a class="inline-flex items-center text-primary text-sm font-bold hover:underline gap-1 group-hover:translate-x-1 transition-transform cursor-pointer" onclick="viewTicketDetails('${ticket.id}')">
+                    View Details
+                    <span class="material-symbols-outlined text-lg">chevron_right</span>
+                </a>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+// Get urgency styling class
+function getUrgencyClass(urgency) {
+    switch(urgency) {
+        case 'High': return 'bg-error-container text-on-error-container';
+        case 'Medium': return 'bg-tertiary-fixed text-on-tertiary-fixed-variant';
+        case 'Low': return 'bg-surface-container-highest text-on-surface-variant';
+        default: return 'bg-surface-container-highest text-on-surface-variant';
+    }
+}
+// Get status styling class
+function getStatusClass(status) {
+    switch(status) {
+        case 'Open': return 'bg-error';
+        case 'In Progress': return 'bg-secondary';
+        case 'Resolved': return 'bg-secondary-fixed-dim';
+        default: return 'bg-outline';
+    }
+}
+// Update statistics
+function updateStats(ticketList) {
+    const openCount = ticketList.filter(t => t.status === 'Open').length;
+    const inProgressCount = ticketList.filter(t => t.status === 'In Progress').length;
+    const urgentCount = ticketList.filter(t => t.urgency === 'High').length;
+    const resolvedCount = ticketList.filter(t => t.status === 'Resolved').length;
+    
+    document.querySelector('h3').textContent = openCount;
+    const allH3s = document.querySelectorAll('h3');
+    if (allH3s[1]) allH3s[1].textContent = inProgressCount;
+    if (allH3s[2]) allH3s[2].textContent = urgentCount.toString().padStart(2, '0');
+    if (allH3s[3]) allH3s[3].textContent = resolvedCount;
+}
+// Notification function
+function showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.className = `fixed top-20 right-4 z-50 p-4 rounded-lg shadow-lg transform transition-all duration-300 ${
+        type === 'success' 
+            ? 'bg-green-500 text-white' 
+            : 'bg-red-500 text-white'
+    }`;
+    notification.innerHTML = `
+        <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined">${type === 'success' ? 'check_circle' : 'error'}</span>
+            <span>${message}</span>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.opacity = '0';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+// Add event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    // Load cached tickets
+    var cachedTickets = cacheLoad('ticketsData', null);
+    if (cachedTickets && cachedTickets.length) {
+        tickets = cachedTickets;
+    }
+    // Add filter change listeners
+    const selects = document.querySelectorAll('select');
+    selects.forEach(select => {
+        select.addEventListener('change', filterTickets);
+    });
+    
+    // Add new ticket button listener
+    const newTicketBtn = document.querySelector('button[class*="primary-gradient"]');
+    if (newTicketBtn) {
+        newTicketBtn.addEventListener('click', createNewTicket);
+    }
+    
+    // Initialize with all tickets
+    updateStats(tickets);
+});
+// Handle real-time updates (simulate)
+setInterval(() => {
+    const updateBadge = document.querySelector('span[class*="bg-error"]');
+    if (updateBadge && Math.random() > 0.8) {
+        updateBadge.style.display = updateBadge.style.display === 'none' ? 'block' : 'none';
+    }
+    cacheSave('ticketsData', tickets);
+}, 10000);
+</script>
+<script>
+// Cache helpers ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¾ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¾ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¾ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¦ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¾ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¦ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â data persists until new data is fetched
+
+var SEARCH_ITEMS = [
+    { label: 'Dashboard', path: '/ict-support', icon: 'dashboard', keywords: 'dashboard support home ict' },
+    { label: 'My Tickets', path: '/my-tickets', icon: 'confirmation_number', keywords: 'tickets my tickets requests' },
+    { label: 'Knowledge Base', path: '/knowledge-base', icon: 'auto_stories', keywords: 'knowledge base docs documentation' },
+    { label: 'Analytics', path: '/ict-analytics', icon: 'analytics', keywords: 'analytics statistics reports charts' },
+    { label: 'User Management', path: '/admin/users', icon: 'admin_panel_settings', keywords: 'users admin management provision' },
+    { label: 'App Settings', path: '/admin/app-settings', icon: 'brand_awareness', keywords: 'app settings branding theme logo' },
+    { label: 'Settings', path: '/settings', icon: 'settings', keywords: 'settings profile preferences password' },
+    { label: 'Emergency Ops', path: '/emergency', icon: 'emergency', keywords: 'emergency critical urgent alerts' },
+];
+function performSearch(query) {
+    var el = document.getElementById('search-results');
+    if (!query || query.trim().length < 2) {
+        el.innerHTML = '<div class="p-8 text-center text-sm text-on-surface-variant"><span class="material-symbols-outlined text-3xl mb-2 block text-outline/40">search</span>Type to start searching...</div>';
+        return;
+    }
+    var q = query.toLowerCase().trim();
+    var results = [];
+    for (var i = 0; i < SEARCH_ITEMS.length; i++) {
+        var item = SEARCH_ITEMS[i];
+        if (item.label.toLowerCase().indexOf(q) !== -1 || item.keywords.indexOf(q) !== -1) {
+            results.push(item);
+        }
+    }
+    if (results.length === 0) {
+        el.innerHTML = '<div class="p-8 text-center text-sm text-on-surface-variant"><span class="material-symbols-outlined text-3xl mb-2 block text-outline/40">search_off</span>No results found</div>';
+        return;
+    }
+    var html = '';
+    for (var i = 0; i < results.length; i++) {
+        html += '<button class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-surface-container-low transition-all text-left group" onclick="window.parent.postMessage({ type: \'navigate\', path: \'' + results[i].path + '\' }, \'*\'); closeSearchOverlay();">' +
+            '<span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">' + results[i].icon + '</span>' +
+            '<div class="flex-1 min-w-0"><p class="text-sm font-medium text-[#001e41]">' + results[i].label + '</p></div>' +
+            '<span class="text-[10px] text-outline/60 font-mono">' + results[i].path + '</span>' +
+            '</button>';
+    }
+    el.innerHTML = html;
+}
+function openSearchOverlay() {
+    document.getElementById('search-overlay').classList.remove('hidden');
+    document.getElementById('search-overlay').classList.add('flex');
+    document.body.style.overflow = 'hidden';
+    setTimeout(function() {
+        document.getElementById('search-input').focus();
+    }, 100);
+}
+function closeSearchOverlay() {
+    document.getElementById('search-overlay').classList.add('hidden');
+    document.getElementById('search-overlay').classList.remove('flex');
+    document.body.style.overflow = '';
+}
+function cacheSave(key, data) {
+    try { localStorage.setItem('ci_cache_' + key, JSON.stringify(data)); } catch(e) {}
+}
+function cacheLoad(key, fallback) {
+    try { var d = localStorage.getItem('ci_cache_' + key); return d ? JSON.parse(d) : null; } catch(e) {}
+    return fallback;
+}
+function cacheClear() {
+    try {
+        var keysToRemove = [];
+        for (var k in localStorage) { if (localStorage.hasOwnProperty(k) && k.indexOf('ci_cache_') === 0) keysToRemove.push(k); }
+        for (var i = 0; i < keysToRemove.length; i++) localStorage.removeItem(keysToRemove[i]);
+    } catch(e) {}
+}
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var skeleton = document.getElementById('page-skeleton');
+    if (skeleton) {
+        setTimeout(function() {
+            skeleton.style.opacity = '0';
+            setTimeout(function() { skeleton.remove(); }, 500);
+        }, 400);
+    }
+});
+function signOut() {
+    showSignOutModal();
+}
+function navigateTo(path) {
+    window.parent.postMessage({ type: 'navigate', path: path }, '*');
+    return false;
+}
+</script>
+<script>
+(function() {
+    var links = document.querySelectorAll("nav a");
+    for (var i = 0; i < links.length; i++) {
+        links[i].classList.remove("bg-white", "text-[#001e41]", "rounded-lg", "shadow-sm", "font-semibold");
+        links[i].classList.add("text-[#44474e]", "opacity-80");
+    }
+    try {
+    var path = (window.parent.location.pathname || window.location.pathname).toLowerCase();
+    var navMap = {
+        "admin/app": "/admin/app-settings",
+        dashboard: "/ict-support",
+        ticket: "/my-tickets",
+        request: "/my-tickets",
+        knowledge: "/knowledge-base",
+        analytics: "/ict-analytics",
+        setting: "/settings",
+        admin: "/admin/users",
+        provision: "/settings",
+        role: "/settings",
+        ucu: "/settings",
+        system: "/settings",
+        user: "/admin/users",
+        emergency: "/ict-support",
+        support: "/ict-support",
+        queue: "/ict-support",
+        clinical: "/knowledge-base",
+    };
+    var target = "";
+    for (var key in navMap) {
+        if (path.indexOf(key) !== -1) { target = navMap[key]; break; }
+    }
+    if (!target) return;
+    for (var i = 0; i < links.length; i++) {
+        var oc = links[i].getAttribute("onclick") || "";
+        if (oc.indexOf(target) !== -1) {
+            links[i].classList.add("bg-white", "text-[#001e41]", "rounded-lg", "shadow-sm", "font-semibold");
+            links[i].classList.remove("text-[#44474e]", "opacity-80");
+        }
+    }
+    } catch(e) {}
+})();
+</script>
+<!-- Sign Out Confirmation Modal -->
+<div id="signout-modal" class="fixed inset-0 z-[400] hidden items-center justify-center bg-black/30 backdrop-blur-sm" onclick="if(event.target===this)cancelSignOut()">
+<div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 mx-4">
+<div class="flex flex-col items-center text-center gap-3">
+<div class="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center">
+<span class="material-symbols-outlined text-red-500 text-2xl" style="font-variation-settings:'FILL' 1">logout</span>
+</div>
+<h3 class="text-lg font-bold text-[#001e41] font-headline">Sign Out</h3>
+<p class="text-sm text-on-surface-variant">Are you sure you want to sign out? You will need to log in again to access the system.</p>
+<div class="flex gap-3 w-full mt-2">
+<button onclick="cancelSignOut()" class="flex-1 px-4 py-2.5 rounded-xl border border-outline-variant text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low transition-all">Cancel</button>
+<button onclick="confirmSignOut()" class="flex-1 px-4 py-2.5 rounded-xl bg-red-500 text-white text-sm font-semibold hover:bg-red-600 transition-all shadow-lg shadow-red-500/20">Sign Out</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Notification Drawer -->
+<div id="notification-drawer" class="fixed inset-0 z-[300] hidden">
+<div id="notification-backdrop" class="absolute inset-0 bg-black/30 backdrop-blur-sm" onclick="closeNotificationDrawer()"></div>
+<div class="absolute top-0 right-0 w-96 h-full bg-white shadow-2xl flex flex-col" style="overscroll-behavior: contain;">
+<div class="flex items-center justify-between px-6 py-4 border-b border-outline-variant/30">
+<div class="flex items-center gap-3">
+<h3 class="text-lg font-bold text-[#001e41] font-headline">Notifications</h3>
+<span class="text-xs bg-error text-white px-2 py-0.5 rounded-full font-medium" id="notif-count">3</span>
+</div>
+<button onclick="closeNotificationDrawer()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-higher transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">close</span>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto" id="notif-list">
+<div class="px-6 py-4 hover:bg-surface-container-low transition-colors cursor-pointer border-b border-outline-variant/10">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary mt-0.5">assignment</span>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-semibold text-[#001e41]">Ticket #1042 Resolved</p>
+<p class="text-xs text-on-surface-variant mt-0.5">Your reported network issue in Ward 3 has been resolved.</p>
+<p class="text-[10px] text-on-surface-variant/60 mt-1">2 min ago</p>
+</div>
+<span class="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-2"></span>
+</div>
+</div>
+<div class="px-6 py-4 hover:bg-surface-container-low transition-colors cursor-pointer border-b border-outline-variant/10">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-[#f59e0b] mt-0.5">warning</span>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-semibold text-[#001e41]">System Maintenance</p>
+<p class="text-xs text-on-surface-variant mt-0.5">Scheduled downtime on Sunday 02:00-04:00 AM for server updates.</p>
+<p class="text-[10px] text-on-surface-variant/60 mt-1">1 hour ago</p>
+</div>
+<span class="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-2"></span>
+</div>
+</div>
+<div class="px-6 py-4 hover:bg-surface-container-low transition-colors cursor-pointer border-b border-outline-variant/10">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-green-600 mt-0.5">check_circle</span>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-semibold text-[#001e41]">New Software Update</p>
+<p class="text-xs text-on-surface-variant mt-0.5">EMR system v3.2 is ready for installation. Contact ICT for deployment.</p>
+<p class="text-[10px] text-on-surface-variant/60 mt-1">3 hours ago</p>
+</div>
+<span class="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-2"></span>
+</div>
+</div>
+</div>
+<div class="px-6 py-3 border-t border-outline-variant/30 text-center">
+<button class="text-sm text-primary font-medium hover:underline" onclick="markAllNotificationsRead()">Mark all as read</button>
+</div>
+</div>
+</div>
+<!-- Help Drawer -->
+<div id="help-drawer" class="fixed inset-0 z-[300] hidden">
+<div id="help-backdrop" class="absolute inset-0 bg-black/30 backdrop-blur-sm" onclick="closeHelpDrawer()"></div>
+<div class="absolute top-0 right-0 w-96 h-full bg-white shadow-2xl flex flex-col" style="overscroll-behavior: contain;">
+<div class="flex items-center justify-between px-6 py-4 border-b border-outline-variant/30">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">help</span>
+<h3 class="text-lg font-bold text-[#001e41] font-headline">Help & Support</h3>
+</div>
+<button onclick="closeHelpDrawer()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-higher transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">close</span>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto p-6 space-y-6">
+<div class="space-y-2">
+<p class="text-[10px] uppercase tracking-widest text-on-surface-variant font-semibold">Quick Actions</p>
+<button class="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-surface-container-low hover:bg-surface-container-higher transition-colors text-left">
+<span class="material-symbols-outlined text-[#001e41]">description</span>
+<div>
+<p class="text-sm font-medium text-[#001e41]">User Guide</p>
+<p class="text-[10px] text-on-surface-variant">Learn how to use the platform</p>
+</div>
+</button>
+<button class="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-surface-container-low hover:bg-surface-container-higher transition-colors text-left">
+<span class="material-symbols-outlined text-[#001e41]">quiz</span>
+<div>
+<p class="text-sm font-medium text-[#001e41]">FAQs</p>
+<p class="text-[10px] text-on-surface-variant">Frequently asked questions</p>
+</div>
+</button>
+<button class="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-surface-container-low hover:bg-surface-container-higher transition-colors text-left">
+<span class="material-symbols-outlined text-[#001e41]">keyboard</span>
+<div>
+<p class="text-sm font-medium text-[#001e41]">Keyboard Shortcuts</p>
+<p class="text-[10px] text-on-surface-variant">Ctrl+N to create a new ticket</p>
+</div>
+</button>
+</div>
+<div class="space-y-2">
+<p class="text-[10px] uppercase tracking-widest text-on-surface-variant font-semibold">Contact Support</p>
+<div class="flex items-center gap-3 px-4 py-3 rounded-xl bg-surface-container-low">
+<span class="material-symbols-outlined text-[#001e41]">mail</span>
+<div>
+<p class="text-sm font-medium text-[#001e41]">Email</p>
+<p class="text-[10px] text-on-surface-variant">ict-support@clinicalintel.com</p>
+</div>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 rounded-xl bg-surface-container-low">
+<span class="material-symbols-outlined text-[#001e41]">phone</span>
+<div>
+<p class="text-sm font-medium text-[#001e41]">Phone</p>
+<p class="text-[10px] text-on-surface-variant">+1 (555) 123-4567</p>
+</div>
+</div>
+</div>
+</div>
+<div class="px-6 py-3 border-t border-outline-variant/30">
+<p id="help-footer" class="text-[10px] text-on-surface-variant/60 text-center">v1.0.0 Clinical Intelligence Platform</p>
+</div>
+</div>
+</div>
+
+<!-- Global Search Overlay -->
+<div id="search-overlay" class="fixed inset-0 z-[500] hidden items-start justify-center pt-[15vh] bg-black/40 backdrop-blur-sm" onclick="if(event.target===this)closeSearchOverlay()">
+<div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-4 overflow-hidden">
+<div class="p-4 border-b border-outline-variant/30">
+<input id="search-input" type="text" placeholder="Search tickets, knowledge base..." class="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/30 rounded-xl text-sm text-on-surface placeholder-on-surface-variant/60 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all" autocomplete="off">
+</div>
+<div id="search-results" class="max-h-96 overflow-y-auto p-2">
+<div class="text-center py-8 text-sm text-on-surface-variant/60">
+<span class="material-symbols-outlined text-3xl block mb-2">search</span>
+Type to start searching...
+</div>
+</div>
+</div>
+</div>
+<div id="new-ticket-overlay" class="fixed inset-0 z-[200] bg-black/40 backdrop-blur-sm hidden items-center justify-center p-4 transition-all duration-300">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden relative">
+    <button onclick="closeNewTicketModal()" class="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-surface-container-hover hover:bg-surface-container-higher transition-colors">
+      <span class="material-symbols-outlined text-on-surface-variant">close</span>
+    </button>
+    <iframe id="new-ticket-iframe" src="/screens/new_ticket_modal.html" class="w-full h-[80vh] border-0" sandbox="allow-scripts allow-same-origin"></iframe>
+  </div>
+</div>
+<script>
+function showSignOutModal() {
+    document.getElementById('signout-modal').classList.remove('hidden');
+    document.getElementById('signout-modal').classList.add('flex');
+    document.body.style.overflow = 'hidden';
+}
+function confirmSignOut() {
+    localStorage.removeItem('clinicalUser');
+    sessionStorage.removeItem('clinicalUser');
+    cacheClear();
+    window.parent.postMessage({ type: 'signout' }, '*');
+}
+function cancelSignOut() {
+    document.getElementById('signout-modal').classList.add('hidden');
+    document.getElementById('signout-modal').classList.remove('flex');
+    document.body.style.overflow = '';
+}
+function openNotificationDrawer() {
+    document.getElementById('notification-drawer').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+function closeNotificationDrawer() {
+    document.getElementById('notification-drawer').classList.add('hidden');
+    document.body.style.overflow = '';
+}
+function markAllNotificationsRead() {
+    var dots = document.querySelectorAll('#notif-list .w-2.h-2.bg-primary');
+    for (var i = 0; i < dots.length; i++) { dots[i].classList.remove('bg-primary'); dots[i].classList.add('bg-outline-variant'); }
+    var count = document.getElementById('notif-count');
+    if (count) count.textContent = '0';
+    var dot = document.getElementById('notification-dot');
+    if (dot) dot.classList.add('hidden');
+}
+function openHelpDrawer() {
+    document.getElementById('help-drawer').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+function closeHelpDrawer() {
+    document.getElementById('help-drawer').classList.add('hidden');
+    document.body.style.overflow = '';
+}
+function openNewTicketModal() {
+    document.getElementById('new-ticket-overlay').classList.remove('hidden');
+    document.getElementById('new-ticket-overlay').classList.add('flex');
+    document.body.style.overflow = 'hidden';
+    return false;
+}
+function closeNewTicketModal() {
+    document.getElementById('new-ticket-overlay').classList.add('hidden');
+    document.getElementById('new-ticket-overlay').classList.remove('flex');
+    document.body.style.overflow = '';
+}
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        if (!document.getElementById('search-overlay').classList.contains('hidden')) closeSearchOverlay();
+        if (!document.getElementById('notification-drawer').classList.contains('hidden')) closeNotificationDrawer();
+        if (!document.getElementById('help-drawer').classList.contains('hidden')) closeHelpDrawer();
+        if (!document.getElementById('signout-modal').classList.contains('hidden')) cancelSignOut();
+    }
+    if (e.key === '/' && !['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) {
+        e.preventDefault();
+        openSearchOverlay();
+    }
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
+        e.preventDefault();
+        openSearchOverlay();
+    }
+});
+document.getElementById('global-search').addEventListener('focus', function() {
+    openSearchOverlay();
+});
+document.getElementById('search-input').addEventListener('input', function() {
+    performSearch(this.value);
+});
+document.getElementById('global-search').addEventListener('focus', function() {
+    openSearchOverlay();
+});
+document.getElementById('search-input').addEventListener('input', function() {
+    performSearch(this.value);
+});
+document.addEventListener('click', function(e) {
+    if (e.target.id === 'new-ticket-overlay') closeNewTicketModal();
+});
+window.addEventListener('message', function(e) {
+    if (e.data.type === 'closeModal') closeNewTicketModal();
+});
+</script>
+</body></html>

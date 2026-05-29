@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Analytics Dashboard - Clinical Intelligence</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-secondary": "#ffffff",
+                        "tertiary": "#371300",
+                        "primary-fixed": "#d6e3ff",
+                        "surface-container-highest": "#dfe3e7",
+                        "on-secondary-fixed": "#002020",
+                        "on-primary-fixed": "#001b3c",
+                        "on-tertiary-fixed-variant": "#773200",
+                        "surface-container-low": "#f0f4f8",
+                        "outline-variant": "#c3c6d1",
+                        "surface-tint": "#455f88",
+                        "primary": "#001e41",
+                        "on-primary-fixed-variant": "#2d476f",
+                        "inverse-surface": "#2c3134",
+                        "on-secondary-container": "#1a6d6e",
+                        "surface": "#f6fafe",
+                        "on-primary-container": "#839cc9",
+                        "secondary-container": "#a2eded",
+                        "primary-container": "#17335a",
+                        "tertiary-fixed-dim": "#ffb68f",
+                        "tertiary-container": "#592300",
+                        "secondary-fixed-dim": "#89d3d4",
+                        "surface-container-high": "#e4e9ed",
+                        "on-tertiary-container": "#f17a2f",
+                        "inverse-on-surface": "#edf1f5",
+                        "secondary-fixed": "#a5eff0",
+                        "on-secondary-fixed-variant": "#004f50",
+                        "tertiary-fixed": "#ffdbca",
+                        "on-error-container": "#93000a",
+                        "error": "#ba1a1a",
+                        "on-surface-variant": "#43474f",
+                        "on-background": "#171c1f",
+                        "surface-bright": "#f6fafe",
+                        "secondary": "#13696a",
+                        "on-tertiary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "surface-dim": "#d6dade",
+                        "surface-container-lowest": "#ffffff",
+                        "on-surface": "#171c1f",
+                        "on-error": "#ffffff",
+                        "outline": "#737780",
+                        "surface-variant": "#dfe3e7",
+                        "surface-container": "#eaeef2",
+                        "on-tertiary-fixed": "#331100",
+                        "inverse-primary": "#adc7f7",
+                        "primary-fixed-dim": "#adc7f7",
+                        "background": "#f6fafe",
+                        "on-primary": "#ffffff"
+                    },
+                    fontFamily: {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(23, 51, 90, 0.05);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+        .primary-gradient {
+            background: linear-gradient(135deg, #001e41 0%, #17335a 100%);
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3 { font-family: 'Manrope', sans-serif; }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .skeleton-pulse {
+            animation: shimmer 1.5s ease-in-out infinite;
+            background: linear-gradient(90deg, #e4e9ed 25%, #f0f4f8 50%, #e4e9ed 75%);
+            background-size: 200% 100%;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-16 bottom-0 w-64 bg-[#f6fafe] dark:bg-[#171c1f] flex flex-col py-4 px-4 gap-2 z-40 overflow-hidden">
+<script>
+(function() {
+    function applySettings() {
+        try {
+            var settings = JSON.parse(localStorage.getItem('ci_app_settings') || '{}');
+            var year = new Date().getFullYear();
+            if (settings.appName) {
+                var na = document.getElementById('navbar-app-name');
+                if (na) na.textContent = settings.appName;
+            }
+            if (settings.tagline) {
+                var nt = document.getElementById('navbar-tagline');
+                if (nt) nt.textContent = settings.tagline;
+            }
+            if (settings.footerText) {
+                var hf = document.getElementById('help-footer');
+                if (hf) hf.innerHTML = (settings.version || 'v1.0.0') + ' \u00A9 ' + year + ' ' + settings.footerText;
+                var mf = document.getElementById('main-footer');
+                if (mf) mf.innerHTML = (settings.version || 'v1.0.0') + ' \u00A9 ' + year + ' ' + settings.footerText;
+            }
+            var raw = localStorage.getItem('clinicalUser') || sessionStorage.getItem('clinicalUser');
+            if (raw) {
+                var user = JSON.parse(raw);
+                var roleEl = document.getElementById('navbar-user-role');
+                if (roleEl && user.role) roleEl.textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
+            }
+        } catch(e) {}
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', applySettings);
+    } else {
+        applySettings();
+    }
+})();
+</script>
+<nav class="flex-1 space-y-1 overflow-y-auto">
+<a class="flex items-center gap-3 px-4 py-3 text-[#44474e] opacity-80 font-medium text-sm hover:bg-[#eaeef2] transition-all duration-300 rounded-lg group" href="javascript:void(0)" onclick="return navigateTo('/ict-support')">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 bg-white text-[#001e41] rounded-lg shadow-sm font-semibold text-sm transition-all duration-300" href="javascript:void(0)" onclick="return navigateTo('/my-tickets')">
+<span class="material-symbols-outlined">confirmation_number</span>
+                Tickets
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#44474e] opacity-80 font-medium text-sm hover:bg-[#eaeef2] transition-all duration-300 rounded-lg group" href="javascript:void(0)" onclick="return navigateTo('/knowledge-base')">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">auto_stories</span>
+                Knowledge Base
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#44474e] opacity-80 font-medium text-sm hover:bg-[#eaeef2] transition-all duration-300 rounded-lg group" href="javascript:void(0)" onclick="return navigateTo('/ict-analytics')">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">analytics</span>
+                Analytics
+            </a>
+<a id="nav-admin" class="flex items-center gap-3 px-4 py-3 text-[#44474e] opacity-80 font-medium text-sm hover:bg-[#eaeef2] transition-all duration-300 rounded-lg group" href="javascript:void(0)" onclick="return navigateTo('/admin/users')">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">admin_panel_settings</span>
+                User Mgmt
+            </a>
+<a id="nav-app-settings" class="flex items-center gap-3 px-4 py-3 text-[#44474e] opacity-80 font-medium text-sm hover:bg-[#eaeef2] transition-all duration-300 rounded-lg group" href="javascript:void(0)" onclick="return navigateTo('/admin/app-settings')">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">brand_awareness</span> App Settings</a>
+<a id="nav-settings" class="flex items-center gap-3 px-4 py-3 text-[#44474e] opacity-80 font-medium text-sm hover:bg-[#eaeef2] transition-all duration-300 rounded-lg group" href="javascript:void(0)" onclick="return navigateTo('/settings')">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">settings</span>
+                Settings
+            </a>
+</nav>
+<script>
+(function() {
+    function isAdminOrIct() {
+        try {
+            var raw = localStorage.getItem('clinicalUser') || sessionStorage.getItem('clinicalUser');
+            if (raw) {
+                var role = JSON.parse(raw).role;
+                return role === 'admin' || role === 'ict' || role === 'hospital_administrator';
+            }
+        } catch(e) {}
+        return false;
+    }
+    if (!isAdminOrIct()) {
+        var els = document.querySelectorAll('#nav-admin, #nav-app-settings');
+        for (var i = 0; i < els.length; i++) {
+            if (els[i]) els[i].style.display = 'none';
+        }
+    }
+})();
+</script>
+<div class="mt-auto">
+<button class="w-full primary-gradient text-white font-headline font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-md hover:shadow-lg active:scale-95 transition-all" onclick="return openNewTicketModal()">
+<span class="material-symbols-outlined">add</span>
+                New Ticket
+            </button>
+            <button onclick="signOut()" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 mt-2 text-red-500/70 hover:text-red-500 hover:bg-red-50 rounded-lg text-sm font-medium transition-all active:scale-95">
+<span class="material-symbols-outlined text-lg">logout</span>
+                Sign Out
+            </button>
+</div>
+</aside>
+<!-- TopAppBar Anchor -->
+<header class="fixed top-0 right-0 left-0 z-50 h-16 bg-[#f6fafe]/80 backdrop-blur-lg flex items-center justify-between px-8 shadow-sm">
+<a href="javascript:void(0)" onclick="return navigateTo('/ict-support')" class="flex items-center gap-3 mr-4 cursor-pointer flex-shrink-0">
+<div class="w-9 h-9 rounded-xl primary-gradient flex items-center justify-center text-white shadow-md flex-shrink-0">
+<span class="material-symbols-outlined text-lg">medical_services</span>
+</div>
+<div class="hidden md:block">
+<h1 id="navbar-app-name" class="font-headline font-bold text-sm text-[#001e41] leading-tight">ICT Support</h1>
+<p id="navbar-tagline" class="text-[9px] uppercase tracking-widest text-outline">Central Medical ICT</p>
+</div>
+</a>
+<div class="flex items-center gap-4">
+<div class="relative flex items-center">
+  <span class="material-symbols-outlined absolute left-3 text-outline" style="font-size: 18px;">search</span>
+  <input id="global-search" type="text" readonly placeholder="Search tickets, knowledge base..." class="w-80 pl-9 pr-8 py-2 bg-surface-container-low border border-outline-variant/30 rounded-lg text-sm text-on-surface placeholder-on-surface-variant/60 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all">
+  <span class="absolute right-2.5 text-[10px] font-medium text-outline bg-surface-container-highest px-1.5 py-0.5 rounded border border-outline-variant/20 pointer-events-none">/</span>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative group">
+<span id="notification-bell" class="material-symbols-outlined text-[#44474e] cursor-pointer" onclick="openNotificationDrawer()">notifications</span>
+<span class="absolute -top-1 -right-1 w-2 h-2 bg-error rounded-full"></span>
+</div>
+<span id="help-button" class="material-symbols-outlined text-[#44474e] cursor-pointer" onclick="openHelpDrawer()">help_outline</span>
+<div class="flex items-center gap-3 pl-4 border-l border-outline-variant/30 cursor-pointer" onclick="return navigateTo('/settings')" title="Settings">
+<img alt="User" class="w-8 h-8 rounded-full object-cover ring-2 ring-primary-fixed" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbsCBaIju0fQ_a8Ix8ckQ-KxMEALzspAqj5bECDzEupOD0EKC7s-JGVerFtUCMPb4w_-uMp_bMeJ5jev38-jr3rRT9AkKnd6qR8lhHmItBafI8zGwQmCymegGsDbIIMwD2M7yqNL77aHX9DAFby0rXcXRRRthr0V2BK_K6HaBjn5VG51CK4cDM4YkWcDeJ7WC_QkmnwjjdSgAotIZkbO_cLv-__aAO59kFWwY2Kob6GJAXJf5eGhOhvv6dDh0N7M9KJ796heSUqj4u"/>
+<div>
+<span class="text-sm font-bold text-[#001e41] font-headline block">Dr. Sarah Chen</span>
+<span id="navbar-user-role" class="text-[10px] text-outline/50">Admin</span>
+</div>
+</div>
+</div>
+<div class="bg-[#dfe3e7]/30 h-[1px] w-full absolute bottom-0 left-0"></div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-64 pt-16 min-h-screen bg-surface relative">
+<div id="page-skeleton" class="absolute inset-0 z-40 bg-background p-8 transition-opacity duration-500">
+  <div class="skeleton-pulse h-8 w-72 mb-8"></div>
+  <div class="skeleton-pulse h-4 w-full mb-4"></div>
+  <div class="skeleton-pulse h-4 w-3/4 mb-4"></div>
+  <div class="grid grid-cols-3 gap-6 mb-6">
+    <div class="skeleton-pulse h-28 rounded-xl"></div>
+    <div class="skeleton-pulse h-28 rounded-xl"></div>
+    <div class="skeleton-pulse h-28 rounded-xl"></div>
+  </div>
+  <div class="skeleton-pulse h-48 w-full rounded-xl"></div>
+</div>
+<div class="max-w-[1440px] mx-auto p-8">
+<!-- Header Section -->
+<header class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+<div>
+<h1 class="text-4xl font-extrabold tracking-tight text-primary mb-2">Operational Analytics</h1>
+<p class="text-on-surface-variant font-body">Real-time performance metrics for Central Medical ICT Support.</p>
+</div>
+<div class="flex items-center gap-3">
+<button class="bg-surface-container-highest text-primary px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-sm">calendar_today</span>
+                        This Month
+                    </button>
+<button class="bg-surface-container-highest text-primary px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-sm">download</span>
+                        Export Report
+                    </button>
+</div>
+</header>
+<!-- Key Metrics Bento Grid -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+<!-- Total Tickets -->
+<div class="bg-surface-container-lowest p-6 rounded-2xl shadow-sm border-b-4 border-primary/10">
+<div class="flex items-center justify-between mb-4">
+<div class="p-3 bg-primary-fixed rounded-xl">
+<span class="material-symbols-outlined text-primary">confirmation_number</span>
+</div>
+<span class="text-secondary text-xs font-bold bg-secondary-container px-2 py-1 rounded-full">+12.5%</span>
+</div>
+<div class="text-3xl font-extrabold text-primary mb-1">1,284</div>
+<div class="text-on-surface-variant text-sm font-medium">Total Tickets (This Month)</div>
+<div class="mt-4 h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[78%]"></div>
+</div>
+</div>
+<!-- Average Response Time -->
+<div class="bg-surface-container-lowest p-6 rounded-2xl shadow-sm border-b-4 border-secondary/10">
+<div class="flex items-center justify-between mb-4">
+<div class="p-3 bg-secondary-container rounded-xl">
+<span class="material-symbols-outlined text-secondary">timer</span>
+</div>
+<span class="text-error text-xs font-bold bg-error-container px-2 py-1 rounded-full">-4m</span>
+</div>
+<div class="text-3xl font-extrabold text-primary mb-1">14.2<span class="text-lg font-medium ml-1">min</span></div>
+<div class="text-on-surface-variant text-sm font-medium">Avg. Response Time</div>
+<div class="mt-4 h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-[45%]"></div>
+</div>
+</div>
+<!-- Resolution Rate -->
+<div class="bg-surface-container-lowest p-6 rounded-2xl shadow-sm border-b-4 border-tertiary-container/10">
+<div class="flex items-center justify-between mb-4">
+<div class="p-3 bg-tertiary-fixed rounded-xl">
+<span class="material-symbols-outlined text-tertiary-container">check_circle</span>
+</div>
+<span class="text-secondary text-xs font-bold bg-secondary-container px-2 py-1 rounded-full">Optimal</span>
+</div>
+<div class="text-3xl font-extrabold text-primary mb-1">94.8%</div>
+<div class="text-on-surface-variant text-sm font-medium">Resolution Rate</div>
+<div class="mt-4 h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-tertiary-container w-[94.8%]"></div>
+</div>
+</div>
+</section>
+<!-- Middle Charts Section -->
+<section class="grid grid-cols-1 xl:grid-cols-12 gap-6 mb-8">
+<!-- Ticket Volume Trend (Line Chart Visualization) -->
+<div class="xl:col-span-8 bg-surface-container-lowest p-8 rounded-2xl shadow-sm relative overflow-hidden">
+<div class="flex items-center justify-between mb-8">
+<div>
+<h3 class="text-lg font-bold text-primary">Ticket Volume Trend</h3>
+<p class="text-sm text-on-surface-variant">Daily incoming support requests</p>
+</div>
+<div class="flex gap-2">
+<span class="flex items-center gap-2 text-xs font-medium text-on-surface-variant">
+<span class="w-3 h-3 rounded-full bg-primary"></span> Current
+                            </span>
+<span class="flex items-center gap-2 text-xs font-medium text-on-surface-variant">
+<span class="w-3 h-3 rounded-full bg-outline-variant"></span> Previous
+                            </span>
+</div>
+</div>
+<!-- Simplified Visual Chart Representation -->
+<div class="h-[240px] w-full flex items-end justify-between gap-1 relative pt-4">
+<!-- Background Grid -->
+<div class="absolute inset-0 flex flex-col justify-between pt-4 pointer-events-none">
+<div class="border-b border-surface-variant w-full h-0"></div>
+<div class="border-b border-surface-variant w-full h-0"></div>
+<div class="border-b border-surface-variant w-full h-0"></div>
+<div class="border-b border-surface-variant w-full h-0"></div>
+</div>
+<!-- SVG Line for Charting representation -->
+<svg class="absolute inset-0 h-full w-full" preserveaspectratio="none">
+<path d="M0,180 Q100,140 200,160 T400,100 T600,120 T800,40" fill="none" stroke="url(#gradient-line)" stroke-linecap="round" stroke-width="4"></path>
+<defs>
+<lineargradient id="gradient-line" x1="0" x2="1" y1="0" y2="0">
+<stop offset="0%" stop-color="#001e41"></stop>
+<stop offset="100%" stop-color="#17335a"></stop>
+</lineargradient>
+</defs>
+</svg>
+<!-- Chart X-Axis Labels -->
+<div class="absolute bottom-[-24px] w-full flex justify-between text-[10px] font-bold text-outline uppercase tracking-wider">
+<span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+</div>
+</div>
+</div>
+<!-- Issue Category Distribution (Donut Chart Visualization) -->
+<div class="xl:col-span-4 bg-surface-container-lowest p-8 rounded-2xl shadow-sm">
+<h3 class="text-lg font-bold text-primary mb-1">Issue Distribution</h3>
+<p class="text-sm text-on-surface-variant mb-8">Top categories by volume</p>
+<div class="relative flex justify-center mb-8">
+<!-- CSS Donut Circle -->
+<div class="w-40 h-40 rounded-full border-[16px] border-surface-container-highest relative flex items-center justify-center">
+<div class="absolute inset-[-16px] w-40 h-40 rounded-full border-[16px] border-primary border-t-transparent border-r-transparent rotate-45"></div>
+<div class="text-center">
+<div class="text-2xl font-black text-primary">42%</div>
+<div class="text-[10px] uppercase font-bold text-outline">Network</div>
+</div>
+</div>
+</div>
+<div class="space-y-3">
+<div class="flex items-center justify-between text-sm">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-primary"></span>
+<span class="font-medium text-on-surface">Network/Server</span>
+</div>
+<span class="font-bold text-primary">422</span>
+</div>
+<div class="flex items-center justify-between text-sm">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-secondary"></span>
+<span class="font-medium text-on-surface">HIS Software</span>
+</div>
+<span class="font-bold text-primary">318</span>
+</div>
+<div class="flex items-center justify-between text-sm">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-tertiary-container"></span>
+<span class="font-medium text-on-surface">Hardware/Peripherals</span>
+</div>
+<span class="font-bold text-primary">245</span>
+</div>
+<div class="flex items-center justify-between text-sm">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-outline-variant"></span>
+<span class="font-medium text-on-surface">Access Management</span>
+</div>
+<span class="font-bold text-primary">128</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Bottom Section: Departmental Load & Bar Chart -->
+<section class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+<!-- Tickets by Department (Bar Chart) -->
+<div class="bg-surface-container-lowest p-8 rounded-2xl shadow-sm">
+<div class="flex items-center justify-between mb-8">
+<div>
+<h3 class="text-lg font-bold text-primary">Departmental Load</h3>
+<p class="text-sm text-on-surface-variant">Active tickets by medical unit</p>
+</div>
+</div>
+<div class="space-y-5">
+<div class="space-y-1">
+<div class="flex justify-between text-xs font-bold uppercase tracking-wide">
+<span class="text-on-surface">Radiology</span>
+<span class="text-primary">84 Tickets</span>
+</div>
+<div class="h-3 w-full bg-surface-container-low rounded-full overflow-hidden">
+<div class="h-full primary-gradient rounded-full" style="width: 85%"></div>
+</div>
+</div>
+<div class="space-y-1">
+<div class="flex justify-between text-xs font-bold uppercase tracking-wide">
+<span class="text-on-surface">Emergency Room</span>
+<span class="text-primary">62 Tickets</span>
+</div>
+<div class="h-3 w-full bg-surface-container-low rounded-full overflow-hidden">
+<div class="h-full primary-gradient rounded-full" style="width: 62%"></div>
+</div>
+</div>
+<div class="space-y-1">
+<div class="flex justify-between text-xs font-bold uppercase tracking-wide">
+<span class="text-on-surface">Cardiology</span>
+<span class="text-primary">45 Tickets</span>
+</div>
+<div class="h-3 w-full bg-surface-container-low rounded-full overflow-hidden">
+<div class="h-full primary-gradient rounded-full" style="width: 45%"></div>
+</div>
+</div>
+<div class="space-y-1">
+<div class="flex justify-between text-xs font-bold uppercase tracking-wide">
+<span class="text-on-surface">Intensive Care (ICU)</span>
+<span class="text-primary">31 Tickets</span>
+</div>
+<div class="h-3 w-full bg-surface-container-low rounded-full overflow-hidden">
+<div class="h-full primary-gradient rounded-full" style="width: 31%"></div>
+</div>
+</div>
+<div class="space-y-1">
+<div class="flex justify-between text-xs font-bold uppercase tracking-wide">
+<span class="text-on-surface">Outpatient Clinics</span>
+<span class="text-primary">28 Tickets</span>
+</div>
+<div class="h-3 w-full bg-surface-container-low rounded-full overflow-hidden">
+<div class="h-full primary-gradient rounded-full" style="width: 28%"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Top Performers Table -->
+<div class="bg-surface-container-lowest p-8 rounded-2xl shadow-sm overflow-hidden">
+<h3 class="text-lg font-bold text-primary mb-1">Top Performing Technicians</h3>
+<p class="text-sm text-on-surface-variant mb-8">Resolution efficiency ranking</p>
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="text-[10px] uppercase font-bold text-outline tracking-widest border-b border-surface-variant">
+<th class="pb-4 font-bold">Technician</th>
+<th class="pb-4 font-bold">Resolved</th>
+<th class="pb-4 font-bold">Avg. Time</th>
+<th class="pb-4 font-bold">Satisfaction</th>
+</tr>
+</thead>
+<tbody class="text-sm">
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="py-4 border-b border-surface-variant/30">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-fixed flex items-center justify-center font-bold text-primary text-[10px]">DA</div>
+<div class="font-semibold text-primary">Dr. Sarah Al-Farsi</div>
+</div>
+</td>
+<td class="py-4 border-b border-surface-variant/30 font-medium">142</td>
+<td class="py-4 border-b border-surface-variant/30 font-medium">8.4m</td>
+<td class="py-4 border-b border-surface-variant/30">
+<div class="flex items-center gap-1 text-secondary">
+<span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-bold">4.9</span>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="py-4 border-b border-surface-variant/30">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center font-bold text-secondary text-[10px]">BM</div>
+<div class="font-semibold text-primary">Ben Mitchell</div>
+</div>
+</td>
+<td class="py-4 border-b border-surface-variant/30 font-medium">118</td>
+<td class="py-4 border-b border-surface-variant/30 font-medium">10.1m</td>
+<td class="py-4 border-b border-surface-variant/30">
+<div class="flex items-center gap-1 text-secondary">
+<span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-bold">4.8</span>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="py-4 border-b border-surface-variant/30">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-tertiary-fixed flex items-center justify-center font-bold text-tertiary-container text-[10px]">JL</div>
+<div class="font-semibold text-primary">Julie Lin</div>
+</div>
+</td>
+<td class="py-4 border-b border-surface-variant/30 font-medium">105</td>
+<td class="py-4 border-b border-surface-variant/30 font-medium">11.5m</td>
+<td class="py-4 border-b border-surface-variant/30">
+<div class="flex items-center gap-1 text-secondary">
+<span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-bold">4.7</span>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="py-4 border-b border-surface-variant/30">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-outline-variant/30 flex items-center justify-center font-bold text-primary text-[10px]">RK</div>
+<div class="font-semibold text-primary">Raj Kapoor</div>
+</div>
+</td>
+<td class="py-4 border-b border-surface-variant/30 font-medium">98</td>
+<td class="py-4 border-b border-surface-variant/30 font-medium">13.2m</td>
+<td class="py-4 border-b border-surface-variant/30">
+<div class="flex items-center gap-1 text-secondary">
+<span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-bold">4.5</span>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+<footer class="text-center text-[10px] text-outline/40 py-5 border-t border-outline-variant/10 mt-12"><p id="main-footer">Clinical Intelligence Platform &copy; 2026</p></footer>
+</main>
+<!-- Floating AI Assistant Button (Contextual for Analytics) -->
+<div class="fixed bottom-8 right-8 z-50">
+<button class="primary-gradient w-14 h-14 rounded-2xl shadow-2xl flex items-center justify-center text-white hover:scale-110 active:scale-95 transition-all group">
+<span class="material-symbols-outlined text-2xl group-hover:rotate-12 transition-transform">insights</span>
+<div class="absolute right-full mr-4 bg-primary text-white text-[10px] font-bold py-1 px-3 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 transition-all pointer-events-none uppercase tracking-widest shadow-xl">
+                Ask Clinical Insights
+            </div>
+</button>
+</div>
+<script>
+
+var SEARCH_ITEMS = [
+    { label: 'Dashboard', path: '/ict-support', icon: 'dashboard', keywords: 'dashboard support home ict' },
+    { label: 'My Tickets', path: '/my-tickets', icon: 'confirmation_number', keywords: 'tickets my tickets requests' },
+    { label: 'Knowledge Base', path: '/knowledge-base', icon: 'auto_stories', keywords: 'knowledge base docs documentation' },
+    { label: 'Analytics', path: '/ict-analytics', icon: 'analytics', keywords: 'analytics statistics reports charts' },
+    { label: 'User Management', path: '/admin/users', icon: 'admin_panel_settings', keywords: 'users admin management provision' },
+    { label: 'App Settings', path: '/admin/app-settings', icon: 'brand_awareness', keywords: 'app settings branding theme logo' },
+    { label: 'Settings', path: '/settings', icon: 'settings', keywords: 'settings profile preferences password' },
+    { label: 'Emergency Ops', path: '/emergency', icon: 'emergency', keywords: 'emergency critical urgent alerts' },
+];
+function performSearch(query) {
+    var el = document.getElementById('search-results');
+    if (!query || query.trim().length < 2) {
+        el.innerHTML = '<div class="p-8 text-center text-sm text-on-surface-variant"><span class="material-symbols-outlined text-3xl mb-2 block text-outline/40">search</span>Type to start searching...</div>';
+        return;
+    }
+    var q = query.toLowerCase().trim();
+    var results = [];
+    for (var i = 0; i < SEARCH_ITEMS.length; i++) {
+        var item = SEARCH_ITEMS[i];
+        if (item.label.toLowerCase().indexOf(q) !== -1 || item.keywords.indexOf(q) !== -1) {
+            results.push(item);
+        }
+    }
+    if (results.length === 0) {
+        el.innerHTML = '<div class="p-8 text-center text-sm text-on-surface-variant"><span class="material-symbols-outlined text-3xl mb-2 block text-outline/40">search_off</span>No results found</div>';
+        return;
+    }
+    var html = '';
+    for (var i = 0; i < results.length; i++) {
+        html += '<button class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-surface-container-low transition-all text-left group" onclick="window.parent.postMessage({ type: \'navigate\', path: \'' + results[i].path + '\' }, \'*\'); closeSearchOverlay();">' +
+            '<span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">' + results[i].icon + '</span>' +
+            '<div class="flex-1 min-w-0"><p class="text-sm font-medium text-[#001e41]">' + results[i].label + '</p></div>' +
+            '<span class="text-[10px] text-outline/60 font-mono">' + results[i].path + '</span>' +
+            '</button>';
+    }
+    el.innerHTML = html;
+}
+function openSearchOverlay() {
+    document.getElementById('search-overlay').classList.remove('hidden');
+    document.getElementById('search-overlay').classList.add('flex');
+    document.body.style.overflow = 'hidden';
+    setTimeout(function() {
+        document.getElementById('search-input').focus();
+    }, 100);
+}
+function closeSearchOverlay() {
+    document.getElementById('search-overlay').classList.add('hidden');
+    document.getElementById('search-overlay').classList.remove('flex');
+    document.body.style.overflow = '';
+}
+function cacheSave(key, data) {
+    try { localStorage.setItem('ci_cache_' + key, JSON.stringify(data)); } catch(e) {}
+}
+function cacheLoad(key, fallback) {
+    try { var d = localStorage.getItem('ci_cache_' + key); return d ? JSON.parse(d) : null; } catch(e) {}
+    return fallback;
+}
+function cacheClear() {
+    try {
+        var keysToRemove = [];
+        for (var k in localStorage) { if (localStorage.hasOwnProperty(k) && k.indexOf('ci_cache_') === 0) keysToRemove.push(k); }
+        for (var i = 0; i < keysToRemove.length; i++) localStorage.removeItem(keysToRemove[i]);
+    } catch(e) {}
+}
+function signOut() {
+    showSignOutModal();
+}
+function navigateTo(path) {
+    window.parent.postMessage({ type: 'navigate', path: path }, '*');
+    return false;
+}
+</script>
+<script>
+(function() {
+    var links = document.querySelectorAll("nav a");
+    for (var i = 0; i < links.length; i++) {
+        links[i].classList.remove("bg-white", "text-[#001e41]", "rounded-lg", "shadow-sm", "font-semibold");
+        links[i].classList.add("text-[#44474e]", "opacity-80");
+    }
+    try {
+    var path = (window.parent.location.pathname || window.location.pathname).toLowerCase();
+    var navMap = {
+        "admin/app": "/admin/app-settings",
+        dashboard: "/ict-support",
+        ticket: "/my-tickets",
+        request: "/my-tickets",
+        knowledge: "/knowledge-base",
+        analytics: "/ict-analytics",
+        setting: "/settings",
+        admin: "/admin/users",
+        provision: "/settings",
+        role: "/settings",
+        ucu: "/settings",
+        system: "/settings",
+        user: "/admin/users",
+        emergency: "/ict-support",
+        support: "/ict-support",
+        queue: "/ict-support",
+        clinical: "/knowledge-base",
+    };
+    var target = "";
+    for (var key in navMap) {
+        if (path.indexOf(key) !== -1) { target = navMap[key]; break; }
+    }
+    if (!target) return;
+    for (var i = 0; i < links.length; i++) {
+        var oc = links[i].getAttribute("onclick") || "";
+        if (oc.indexOf(target) !== -1) {
+            links[i].classList.add("bg-white", "text-[#001e41]", "rounded-lg", "shadow-sm", "font-semibold");
+            links[i].classList.remove("text-[#44474e]", "opacity-80");
+        }
+    }
+    } catch(e) {}
+})();
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var skeleton = document.getElementById('page-skeleton');
+    if (skeleton) {
+        setTimeout(function() {
+            skeleton.style.opacity = '0';
+            setTimeout(function() { skeleton.remove(); }, 500);
+        }, 400);
+    }
+});
+</script>
+<!-- Sign Out Confirmation Modal -->
+<div id="signout-modal" class="fixed inset-0 z-[400] hidden items-center justify-center bg-black/30 backdrop-blur-sm" onclick="if(event.target===this)cancelSignOut()">
+<div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 mx-4">
+<div class="flex flex-col items-center text-center gap-3">
+<div class="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center">
+<span class="material-symbols-outlined text-red-500 text-2xl" style="font-variation-settings:'FILL' 1">logout</span>
+</div>
+<h3 class="text-lg font-bold text-[#001e41] font-headline">Sign Out</h3>
+<p class="text-sm text-on-surface-variant">Are you sure you want to sign out? You will need to log in again to access the system.</p>
+<div class="flex gap-3 w-full mt-2">
+<button onclick="cancelSignOut()" class="flex-1 px-4 py-2.5 rounded-xl border border-outline-variant text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low transition-all">Cancel</button>
+<button onclick="confirmSignOut()" class="flex-1 px-4 py-2.5 rounded-xl bg-red-500 text-white text-sm font-semibold hover:bg-red-600 transition-all shadow-lg shadow-red-500/20">Sign Out</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Notification Drawer -->
+<div id="notification-drawer" class="fixed inset-0 z-[300] hidden">
+<div id="notification-backdrop" class="absolute inset-0 bg-black/30 backdrop-blur-sm" onclick="closeNotificationDrawer()"></div>
+<div class="absolute top-0 right-0 w-96 h-full bg-white shadow-2xl flex flex-col" style="overscroll-behavior: contain;">
+<div class="flex items-center justify-between px-6 py-4 border-b border-outline-variant/30">
+<div class="flex items-center gap-3">
+<h3 class="text-lg font-bold text-[#001e41] font-headline">Notifications</h3>
+<span class="text-xs bg-error text-white px-2 py-0.5 rounded-full font-medium" id="notif-count">3</span>
+</div>
+<button onclick="closeNotificationDrawer()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-higher transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">close</span>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto" id="notif-list">
+<div class="px-6 py-4 hover:bg-surface-container-low transition-colors cursor-pointer border-b border-outline-variant/10">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary mt-0.5">assignment</span>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-semibold text-[#001e41]">Ticket #1042 Resolved</p>
+<p class="text-xs text-on-surface-variant mt-0.5">Your reported network issue in Ward 3 has been resolved.</p>
+<p class="text-[10px] text-on-surface-variant/60 mt-1">2 min ago</p>
+</div>
+<span class="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-2"></span>
+</div>
+</div>
+<div class="px-6 py-4 hover:bg-surface-container-low transition-colors cursor-pointer border-b border-outline-variant/10">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-[#f59e0b] mt-0.5">warning</span>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-semibold text-[#001e41]">System Maintenance</p>
+<p class="text-xs text-on-surface-variant mt-0.5">Scheduled downtime on Sunday 02:00-04:00 AM for server updates.</p>
+<p class="text-[10px] text-on-surface-variant/60 mt-1">1 hour ago</p>
+</div>
+<span class="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-2"></span>
+</div>
+</div>
+<div class="px-6 py-4 hover:bg-surface-container-low transition-colors cursor-pointer border-b border-outline-variant/10">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-green-600 mt-0.5">check_circle</span>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-semibold text-[#001e41]">New Software Update</p>
+<p class="text-xs text-on-surface-variant mt-0.5">EMR system v3.2 is ready for installation. Contact ICT for deployment.</p>
+<p class="text-[10px] text-on-surface-variant/60 mt-1">3 hours ago</p>
+</div>
+<span class="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-2"></span>
+</div>
+</div>
+</div>
+<div class="px-6 py-3 border-t border-outline-variant/30 text-center">
+<button class="text-sm text-primary font-medium hover:underline" onclick="markAllNotificationsRead()">Mark all as read</button>
+</div>
+</div>
+</div>
+<!-- Help Drawer -->
+<div id="help-drawer" class="fixed inset-0 z-[300] hidden">
+<div id="help-backdrop" class="absolute inset-0 bg-black/30 backdrop-blur-sm" onclick="closeHelpDrawer()"></div>
+<div class="absolute top-0 right-0 w-96 h-full bg-white shadow-2xl flex flex-col" style="overscroll-behavior: contain;">
+<div class="flex items-center justify-between px-6 py-4 border-b border-outline-variant/30">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">help</span>
+<h3 class="text-lg font-bold text-[#001e41] font-headline">Help & Support</h3>
+</div>
+<button onclick="closeHelpDrawer()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-higher transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">close</span>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto p-6 space-y-6">
+<div class="space-y-2">
+<p class="text-[10px] uppercase tracking-widest text-on-surface-variant font-semibold">Quick Actions</p>
+<button class="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-surface-container-low hover:bg-surface-container-higher transition-colors text-left">
+<span class="material-symbols-outlined text-[#001e41]">description</span>
+<div>
+<p class="text-sm font-medium text-[#001e41]">User Guide</p>
+<p class="text-[10px] text-on-surface-variant">Learn how to use the platform</p>
+</div>
+</button>
+<button class="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-surface-container-low hover:bg-surface-container-higher transition-colors text-left">
+<span class="material-symbols-outlined text-[#001e41]">quiz</span>
+<div>
+<p class="text-sm font-medium text-[#001e41]">FAQs</p>
+<p class="text-[10px] text-on-surface-variant">Frequently asked questions</p>
+</div>
+</button>
+<button class="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-surface-container-low hover:bg-surface-container-higher transition-colors text-left">
+<span class="material-symbols-outlined text-[#001e41]">keyboard</span>
+<div>
+<p class="text-sm font-medium text-[#001e41]">Keyboard Shortcuts</p>
+<p class="text-[10px] text-on-surface-variant">Ctrl+N to create a new ticket</p>
+</div>
+</button>
+</div>
+<div class="space-y-2">
+<p class="text-[10px] uppercase tracking-widest text-on-surface-variant font-semibold">Contact Support</p>
+<div class="flex items-center gap-3 px-4 py-3 rounded-xl bg-surface-container-low">
+<span class="material-symbols-outlined text-[#001e41]">mail</span>
+<div>
+<p class="text-sm font-medium text-[#001e41]">Email</p>
+<p class="text-[10px] text-on-surface-variant">ict-support@clinicalintel.com</p>
+</div>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 rounded-xl bg-surface-container-low">
+<span class="material-symbols-outlined text-[#001e41]">phone</span>
+<div>
+<p class="text-sm font-medium text-[#001e41]">Phone</p>
+<p class="text-[10px] text-on-surface-variant">+1 (555) 123-4567</p>
+</div>
+</div>
+</div>
+</div>
+<div class="px-6 py-3 border-t border-outline-variant/30">
+<p id="help-footer" class="text-[10px] text-on-surface-variant/60 text-center">v1.0.0 Clinical Intelligence Platform</p>
+</div>
+</div>
+</div>
+
+<!-- Global Search Overlay -->
+<div id="search-overlay" class="fixed inset-0 z-[500] hidden items-start justify-center pt-[15vh] bg-black/40 backdrop-blur-sm" onclick="if(event.target===this)closeSearchOverlay()">
+<div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-4 overflow-hidden">
+<div class="p-4 border-b border-outline-variant/30">
+<input id="search-input" type="text" placeholder="Search tickets, knowledge base..." class="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/30 rounded-xl text-sm text-on-surface placeholder-on-surface-variant/60 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all" autocomplete="off">
+</div>
+<div id="search-results" class="max-h-96 overflow-y-auto p-2">
+<div class="text-center py-8 text-sm text-on-surface-variant/60">
+<span class="material-symbols-outlined text-3xl block mb-2">search</span>
+Type to start searching...
+</div>
+</div>
+</div>
+</div>
+<div id="new-ticket-overlay" class="fixed inset-0 z-[200] bg-black/40 backdrop-blur-sm hidden items-center justify-center p-4 transition-all duration-300">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden relative">
+    <button onclick="closeNewTicketModal()" class="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-surface-container-hover hover:bg-surface-container-higher transition-colors">
+      <span class="material-symbols-outlined text-on-surface-variant">close</span>
+    </button>
+    <iframe id="new-ticket-iframe" src="/screens/new_ticket_modal.html" class="w-full h-[80vh] border-0" sandbox="allow-scripts allow-same-origin"></iframe>
+  </div>
+</div>
+<script>
+function showSignOutModal() {
+    document.getElementById('signout-modal').classList.remove('hidden');
+    document.getElementById('signout-modal').classList.add('flex');
+    document.body.style.overflow = 'hidden';
+}
+function confirmSignOut() {
+    localStorage.removeItem('clinicalUser');
+    sessionStorage.removeItem('clinicalUser');
+    cacheClear();
+    window.parent.postMessage({ type: 'signout' }, '*');
+}
+function cancelSignOut() {
+    document.getElementById('signout-modal').classList.add('hidden');
+    document.getElementById('signout-modal').classList.remove('flex');
+    document.body.style.overflow = '';
+}
+function openNotificationDrawer() {
+    document.getElementById('notification-drawer').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+function closeNotificationDrawer() {
+    document.getElementById('notification-drawer').classList.add('hidden');
+    document.body.style.overflow = '';
+}
+function markAllNotificationsRead() {
+    var dots = document.querySelectorAll('#notif-list .w-2.h-2.bg-primary');
+    for (var i = 0; i < dots.length; i++) { dots[i].classList.remove('bg-primary'); dots[i].classList.add('bg-outline-variant'); }
+    var count = document.getElementById('notif-count');
+    if (count) count.textContent = '0';
+    var dot = document.getElementById('notification-dot');
+    if (dot) dot.classList.add('hidden');
+}
+function openHelpDrawer() {
+    document.getElementById('help-drawer').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+function closeHelpDrawer() {
+    document.getElementById('help-drawer').classList.add('hidden');
+    document.body.style.overflow = '';
+}
+function openNewTicketModal() {
+    document.getElementById('new-ticket-overlay').classList.remove('hidden');
+    document.getElementById('new-ticket-overlay').classList.add('flex');
+    document.body.style.overflow = 'hidden';
+    return false;
+}
+function closeNewTicketModal() {
+    document.getElementById('new-ticket-overlay').classList.add('hidden');
+    document.getElementById('new-ticket-overlay').classList.remove('flex');
+    document.body.style.overflow = '';
+}
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        if (!document.getElementById('search-overlay').classList.contains('hidden')) closeSearchOverlay();
+        if (!document.getElementById('notification-drawer').classList.contains('hidden')) closeNotificationDrawer();
+        if (!document.getElementById('help-drawer').classList.contains('hidden')) closeHelpDrawer();
+        if (!document.getElementById('signout-modal').classList.contains('hidden')) cancelSignOut();
+    }
+    if (e.key === '/' && !['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) {
+        e.preventDefault();
+        openSearchOverlay();
+    }
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
+        e.preventDefault();
+        openSearchOverlay();
+    }
+});
+document.getElementById('global-search').addEventListener('focus', function() {
+    openSearchOverlay();
+});
+document.getElementById('search-input').addEventListener('input', function() {
+    performSearch(this.value);
+});
+document.getElementById('global-search').addEventListener('focus', function() {
+    openSearchOverlay();
+});
+document.getElementById('search-input').addEventListener('input', function() {
+    performSearch(this.value);
+});
+document.addEventListener('click', function(e) {
+    if (e.target.id === 'new-ticket-overlay') closeNewTicketModal();
+});
+window.addEventListener('message', function(e) {
+    if (e.data.type === 'closeModal') closeNewTicketModal();
+});
+</script>
+</body></html>

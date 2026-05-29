@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Clinical Intelligence | ICT Support Portal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "background": "#f6fafe",
+              "on-surface": "#171c1f",
+              "on-primary-fixed": "#001b3c",
+              "surface-container-lowest": "#ffffff",
+              "secondary-container": "#a2eded",
+              "outline": "#737780",
+              "on-tertiary": "#ffffff",
+              "on-primary-container": "#839cc9",
+              "surface-bright": "#f6fafe",
+              "on-surface-variant": "#43474f",
+              "on-secondary-container": "#1a6d6e",
+              "error": "#ba1a1a",
+              "on-background": "#171c1f",
+              "on-error-container": "#93000a",
+              "primary-container": "#17335a",
+              "tertiary-fixed": "#ffdbca",
+              "primary-fixed-dim": "#adc7f7",
+              "surface-dim": "#d6dade",
+              "on-error": "#ffffff",
+              "surface-container": "#eaeef2",
+              "outline-variant": "#c3c6d1",
+              "on-primary": "#ffffff",
+              "secondary-fixed": "#a5eff0",
+              "on-secondary-fixed-variant": "#004f50",
+              "surface-container-low": "#f0f4f8",
+              "tertiary": "#371300",
+              "inverse-primary": "#adc7f7",
+              "on-tertiary-fixed": "#331100",
+              "inverse-surface": "#2c3134",
+              "on-secondary-fixed": "#002020",
+              "surface-container-highest": "#dfe3e7",
+              "error-container": "#ffdad6",
+              "surface-container-high": "#e4e9ed",
+              "on-secondary": "#ffffff",
+              "primary-fixed": "#d6e3ff",
+              "tertiary-container": "#592300",
+              "secondary": "#13696a",
+              "secondary-fixed-dim": "#89d3d4",
+              "surface-variant": "#dfe3e7",
+              "tertiary-fixed-dim": "#ffb68f",
+              "surface": "#f6fafe",
+              "surface-tint": "#455f88",
+              "on-primary-fixed-variant": "#2d476f",
+              "on-tertiary-container": "#f17a2f",
+              "primary": "#001e41",
+              "inverse-on-surface": "#edf1f5",
+              "on-tertiary-fixed-variant": "#773200"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .glass-card {
+        background: rgba(23, 51, 90, 0.04);
+        backdrop-filter: blur(12px);
+      }
+      .primary-gradient {
+        background: linear-gradient(135deg, #001e41 0%, #17335a 100%);
+      }
+      body {
+        font-family: 'Inter', sans-serif;
+      }
+      @keyframes shimmer {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+      }
+      .skeleton-pulse {
+        animation: shimmer 1.5s ease-in-out infinite;
+        background: linear-gradient(90deg, #e4e9ed 25%, #f0f4f8 50%, #e4e9ed 75%);
+        background-size: 200% 100%;
+        border-radius: 8px;
+      }
+    </style>
+</head>
+<body class="bg-background text-on-background selection:bg-secondary-fixed">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-16 bottom-0 w-64 bg-[#f6fafe] dark:bg-[#171c1f] flex flex-col py-4 px-4 gap-2 z-40 overflow-hidden">
+<script>
+(function() {
+    function applySettings() {
+        try {
+            var settings = JSON.parse(localStorage.getItem('ci_app_settings') || '{}');
+            var year = new Date().getFullYear();
+            if (settings.appName) {
+                var na = document.getElementById('navbar-app-name');
+                if (na) na.textContent = settings.appName;
+            }
+            if (settings.tagline) {
+                var nt = document.getElementById('navbar-tagline');
+                if (nt) nt.textContent = settings.tagline;
+            }
+            if (settings.footerText) {
+                var hf = document.getElementById('help-footer');
+                if (hf) hf.innerHTML = (settings.version || 'v1.0.0') + ' \u00A9 ' + year + ' ' + settings.footerText;
+                var mf = document.getElementById('main-footer');
+                if (mf) mf.innerHTML = (settings.version || 'v1.0.0') + ' \u00A9 ' + year + ' ' + settings.footerText;
+            }
+            var raw = localStorage.getItem('clinicalUser') || sessionStorage.getItem('clinicalUser');
+            if (raw) {
+                var user = JSON.parse(raw);
+                var roleEl = document.getElementById('navbar-user-role');
+                if (roleEl && user.role) roleEl.textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
+            }
+        } catch(e) {}
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', applySettings);
+    } else {
+        applySettings();
+    }
+})();
+</script>
+<nav class="flex-1 space-y-1 overflow-y-auto">
+<a class="flex items-center gap-3 px-4 py-3 text-[#44474e] opacity-80 font-medium text-sm hover:bg-[#eaeef2] transition-all duration-300 rounded-lg group" href="javascript:void(0)" onclick="return navigateTo('/ict-support')">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 bg-white text-[#001e41] rounded-lg shadow-sm font-semibold text-sm transition-all duration-300" href="javascript:void(0)" onclick="return navigateTo('/my-tickets')">
+<span class="material-symbols-outlined">confirmation_number</span>
+                Tickets
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#44474e] opacity-80 font-medium text-sm hover:bg-[#eaeef2] transition-all duration-300 rounded-lg group" href="javascript:void(0)" onclick="return navigateTo('/knowledge-base')">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">auto_stories</span>
+                Knowledge Base
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#44474e] opacity-80 font-medium text-sm hover:bg-[#eaeef2] transition-all duration-300 rounded-lg group" href="javascript:void(0)" onclick="return navigateTo('/ict-analytics')">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">analytics</span>
+                Analytics
+            </a>
+<a id="nav-admin" class="flex items-center gap-3 px-4 py-3 text-[#44474e] opacity-80 font-medium text-sm hover:bg-[#eaeef2] transition-all duration-300 rounded-lg group" href="javascript:void(0)" onclick="return navigateTo('/admin/users')">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">admin_panel_settings</span>
+                User Mgmt
+            </a>
+<a id="nav-app-settings" class="flex items-center gap-3 px-4 py-3 text-[#44474e] opacity-80 font-medium text-sm hover:bg-[#eaeef2] transition-all duration-300 rounded-lg group" href="javascript:void(0)" onclick="return navigateTo('/admin/app-settings')">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">brand_awareness</span> App Settings</a>
+<a id="nav-settings" class="flex items-center gap-3 px-4 py-3 text-[#44474e] opacity-80 font-medium text-sm hover:bg-[#eaeef2] transition-all duration-300 rounded-lg group" href="javascript:void(0)" onclick="return navigateTo('/settings')">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">settings</span>
+                Settings
+            </a>
+</nav>
+<script>
+(function() {
+    function isAdminOrIct() {
+        try {
+            var raw = localStorage.getItem('clinicalUser') || sessionStorage.getItem('clinicalUser');
+            if (raw) {
+                var role = JSON.parse(raw).role;
+                return role === 'admin' || role === 'ict' || role === 'hospital_administrator';
+            }
+        } catch(e) {}
+        return false;
+    }
+    if (!isAdminOrIct()) {
+        var els = document.querySelectorAll('#nav-admin, #nav-app-settings');
+        for (var i = 0; i < els.length; i++) {
+            if (els[i]) els[i].style.display = 'none';
+        }
+    }
+})();
+</script>
+<div class="mt-auto">
+<button class="w-full primary-gradient text-white font-headline font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-md hover:shadow-lg active:scale-95 transition-all" onclick="return openNewTicketModal()">
+<span class="material-symbols-outlined">add</span>
+                New Ticket
+            </button>
+            <button onclick="signOut()" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 mt-2 text-red-500/70 hover:text-red-500 hover:bg-red-50 rounded-lg text-sm font-medium transition-all active:scale-95">
+<span class="material-symbols-outlined text-lg">logout</span>
+                Sign Out
+            </button>
+</div>
+</aside>
+<!-- TopAppBar Anchor -->
+<header class="fixed top-0 right-0 left-0 z-50 h-16 bg-[#f6fafe]/80 backdrop-blur-lg flex items-center justify-between px-8 shadow-sm">
+<a href="javascript:void(0)" onclick="return navigateTo('/ict-support')" class="flex items-center gap-3 mr-4 cursor-pointer flex-shrink-0">
+<div class="w-9 h-9 rounded-xl primary-gradient flex items-center justify-center text-white shadow-md flex-shrink-0">
+<span class="material-symbols-outlined text-lg">medical_services</span>
+</div>
+<div class="hidden md:block">
+<h1 id="navbar-app-name" class="font-headline font-bold text-sm text-[#001e41] leading-tight">ICT Support</h1>
+<p id="navbar-tagline" class="text-[9px] uppercase tracking-widest text-outline">Central Medical ICT</p>
+</div>
+</a>
+<div class="flex items-center gap-4">
+<div class="relative flex items-center">
+  <span class="material-symbols-outlined absolute left-3 text-outline" style="font-size: 18px;">search</span>
+  <input id="global-search" type="text" readonly placeholder="Search tickets, knowledge base..." class="w-80 pl-9 pr-8 py-2 bg-surface-container-low border border-outline-variant/30 rounded-lg text-sm text-on-surface placeholder-on-surface-variant/60 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all">
+  <span class="absolute right-2.5 text-[10px] font-medium text-outline bg-surface-container-highest px-1.5 py-0.5 rounded border border-outline-variant/20 pointer-events-none">/</span>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative group">
+<span id="notification-bell" class="material-symbols-outlined text-[#44474e] cursor-pointer" data-icon="notifications" onclick="openNotificationDrawer()">notifications</span>
+<span class="absolute -top-1 -right-1 w-2 h-2 bg-error rounded-full"></span>
+</div>
+<span id="help-button" class="material-symbols-outlined text-[#44474e] cursor-pointer" data-icon="help_outline" onclick="openHelpDrawer()">help_outline</span>
+<div class="flex items-center gap-3 pl-4 border-l border-outline-variant/30 cursor-pointer" onclick="return navigateTo('/settings')" title="Settings">
+<img alt="User Profile Avatar" class="w-8 h-8 rounded-full object-cover ring-2 ring-primary-fixed" data-alt="Close up portrait of a professional female doctor in white lab coat with soft hospital lighting in background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbsCBaIju0fQ_a8Ix8ckQ-KxMEALzspAqj5bECDzEupOD0EKC7s-JGVerFtUCMPb4w_-uMp_bMeJ5jev38-jr3rRT9AkKnd6qR8lhHmItBafI8zGwQmCymegGsDbIIMwD2M7yqNL77aHX9DAFby0rXcXRRRthr0V2BK_K6HaBjn5VG51CK4cDM4YkWcDeJ7WC_QkmnwjjdSgAotIZkbO_cLv-__aAO59kFWwY2Kob6GJAXJf5eGhOhvv6dDh0N7M9KJ796heSUqj4u"/>
+<div>
+<span class="text-sm font-bold text-[#001e41] font-headline block">Dr. Sarah Chen</span>
+<span id="navbar-user-role" class="text-[10px] text-outline/50">Admin</span>
+</div>
+</div>
+</div>
+<div class="bg-[#dfe3e7]/30 h-[1px] w-full absolute bottom-0 left-0"></div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-64 pt-16 p-10 min-h-screen relative">
+<div id="page-skeleton" class="absolute inset-0 z-40 bg-background p-8 transition-opacity duration-500">
+  <div class="skeleton-pulse h-8 w-72 mb-8"></div>
+  <div class="skeleton-pulse h-4 w-full mb-4"></div>
+  <div class="skeleton-pulse h-4 w-3/4 mb-4"></div>
+  <div class="grid grid-cols-3 gap-6 mb-6">
+    <div class="skeleton-pulse h-28 rounded-xl"></div>
+    <div class="skeleton-pulse h-28 rounded-xl"></div>
+    <div class="skeleton-pulse h-28 rounded-xl"></div>
+  </div>
+  <div class="skeleton-pulse h-48 w-full rounded-xl"></div>
+</div>
+<!-- Welcoming Header -->
+<header class="mb-12">
+<h3 class="text-5xl font-extrabold font-headline text-primary tracking-tight mb-2">Good morning, Sarah.</h3>
+<p class="text-on-surface-variant font-body max-w-2xl text-lg">Your precision is vital. We're here to ensure your technology never misses a beat. You have <span class="text-primary font-bold">3 active tickets</span> requiring attention.</p>
+</header>
+<!-- Bento Grid Dashboard Stats -->
+<div class="grid grid-cols-12 gap-6 mb-12">
+<!-- Active Tickets Card -->
+<div class="col-span-12 lg:col-span-4 bg-surface-container-lowest rounded-xl p-8 shadow-sm group hover:shadow-md transition-shadow">
+<div class="flex items-center justify-between mb-6">
+<div class="w-12 h-12 rounded-full bg-primary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" data-icon="pending_actions">pending_actions</span>
+</div>
+<span class="text-3xl font-bold font-headline text-primary">03</span>
+</div>
+<h4 class="text-xl font-bold font-headline mb-1 text-on-surface">Active Tickets</h4>
+<p class="text-sm text-on-surface-variant font-body">Ongoing support requests currently being handled.</p>
+<div class="mt-6 flex -space-x-2">
+<div class="w-8 h-8 rounded-full border-2 border-white bg-secondary-container flex items-center justify-center text-[10px] font-bold">IT</div>
+<div class="w-8 h-8 rounded-full border-2 border-white bg-tertiary-fixed flex items-center justify-center text-[10px] font-bold">ER</div>
+</div>
+</div>
+<!-- Recent Updates Card -->
+<div class="col-span-12 lg:col-span-5 bg-surface-container-low rounded-xl p-8 flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-3 mb-4">
+<span class="material-symbols-outlined text-secondary" data-icon="update">update</span>
+<h4 class="text-xl font-bold font-headline text-on-surface">Recent Updates</h4>
+</div>
+<div class="space-y-4">
+<div class="flex items-start gap-4 p-3 bg-white/50 rounded-lg">
+<div class="w-2 h-2 mt-2 rounded-full bg-secondary"></div>
+<div>
+<p class="text-sm font-semibold">PACS System Upgrade</p>
+<p class="text-xs text-on-surface-variant">Completed 2 hours ago
+</div>
+</div>
+<div class="flex items-start gap-4 p-3 rounded-lg">
+<div class="w-2 h-2 mt-2 rounded-full bg-outline-variant"></div>
+<div>
+<p class="text-sm font-semibold">Network Maintenance</p>
+<p class="text-xs text-on-surface-variant">Scheduled for 11:00 PM tonight</p>
+</div>
+</div>
+</div>
+</div>
+<a class="text-primary text-sm font-bold flex items-center gap-1 mt-6 hover:underline" href="#">
+                    View full history <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</a>
+</div>
+<!-- Help Needed / Urgent Card -->
+<div class="col-span-12 lg:col-span-3 bg-error-container rounded-xl p-8 animate-pulse shadow-sm">
+<div class="flex flex-col h-full justify-between">
+<div>
+<div class="w-10 h-10 rounded-lg bg-error text-white flex items-center justify-center mb-4">
+<span class="material-symbols-outlined" data-icon="emergency">emergency</span>
+</div>
+<h4 class="text-xl font-bold font-headline text-on-error-container">Critical Alert</h4>
+<p class="text-sm text-on-error-container/80 mt-2 font-medium">Main Pharmacy Server experiencing high latency. Critical support required.</p>
+</div>
+<button class="bg-error text-white font-bold py-3 rounded-lg mt-4 hover:bg-red-700 transition-colors">
+                        Respond Now
+                    </button>
+</div>
+</div>
+</div>
+<!-- Secondary Section: Pinned Resources & Ticket Submission -->
+<div class="grid grid-cols-12 gap-8">
+<!-- Pinned Resources -->
+<div class="col-span-12 lg:col-span-8">
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-2xl font-bold font-headline text-primary">Pinned Resources</h3>
+<button class="text-sm font-semibold text-on-surface-variant hover:text-primary">Edit Favorites</button>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div class="p-6 bg-surface-container rounded-xl flex items-center gap-4 hover:bg-surface-container-high transition-colors cursor-pointer">
+<div class="w-12 h-12 bg-white rounded-lg flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="vpn_key">vpn_key</span>
+</div>
+<div>
+<p class="font-bold text-sm">Password Reset Portal</p>
+<p class="text-xs text-on-surface-variant">Self-service authentication</p>
+</div>
+</div>
+<div class="p-6 bg-surface-container rounded-xl flex items-center gap-4 hover:bg-surface-container-high transition-colors cursor-pointer">
+<div class="w-12 h-12 bg-white rounded-lg flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="wifi">wifi</span>
+</div>
+<div>
+<p class="font-bold text-sm">Hospital Guest Wi-Fi</p>
+<p class="text-xs text-on-surface-variant">Access codes &amp; policies</p>
+</div>
+</div>
+<div class="p-6 bg-surface-container rounded-xl flex items-center gap-4 hover:bg-surface-container-high transition-colors cursor-pointer">
+<div class="w-12 h-12 bg-white rounded-lg flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="print">print</span>
+</div>
+<div>
+<p class="font-bold text-sm">Printer Setup Guide</p>
+<p class="text-xs text-on-surface-variant">Floor 3 &amp; 4 Central Stations</p>
+</div>
+</div>
+<div class="p-6 bg-surface-container rounded-xl flex items-center gap-4 hover:bg-surface-container-high transition-colors cursor-pointer">
+<div class="w-12 h-12 bg-white rounded-lg flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+</div>
+<div>
+<p class="font-bold text-sm">EMR Quick Start</p>
+<p class="text-xs text-on-surface-variant">Version 4.2 Release Notes</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Promotion / Quick Action -->
+<div class="col-span-12 lg:col-span-4 relative overflow-hidden rounded-xl bg-primary-container text-white p-8 min-h-[300px] flex flex-col justify-end">
+<div class="absolute inset-0 z-0">
+<img alt="Technology in medical setting" class="w-full h-full object-cover opacity-40 mix-blend-overlay" data-alt="Modern minimalist hospital hallway with sleek medical tablets and blue atmospheric lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC312xMDv7j2um097gdjbEv8Lw7K29W9TI_-GrdfZ8HO789O7pHQsH0hc7FJwo1U4_Ju3uv1oGHBqphCarbW20tK5nUrib0Uz73KyTwFgzqwSK0Nbhs7Xkh-34FZ80oteCpX8GjD7bvANdY5-3DIDzuzg7buTxWW3C7nu9-oAoVEZ8vOaycr_B-NeOXSx-5tVnRaiuDBHIn9lhDjAypHxnJVFyrF4lgDzp8wU7L1G1-SFKN921Hj0BSsY9-uQk-IzFnRd19TalUnPNg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary via-primary/50 to-transparent"></div>
+</div>
+<div class="relative z-10">
+<h4 class="text-2xl font-bold font-headline mb-2 leading-tight">Need technical assistance immediately?</h4>
+<p class="text-on-primary-container text-sm mb-6">Our average response time for new tickets is currently under 12 minutes.</p>
+<button class="bg-secondary-fixed text-on-secondary-fixed px-6 py-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 w-full active:scale-95 transition-transform">
+<span class="material-symbols-outlined" data-icon="send">send</span>
+                        Raise a New Ticket
+                    </button>
+</div>
+</div>
+</div>
+<!-- Latest News / Ticker -->
+<footer class="mt-16 pt-8 border-t border-outline-variant/20 flex flex-col md:flex-row items-center justify-between text-xs text-on-surface-variant gap-4">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-green-500"></span> 
+        All Systems Operational
+    </div>
+<p id="main-footer" class="text-[10px] text-outline/40">Clinical Intelligence Platform &copy; 2026</p>
+</footer>
+</main>
+<script>
+// Mock real-time data
+let dashboardData = {
+    activeTickets: 47,
+    criticalIssues: 3,
+    responseTime: 12,
+    systemHealth: 98.7,
+    recentActivity: [
+        { time: '2 min ago', action: 'New ticket created', user: 'Dr. Smith', priority: 'High' },
+        { time: '5 min ago', action: 'Ticket resolved', user: 'ICT Team', priority: 'Medium' },
+        { time: '8 min ago', action: 'System maintenance', user: 'Admin', priority: 'Low' },
+        { time: '12 min ago', action: 'Emergency response', user: 'ER Staff', priority: 'Critical' }
+    ],
+    alerts: [
+        { type: 'warning', message: 'DICOM Server experiencing high load', time: '5 min ago' },
+        { type: 'info', message: 'Scheduled maintenance tonight 11PM-2AM', time: '1 hour ago' },
+        { type: 'success', message: 'EHR system performance optimized', time: '2 hours ago' }
+    ]
+};
+// Update dashboard statistics
+function updateDashboard() {
+    // Simulate real-time updates
+    dashboardData.activeTickets += Math.floor(Math.random() * 3) - 1;
+    dashboardData.responseTime = Math.max(8, Math.min(20, dashboardData.responseTime + (Math.random() - 0.5) * 2));
+    dashboardData.systemHealth = Math.max(95, Math.min(99.9, dashboardData.systemHealth + (Math.random() - 0.5) * 0.5));
+    
+    // Update stats in the UI
+    updateStatCards();
+    updateActivityFeed();
+    updateSystemStatus();
+    cacheSave('dashboardData', dashboardData);
+}
+function updateStatCards() {
+    // Find and update stat cards
+    const statValues = document.querySelectorAll('.text-3xl, .text-4xl');
+    if (statValues[0]) statValues[0].textContent = dashboardData.activeTickets;
+    if (statValues[1]) statValues[1].textContent = dashboardData.criticalIssues;
+    if (statValues[2]) statValues[2].textContent = dashboardData.responseTime + ' min';
+    if (statValues[3]) statValues[3].textContent = dashboardData.systemHealth.toFixed(1) + '%';
+}
+function updateActivityFeed() {
+    // Add new activity to feed (if it exists)
+    const activityFeed = document.querySelector('[class*="space-y"]');
+    if (activityFeed && Math.random() > 0.7) {
+        const newActivity = {
+            time: 'Just now',
+            action: 'System update',
+            user: 'ICT Team',
+            priority: ['Low', 'Medium', 'High'][Math.floor(Math.random() * 3)]
+        };
+        dashboardData.recentActivity.unshift(newActivity);
+        dashboardData.recentActivity = dashboardData.recentActivity.slice(0, 4);
+    }
+}
+function updateSystemStatus() {
+    const statusIndicator = document.querySelector('.bg-green-500');
+    if (statusIndicator) {
+        if (dashboardData.systemHealth < 97) {
+            statusIndicator.className = 'w-2 h-2 rounded-full bg-yellow-500';
+        } else if (dashboardData.systemHealth < 95) {
+            statusIndicator.className = 'w-2 h-2 rounded-full bg-red-500';
+        } else {
+            statusIndicator.className = 'w-2 h-2 rounded-full bg-green-500';
+        }
+    }
+}
+// Handle ticket creation
+function createNewTicket() {
+    openNewTicketModal();
+}
+// Show notifications
+function showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transform transition-all duration-300 ${
+        type === 'success' 
+            ? 'bg-green-500 text-white' 
+            : 'bg-red-500 text-white'
+    }`;
+    notification.innerHTML = `
+        <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined">${type === 'success' ? 'check_circle' : 'error'}</span>
+            <span>${message}</span>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.opacity = '0';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+// Add click handlers
+document.addEventListener('DOMContentLoaded', function() {
+    // Add click handler to "Raise a New Ticket" button
+    const newTicketBtn = document.querySelector('button[class*="bg-secondary-fixed"]');
+    if (newTicketBtn) {
+        newTicketBtn.addEventListener('click', createNewTicket);
+    }
+    
+    // Load cached data
+    var cached = cacheLoad('dashboardData', null);
+    if (cached) {
+        dashboardData = cached;
+    }
+    // Initialize dashboard
+    updateStatCards();
+    
+    // Set up real-time updates
+    setInterval(updateDashboard, 10000); // Update every 10 seconds
+    
+    // Simulate initial alerts
+    setTimeout(() => {
+        showNotification('Dashboard loaded successfully', 'success');
+        }, 1000);
+});
+</script>
+<script>
+// Cache helpers
+
+var SEARCH_ITEMS = [
+    { label: 'Dashboard', path: '/ict-support', icon: 'dashboard', keywords: 'dashboard support home ict' },
+    { label: 'My Tickets', path: '/my-tickets', icon: 'confirmation_number', keywords: 'tickets my tickets requests' },
+    { label: 'Knowledge Base', path: '/knowledge-base', icon: 'auto_stories', keywords: 'knowledge base docs documentation' },
+    { label: 'Analytics', path: '/ict-analytics', icon: 'analytics', keywords: 'analytics statistics reports charts' },
+    { label: 'User Management', path: '/admin/users', icon: 'admin_panel_settings', keywords: 'users admin management provision' },
+    { label: 'App Settings', path: '/admin/app-settings', icon: 'brand_awareness', keywords: 'app settings branding theme logo' },
+    { label: 'Settings', path: '/settings', icon: 'settings', keywords: 'settings profile preferences password' },
+    { label: 'Emergency Ops', path: '/emergency', icon: 'emergency', keywords: 'emergency critical urgent alerts' },
+];
+function performSearch(query) {
+    var el = document.getElementById('search-results');
+    if (!query || query.trim().length < 2) {
+        el.innerHTML = '<div class="p-8 text-center text-sm text-on-surface-variant"><span class="material-symbols-outlined text-3xl mb-2 block text-outline/40">search</span>Type to start searching...</div>';
+        return;
+    }
+    var q = query.toLowerCase().trim();
+    var results = [];
+    for (var i = 0; i < SEARCH_ITEMS.length; i++) {
+        var item = SEARCH_ITEMS[i];
+        if (item.label.toLowerCase().indexOf(q) !== -1 || item.keywords.indexOf(q) !== -1) {
+            results.push(item);
+        }
+    }
+    if (results.length === 0) {
+        el.innerHTML = '<div class="p-8 text-center text-sm text-on-surface-variant"><span class="material-symbols-outlined text-3xl mb-2 block text-outline/40">search_off</span>No results found</div>';
+        return;
+    }
+    var html = '';
+    for (var i = 0; i < results.length; i++) {
+        html += '<button class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-surface-container-low transition-all text-left group" onclick="window.parent.postMessage({ type: \'navigate\', path: \'' + results[i].path + '\' }, \'*\'); closeSearchOverlay();">' +
+            '<span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">' + results[i].icon + '</span>' +
+            '<div class="flex-1 min-w-0"><p class="text-sm font-medium text-[#001e41]">' + results[i].label + '</p></div>' +
+            '<span class="text-[10px] text-outline/60 font-mono">' + results[i].path + '</span>' +
+            '</button>';
+    }
+    el.innerHTML = html;
+}
+function openSearchOverlay() {
+    document.getElementById('search-overlay').classList.remove('hidden');
+    document.getElementById('search-overlay').classList.add('flex');
+    document.body.style.overflow = 'hidden';
+    setTimeout(function() {
+        document.getElementById('search-input').focus();
+    }, 100);
+}
+function closeSearchOverlay() {
+    document.getElementById('search-overlay').classList.add('hidden');
+    document.getElementById('search-overlay').classList.remove('flex');
+    document.body.style.overflow = '';
+}
+function cacheSave(key, data) {
+    try { localStorage.setItem('ci_cache_' + key, JSON.stringify(data)); } catch(e) {}
+}
+function cacheLoad(key, fallback) {
+    try { var d = localStorage.getItem('ci_cache_' + key); return d ? JSON.parse(d) : null; } catch(e) {}
+    return fallback;
+}
+function cacheClear() {
+    try {
+        var keysToRemove = [];
+        for (var k in localStorage) { if (localStorage.hasOwnProperty(k) && k.indexOf('ci_cache_') === 0) keysToRemove.push(k); }
+        for (var i = 0; i < keysToRemove.length; i++) localStorage.removeItem(keysToRemove[i]);
+    } catch(e) {}
+}
+</script>
+<script>
+// Handle keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey && e.key === 'n') {
+        e.preventDefault();
+        createNewTicket();
+    }
+});
+// Add hover effects to interactive elements
+document.addEventListener('mouseover', function(e) {
+    if (e.target.closest('.hover:bg-surface-container-high')) {
+        e.target.style.transform = 'translateX(2px)';
+    }
+});
+document.addEventListener('mouseout', function(e) {
+    if (e.target.closest('.hover:bg-surface-container-high')) {
+        e.target.style.transform = 'translateX(0)';
+    }
+    });
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var skeleton = document.getElementById('page-skeleton');
+    if (skeleton) {
+        setTimeout(function() {
+            skeleton.style.opacity = '0';
+            setTimeout(function() { skeleton.remove(); }, 500);
+        }, 400);
+    }
+});
+function signOut() {
+    showSignOutModal();
+}
+function navigateTo(path) {
+    window.parent.postMessage({ type: 'navigate', path: path }, '*');
+    return false;
+}
+</script>
+<script>
+(function() {
+    var links = document.querySelectorAll("nav a");
+    for (var i = 0; i < links.length; i++) {
+        links[i].classList.remove("bg-white", "text-[#001e41]", "rounded-lg", "shadow-sm", "font-semibold");
+        links[i].classList.add("text-[#44474e]", "opacity-80");
+    }
+    try {
+    var path = (window.parent.location.pathname || window.location.pathname).toLowerCase();
+    var navMap = {
+        "admin/app": "/admin/app-settings",
+        dashboard: "/ict-support",
+        ticket: "/my-tickets",
+        request: "/my-tickets",
+        knowledge: "/knowledge-base",
+        analytics: "/ict-analytics",
+        setting: "/settings",
+        admin: "/admin/users",
+        provision: "/settings",
+        role: "/settings",
+        ucu: "/settings",
+        system: "/settings",
+        emergency: "/ict-support",
+        user: "/admin/users",
+        support: "/ict-support",
+        queue: "/ict-support",
+        clinical: "/knowledge-base",
+    };
+    var target = "";
+    for (var key in navMap) {
+        if (path.indexOf(key) !== -1) { target = navMap[key]; break; }
+    }
+    if (!target) return;
+    for (var i = 0; i < links.length; i++) {
+        var oc = links[i].getAttribute("onclick") || "";
+        if (oc.indexOf(target) !== -1) {
+            links[i].classList.add("bg-white", "text-[#001e41]", "rounded-lg", "shadow-sm", "font-semibold");
+            links[i].classList.remove("text-[#44474e]", "opacity-80");
+        }
+    }
+    } catch(e) {}
+})();
+</script>
+<!-- Sign Out Confirmation Modal -->
+<div id="signout-modal" class="fixed inset-0 z-[400] hidden items-center justify-center bg-black/30 backdrop-blur-sm" onclick="if(event.target===this)cancelSignOut()">
+<div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 mx-4">
+<div class="flex flex-col items-center text-center gap-3">
+<div class="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center">
+<span class="material-symbols-outlined text-red-500 text-2xl" style="font-variation-settings:'FILL' 1">logout</span>
+</div>
+<h3 class="text-lg font-bold text-[#001e41] font-headline">Sign Out</h3>
+<p class="text-sm text-on-surface-variant">Are you sure you want to sign out? You will need to log in again to access the system.</p>
+<div class="flex gap-3 w-full mt-2">
+<button onclick="cancelSignOut()" class="flex-1 px-4 py-2.5 rounded-xl border border-outline-variant text-sm font-semibold text-on-surface-variant hover:bg-surface-container-low transition-all">Cancel</button>
+<button onclick="confirmSignOut()" class="flex-1 px-4 py-2.5 rounded-xl bg-red-500 text-white text-sm font-semibold hover:bg-red-600 transition-all shadow-lg shadow-red-500/20">Sign Out</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Notification Drawer -->
+<div id="notification-drawer" class="fixed inset-0 z-[300] hidden">
+<div id="notification-backdrop" class="absolute inset-0 bg-black/30 backdrop-blur-sm" onclick="closeNotificationDrawer()"></div>
+<div class="absolute top-0 right-0 w-96 h-full bg-white shadow-2xl flex flex-col" style="overscroll-behavior: contain;">
+<div class="flex items-center justify-between px-6 py-4 border-b border-outline-variant/30">
+<div class="flex items-center gap-3">
+<h3 class="text-lg font-bold text-[#001e41] font-headline">Notifications</h3>
+<span class="text-xs bg-error text-white px-2 py-0.5 rounded-full font-medium" id="notif-count">3</span>
+</div>
+<button onclick="closeNotificationDrawer()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-higher transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">close</span>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto" id="notif-list">
+<div class="px-6 py-4 hover:bg-surface-container-low transition-colors cursor-pointer border-b border-outline-variant/10">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary mt-0.5">assignment</span>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-semibold text-[#001e41]">Ticket #1042 Resolved</p>
+<p class="text-xs text-on-surface-variant mt-0.5">Your reported network issue in Ward 3 has been resolved.</p>
+<p class="text-[10px] text-on-surface-variant/60 mt-1">2 min ago</p>
+</div>
+<span class="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-2"></span>
+</div>
+</div>
+<div class="px-6 py-4 hover:bg-surface-container-low transition-colors cursor-pointer border-b border-outline-variant/10">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-[#f59e0b] mt-0.5">warning</span>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-semibold text-[#001e41]">System Maintenance</p>
+<p class="text-xs text-on-surface-variant mt-0.5">Scheduled downtime on Sunday 02:00-04:00 AM for server updates.</p>
+<p class="text-[10px] text-on-surface-variant/60 mt-1">1 hour ago</p>
+</div>
+<span class="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-2"></span>
+</div>
+</div>
+<div class="px-6 py-4 hover:bg-surface-container-low transition-colors cursor-pointer border-b border-outline-variant/10">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-green-600 mt-0.5">check_circle</span>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-semibold text-[#001e41]">New Software Update</p>
+<p class="text-xs text-on-surface-variant mt-0.5">EMR system v3.2 is ready for installation. Contact ICT for deployment.</p>
+<p class="text-[10px] text-on-surface-variant/60 mt-1">3 hours ago</p>
+</div>
+<span class="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-2"></span>
+</div>
+</div>
+</div>
+<div class="px-6 py-3 border-t border-outline-variant/30 text-center">
+<button class="text-sm text-primary font-medium hover:underline" onclick="markAllNotificationsRead()">Mark all as read</button>
+</div>
+</div>
+</div>
+<!-- Help Drawer -->
+<div id="help-drawer" class="fixed inset-0 z-[300] hidden">
+<div id="help-backdrop" class="absolute inset-0 bg-black/30 backdrop-blur-sm" onclick="closeHelpDrawer()"></div>
+<div class="absolute top-0 right-0 w-96 h-full bg-white shadow-2xl flex flex-col" style="overscroll-behavior: contain;">
+<div class="flex items-center justify-between px-6 py-4 border-b border-outline-variant/30">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">help</span>
+<h3 class="text-lg font-bold text-[#001e41] font-headline">Help & Support</h3>
+</div>
+<button onclick="closeHelpDrawer()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-higher transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">close</span>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto p-6 space-y-6">
+<div class="space-y-2">
+<p class="text-[10px] uppercase tracking-widest text-on-surface-variant font-semibold">Quick Actions</p>
+<button class="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-surface-container-low hover:bg-surface-container-higher transition-colors text-left">
+<span class="material-symbols-outlined text-[#001e41]">description</span>
+<div>
+<p class="text-sm font-medium text-[#001e41]">User Guide</p>
+<p class="text-[10px] text-on-surface-variant">Learn how to use the platform</p>
+</div>
+</button>
+<button class="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-surface-container-low hover:bg-surface-container-higher transition-colors text-left">
+<span class="material-symbols-outlined text-[#001e41]">quiz</span>
+<div>
+<p class="text-sm font-medium text-[#001e41]">FAQs</p>
+<p class="text-[10px] text-on-surface-variant">Frequently asked questions</p>
+</div>
+</button>
+<button class="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-surface-container-low hover:bg-surface-container-higher transition-colors text-left">
+<span class="material-symbols-outlined text-[#001e41]">keyboard</span>
+<div>
+<p class="text-sm font-medium text-[#001e41]">Keyboard Shortcuts</p>
+<p class="text-[10px] text-on-surface-variant">Ctrl+N to create a new ticket</p>
+</div>
+</button>
+</div>
+<div class="space-y-2">
+<p class="text-[10px] uppercase tracking-widest text-on-surface-variant font-semibold">Contact Support</p>
+<div class="flex items-center gap-3 px-4 py-3 rounded-xl bg-surface-container-low">
+<span class="material-symbols-outlined text-[#001e41]">mail</span>
+<div>
+<p class="text-sm font-medium text-[#001e41]">Email</p>
+<p class="text-[10px] text-on-surface-variant">ict-support@clinicalintel.com</p>
+</div>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 rounded-xl bg-surface-container-low">
+<span class="material-symbols-outlined text-[#001e41]">phone</span>
+<div>
+<p class="text-sm font-medium text-[#001e41]">Phone</p>
+<p class="text-[10px] text-on-surface-variant">+1 (555) 123-4567</p>
+</div>
+</div>
+</div>
+</div>
+<div class="px-6 py-3 border-t border-outline-variant/30">
+<p id="help-footer" class="text-[10px] text-on-surface-variant/60 text-center">v1.0.0 Clinical Intelligence Platform</p>
+</div>
+</div>
+</div>
+
+<!-- Global Search Overlay -->
+<div id="search-overlay" class="fixed inset-0 z-[500] hidden items-start justify-center pt-[15vh] bg-black/40 backdrop-blur-sm" onclick="if(event.target===this)closeSearchOverlay()">
+<div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-4 overflow-hidden">
+<div class="p-4 border-b border-outline-variant/30">
+<input id="search-input" type="text" placeholder="Search tickets, knowledge base..." class="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/30 rounded-xl text-sm text-on-surface placeholder-on-surface-variant/60 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all" autocomplete="off">
+</div>
+<div id="search-results" class="max-h-96 overflow-y-auto p-2">
+<div class="text-center py-8 text-sm text-on-surface-variant/60">
+<span class="material-symbols-outlined text-3xl block mb-2">search</span>
+Type to start searching...
+</div>
+</div>
+</div>
+</div>
+<div id="new-ticket-overlay" class="fixed inset-0 z-[200] bg-black/40 backdrop-blur-sm hidden items-center justify-center p-4 transition-all duration-300">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden relative">
+    <button onclick="closeNewTicketModal()" class="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-surface-container-hover hover:bg-surface-container-higher transition-colors">
+      <span class="material-symbols-outlined text-on-surface-variant">close</span>
+    </button>
+    <iframe id="new-ticket-iframe" src="/screens/new_ticket_modal.html" class="w-full h-[80vh] border-0" sandbox="allow-scripts allow-same-origin"></iframe>
+  </div>
+</div>
+<script>
+function showSignOutModal() {
+    document.getElementById('signout-modal').classList.remove('hidden');
+    document.getElementById('signout-modal').classList.add('flex');
+    document.body.style.overflow = 'hidden';
+}
+function confirmSignOut() {
+    localStorage.removeItem('clinicalUser');
+    sessionStorage.removeItem('clinicalUser');
+    cacheClear();
+    window.parent.postMessage({ type: 'signout' }, '*');
+}
+function cancelSignOut() {
+    document.getElementById('signout-modal').classList.add('hidden');
+    document.getElementById('signout-modal').classList.remove('flex');
+    document.body.style.overflow = '';
+}
+function openNotificationDrawer() {
+    document.getElementById('notification-drawer').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+function closeNotificationDrawer() {
+    document.getElementById('notification-drawer').classList.add('hidden');
+    document.body.style.overflow = '';
+}
+function markAllNotificationsRead() {
+    var dots = document.querySelectorAll('#notif-list .w-2.h-2.bg-primary');
+    for (var i = 0; i < dots.length; i++) { dots[i].classList.remove('bg-primary'); dots[i].classList.add('bg-outline-variant'); }
+    var count = document.getElementById('notif-count');
+    if (count) count.textContent = '0';
+    var dot = document.getElementById('notification-dot');
+    if (dot) dot.classList.add('hidden');
+}
+function openHelpDrawer() {
+    document.getElementById('help-drawer').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+function closeHelpDrawer() {
+    document.getElementById('help-drawer').classList.add('hidden');
+    document.body.style.overflow = '';
+}
+function openNewTicketModal() {
+    document.getElementById('new-ticket-overlay').classList.remove('hidden');
+    document.getElementById('new-ticket-overlay').classList.add('flex');
+    document.body.style.overflow = 'hidden';
+    return false;
+}
+function closeNewTicketModal() {
+    document.getElementById('new-ticket-overlay').classList.add('hidden');
+    document.getElementById('new-ticket-overlay').classList.remove('flex');
+    document.body.style.overflow = '';
+}
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        if (!document.getElementById('search-overlay').classList.contains('hidden')) closeSearchOverlay();
+        if (!document.getElementById('notification-drawer').classList.contains('hidden')) closeNotificationDrawer();
+        if (!document.getElementById('help-drawer').classList.contains('hidden')) closeHelpDrawer();
+        if (!document.getElementById('signout-modal').classList.contains('hidden')) cancelSignOut();
+    }
+    if (e.key === '/' && !['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) {
+        e.preventDefault();
+        openSearchOverlay();
+    }
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
+        e.preventDefault();
+        openSearchOverlay();
+    }
+});
+document.getElementById('global-search').addEventListener('focus', function() {
+    openSearchOverlay();
+});
+document.getElementById('search-input').addEventListener('input', function() {
+    performSearch(this.value);
+});
+document.addEventListener('click', function(e) {
+    if (e.target.id === 'new-ticket-overlay') closeNewTicketModal();
+});
+window.addEventListener('message', function(e) {
+    if (e.data.type === 'closeModal') closeNewTicketModal();
+});
+</script>
+</body></html>
