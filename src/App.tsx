@@ -87,36 +87,37 @@ function AppContent() {
   }, []);
 
   useEffect(() => {
+    const onError = (err: Error) => console.warn("Firestore listener error:", err.message);
     const unsubAppSettings = onSnapshot(doc(db, "appSettings", "current"), (snap) => {
       if (snap.exists()) {
         try { localStorage.setItem("ci_app_settings", JSON.stringify(snap.data())); } catch {}
       }
-    });
+    }, onError);
     const unsubKbArticles = onSnapshot(collection(db, "kbArticles"), (snap) => {
       const articles: Record<string, unknown>[] = [];
       snap.forEach((d) => articles.push({ id: d.id, ...d.data() }));
       try { localStorage.setItem("ci_kb_articles", JSON.stringify(articles)); } catch {}
-    });
+    }, onError);
     const unsubUserTypes = onSnapshot(collection(db, "user_types"), (snap) => {
       const types: Record<string, unknown> = {};
       snap.forEach((d) => { types[d.id] = d.data(); });
       try { localStorage.setItem("ci_user_types", JSON.stringify(types)); } catch {}
-    });
+    }, onError);
     const unsubUsers = onSnapshot(collection(db, "users"), (snap) => {
       const users: Record<string, unknown>[] = [];
       snap.forEach((d) => users.push({ uid: d.id, ...d.data() }));
       try { localStorage.setItem("ci_provisioned_users", JSON.stringify(users)); } catch {}
-    });
+    }, onError);
     const unsubTickets = onSnapshot(collection(db, "tickets"), (snap) => {
       const tickets: Record<string, unknown>[] = [];
       snap.forEach((d) => tickets.push({ id: d.id, ...d.data() }));
       try { localStorage.setItem("ci_tickets", JSON.stringify(tickets)); } catch {}
-    });
+    }, onError);
     const unsubNotifications = onSnapshot(collection(db, "notifications"), (snap) => {
       const notifs: Record<string, unknown>[] = [];
       snap.forEach((d) => notifs.push({ id: d.id, ...d.data() }));
       try { localStorage.setItem("ci_notifications", JSON.stringify(notifs)); } catch {}
-    });
+    }, onError);
     return () => {
       unsubAppSettings();
       unsubKbArticles();
