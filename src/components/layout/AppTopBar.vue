@@ -1,7 +1,7 @@
 <template>
   <header class="bg-surface-container-lowest dark:bg-inverse-surface text-primary border-b border-outline-variant dark:border-outline flex justify-between items-center w-full px-lg h-16 sticky top-0 z-30 shrink-0">
     <div class="flex items-center gap-md w-1/3">
-      <span class="text-headline-md font-headline-md font-bold text-primary dark:text-inverse-primary truncate">Hospital ICT Service Management</span>
+      <span class="text-headline-md font-headline-md font-bold text-primary dark:text-inverse-primary truncate">{{ hospitalName }}</span>
     </div>
     <div class="flex-1 flex justify-center max-w-md w-1/3">
       <div class="relative w-full">
@@ -16,9 +16,6 @@
     </div>
     <div class="flex items-center justify-end gap-md w-1/3">
       <div class="flex items-center gap-xs">
-        <button @click="$emit('sync-data')" class="p-2 rounded-full hover:bg-amber-100 transition-colors text-amber-700 relative group" title="Sync mock data to Firestore">
-          <span class="material-symbols-outlined">cloud_upload</span>
-        </button>
         <button class="p-2 rounded-full hover:bg-surface-container-low dark:hover:bg-surface-variant transition-colors text-on-surface-variant">
           <span class="material-symbols-outlined">terminal</span>
         </button>
@@ -47,9 +44,11 @@
 import { ref } from 'vue'
 import { useUIStore } from '@/stores/ui'
 import { useAuthStore } from '@/stores/auth'
+import { useSettings } from '@/composables/useSettings'
 
 defineEmits(['new-ticket'])
 const ui = useUIStore()
 const auth = useAuthStore()
+const { hospitalName } = useSettings()
 const searchQuery = ref('')
 </script>

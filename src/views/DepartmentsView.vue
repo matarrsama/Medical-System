@@ -31,23 +31,42 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useUIStore } from '@/stores/ui'
-const ui = useUIStore()
+import { db } from '@/lib/firebase'
+import { collection, onSnapshot, query } from 'firebase/firestore'
 
-const departments = ref([
-  { name: 'Emergency Room', head: 'Dr. Sarah Chen', icon: 'local_hospital', staffCount: 48, devices: 156, colorClass: 'bg-error' },
-  { name: 'Imaging & Radiology', head: 'Dr. James Mitchell', icon: 'radiology', staffCount: 32, devices: 89, colorClass: 'bg-primary' },
-  { name: 'Pharmacy', head: 'Mark Thompson', icon: 'medication', staffCount: 24, devices: 45, colorClass: 'bg-tertiary' },
-  { name: 'Infrastructure', head: 'Ahmed Al-Rashid', icon: 'dns', staffCount: 18, devices: 234, colorClass: 'bg-secondary' },
-  { name: 'Administration', head: 'Lisa Thompson', icon: 'admin_panel_settings', staffCount: 15, devices: 67, colorClass: 'bg-surface-variant text-on-surface' },
-  { name: 'Pathology Lab', head: 'Dr. James Wilson', icon: 'biotech', staffCount: 12, devices: 34, colorClass: 'bg-primary-container' },
-  { name: 'Finance', head: 'John Mwangi', icon: 'account_balance', staffCount: 10, devices: 28, colorClass: 'bg-pink-500' },
-  { name: 'ICT', head: 'Ahmed Al-Rashid', icon: 'computer', staffCount: 22, devices: 189, colorClass: 'bg-cyan-600' },
-  { name: 'Maternity', head: 'Dr. Mary Wanjiku', icon: 'pregnancy', staffCount: 56, devices: 112, colorClass: 'bg-rose-500' },
-  { name: 'LAB', head: 'Dr. James Wilson', icon: 'science', staffCount: 18, devices: 67, colorClass: 'bg-amber-600' },
-  { name: 'Super Admin', head: 'Dr. Peter Kamau', icon: 'shield', staffCount: 5, devices: 45, colorClass: 'bg-purple-600' },
-  { name: 'Procurement', head: 'Grace Akinyi', icon: 'shopping_cart', staffCount: 8, devices: 22, colorClass: 'bg-orange-600' },
-  { name: 'Human Resources', head: 'Jane Wanjiku', icon: 'badge', staffCount: 7, devices: 18, colorClass: 'bg-teal-600' }
-])
+const ui = useUIStore()
+const departments = ref([])
+let unsubscribe = null
+
+const colorMap = {
+  'Emergency Room': 'bg-error',
+  'Imaging & Radiology': 'bg-primary',
+  'Pharmacy': 'bg-tertiary',
+  'Infrastructure': 'bg-secondary',
+  'Administration': 'bg-surface-variant text-on-surface',
+  'Pathology Lab': 'bg-primary-container',
+  'Finance': 'bg-pink-500',
+  'ICT': 'bg-cyan-600',
+  'Maternity': 'bg-rose-500',
+  'LAB': 'bg-amber-600',
+  'Super Admin': 'bg-purple-600',
+  'Procurement': 'bg-orange-600',
+  'Human Resources': 'bg-teal-600'
+}
+
+onMounted(() => {
+  const q = query(collection(db, 'departments'))
+  unsubscribe = onSnapshot(q, (snapshot) => {
+    departments.value = snapshot.docs.map(doc => {
+      const data = doc.data()
+      return { ...data, colorClass: colorMap[data.name] || 'bg-primary' }
+    })
+  })
+})
+
+onUnmounted(() => {
+  if (unsubscribe) unsubscribe()
+})
 </script>

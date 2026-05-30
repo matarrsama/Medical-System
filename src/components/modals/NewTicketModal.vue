@@ -32,30 +32,50 @@
       <div>
         <label class="text-label-md font-label-md text-on-surface">Department</label>
         <select v-model="form.department" class="w-full mt-1 px-3 py-2 border border-outline-variant rounded text-body-sm bg-surface">
-          <option>ER</option><option>Imaging & Radiology</option><option>Pharmacy</option><option>Infrastructure</option><option>Administration</option><option>Pathology Lab</option><option>Finance</option><option>ICT</option><option>Maternity</option><option>LAB</option><option>Super Admin</option><option>Procurement</option><option>Human Resources</option>
+          <option v-for="dept in departments" :key="dept" :value="dept">{{ dept }}</option>
         </select>
       </div>
     </form>
     <div class="flex justify-end gap-3 p-4 border-t border-outline-variant">
       <button @click="$emit('close')" class="px-4 py-2 border border-outline-variant rounded text-label-md text-on-surface hover:bg-surface-container">Cancel</button>
-      <button @click="submit" class="px-4 py-2 bg-primary text-on-primary rounded text-label-md hover:bg-primary-container">Create Ticket</button>
+      <button @click="submit" :disabled="saving" class="px-4 py-2 bg-primary text-on-primary rounded text-label-md hover:bg-primary-container flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed">
+        <span v-if="saving" class="material-symbols-outlined animate-spin text-[18px]">sync</span>
+        Create Ticket
+      </button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { reactive } from 'vue'
+import { reactive, ref, onMounted, onUnmounted } from 'vue'
 import { useToast } from '@/composables/useToast'
+import { db } from '@/lib/firebase'
+import { collection, onSnapshot } from 'firebase/firestore'
 
 const emit = defineEmits(['close'])
 const toast = useToast()
+const saving = ref(false)
+const departments = ref([])
+let unsubDepts = null
 
 const form = reactive({
   title: '', priority: 'Medium', category: 'Network', description: '', department: 'ER'
 })
 
 function submit() {
+  saving.value = true
   toast.success('Ticket created successfully!')
   emit('close')
+  saving.value = false
 }
+
+onMounted(() => {
+  unsubDepts = onSnapshot(collection(db, 'departments'), (snap) => {
+    departments.value = snap.docs.map(d => d.data().name)
+  })
+})
+
+onUnmounted(() => {
+  if (unsubDepts) unsubDepts()
+})
 </script>

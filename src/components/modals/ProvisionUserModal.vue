@@ -83,9 +83,11 @@
         <button
           v-else
           @click="submit"
-          class="flex items-center gap-2 px-6 py-2.5 rounded-lg text-label-md font-label-md text-on-primary bg-primary hover:bg-primary-container transition-all shadow-sm"
+          :disabled="saving"
+          class="flex items-center gap-2 px-6 py-2.5 rounded-lg text-label-md font-label-md text-on-primary bg-primary hover:bg-primary-container transition-all shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          <span class="material-symbols-outlined text-[18px]">bolt</span>
+          <span v-if="saving" class="material-symbols-outlined animate-spin text-[18px]">sync</span>
+          <span v-if="!saving" class="material-symbols-outlined text-[18px]">bolt</span>
           Complete Provisioning
         </button>
       </div>
@@ -105,6 +107,7 @@ import StepSecurityCredentials from '@/components/provision/StepSecurityCredenti
 const emit = defineEmits(['close'])
 const toast = useToast()
 const currentStep = ref(1)
+const saving = ref(false)
 
 const wizardData = reactive({
   avatar: '',
@@ -150,6 +153,8 @@ function prevStep() {
 }
 
 async function submit() {
+  if (saving.value) return
+  saving.value = true
   try {
     await createUser({
       email: wizardData.credentials.email,
@@ -166,6 +171,8 @@ async function submit() {
     emit('close')
   } catch (err) {
     toast.error(err.message)
+  } finally {
+    saving.value = false
   }
 }
 </script>

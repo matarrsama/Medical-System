@@ -36,19 +36,27 @@
     </div>
     <div class="flex justify-end gap-3">
       <button @click="reset" class="px-4 py-2 border border-outline-variant rounded-lg text-label-md text-on-surface hover:bg-surface-container transition-colors">Reset to Defaults</button>
-      <button @click="save" class="px-5 py-2 bg-primary text-on-primary rounded-lg text-label-md font-label-md hover:bg-primary-container transition-colors">Save Settings</button>
+      <button @click="save" :disabled="saving" class="px-5 py-2 bg-primary text-on-primary rounded-lg text-label-md font-label-md hover:bg-primary-container transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+        <span v-if="saving" class="material-symbols-outlined animate-spin text-[18px]">sync</span>
+        <span v-else>Save Settings</span>
+      </button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useUIStore } from '@/stores/ui'
+import { useSettings } from '@/composables/useSettings'
+import { doc, getDoc } from 'firebase/firestore'
+import { db } from '@/lib/firebase'
 
 const ui = useUIStore()
+const saving = ref(false)
+const { saveSettings } = useSettings()
 
 const defaults = {
-  hospitalName: 'Main Hospital',
+  hospitalName: 'Hospital ICT Service Management',
   displayName: 'ICT Admin Console',
   timeZone: 'America/New_York',
   language: 'English (US)',
@@ -67,47 +75,49 @@ const defaults = {
   maintenanceMode: false
 }
 
-function buildSections() {
+function buildSections(overrides = {}) {
+  const v = (key, fallback) => overrides[key] ?? fallback
+  const item = (key, label, desc, type, extra) => ({ key, label, description: desc, type, value: v(key, defaults[key]), ...extra })
   return [
     {
       title: 'General',
       description: 'Basic system identification and regional preferences.',
       items: [
-        { label: 'Hospital Name', description: 'Display name for the system', type: 'text', value: defaults.hospitalName },
-        { label: 'System Display Name', description: 'Title shown in the sidebar and browser tab', type: 'text', value: defaults.displayName },
-        { label: 'Time Zone', description: 'System-wide time zone for all logs and schedules', type: 'select', value: defaults.timeZone, options: ['America/New_York', 'America/Chicago', 'America/Denver', 'America/Los_Angeles', 'Europe/London', 'Europe/Berlin', 'Asia/Dubai', 'Asia/Tokyo', 'UTC'] },
-        { label: 'Language', description: 'Default interface language', type: 'select', value: defaults.language, options: ['English (US)', 'English (UK)', 'French', 'Spanish', 'Arabic'] },
-        { label: 'Date Format', description: 'How dates are displayed throughout the system', type: 'select', value: defaults.dateFormat, options: ['MM/DD/YYYY', 'DD/MM/YYYY', 'YYYY-MM-DD'] },
-        { label: 'Currency', description: 'Default currency for financial modules', type: 'select', value: defaults.currency, options: ['USD ($)', 'EUR (€)', 'GBP (£)', 'KES (KSh)'] }
+        item('hospitalName', 'Hospital Name', 'Display name for the system', 'text'),
+        item('displayName', 'System Display Name', 'Title shown in the sidebar and browser tab', 'text'),
+        item('timeZone', 'Time Zone', 'System-wide time zone for all logs and schedules', 'select', { options: ['America/New_York', 'America/Chicago', 'America/Denver', 'America/Los_Angeles', 'Europe/London', 'Europe/Berlin', 'Asia/Dubai', 'Asia/Tokyo', 'UTC'] }),
+        item('language', 'Language', 'Default interface language', 'select', { options: ['English (US)', 'English (UK)', 'French', 'Spanish', 'Arabic'] }),
+        item('dateFormat', 'Date Format', 'How dates are displayed throughout the system', 'select', { options: ['MM/DD/YYYY', 'DD/MM/YYYY', 'YYYY-MM-DD'] }),
+        item('currency', 'Currency', 'Default currency for financial modules', 'select', { options: ['USD ($)', 'EUR (€)', 'GBP (£)', 'KES (KSh)'] })
       ]
     },
     {
       title: 'Security',
       description: 'Authentication, password policy, and access control settings.',
       items: [
-        { label: 'Session Timeout', description: 'Minutes of inactivity before auto-logout', type: 'text', value: defaults.sessionTimeout },
-        { label: 'Min Password Length', description: 'Minimum characters required for user passwords', type: 'text', value: defaults.passwordMinLength },
-        { label: 'Require MFA', description: 'Enforce multi-factor authentication for all users', type: 'toggle', value: defaults.mfaRequired },
-        { label: 'Account Lockout', description: 'Lock account after multiple failed login attempts', type: 'toggle', value: defaults.accountLockout }
+        item('sessionTimeout', 'Session Timeout', 'Minutes of inactivity before auto-logout', 'text'),
+        item('passwordMinLength', 'Min Password Length', 'Minimum characters required for user passwords', 'text'),
+        item('mfaRequired', 'Require MFA', 'Enforce multi-factor authentication for all users', 'toggle'),
+        item('accountLockout', 'Account Lockout', 'Lock account after multiple failed login attempts', 'toggle')
       ]
     },
     {
       title: 'Notifications',
       description: 'Configure system notification and alert channels.',
       items: [
-        { label: 'Email Alerts', description: 'Send email notifications for critical system events', type: 'toggle', value: defaults.emailAlerts },
-        { label: 'SMS Alerts', description: 'Send SMS notifications for P1 incidents', type: 'toggle', value: defaults.smsAlerts },
-        { label: 'Daily Summary', description: 'Email daily activity summary to administrators', type: 'toggle', value: defaults.dailySummary }
+        item('emailAlerts', 'Email Alerts', 'Send email notifications for critical system events', 'toggle'),
+        item('smsAlerts', 'SMS Alerts', 'Send SMS notifications for P1 incidents', 'toggle'),
+        item('dailySummary', 'Daily Summary', 'Email daily activity summary to administrators', 'toggle')
       ]
     },
     {
       title: 'Integrations',
       description: 'Status of connected external services and sync settings.',
       items: [
-        { label: 'Active Directory', description: 'LDAP directory synchronization status', type: 'select', value: defaults.adSync, options: ['Connected', 'Disconnected', 'Syncing'] },
-        { label: 'EHR System', description: 'Electronic Health Records integration', type: 'select', value: defaults.ehrIntegration, options: ['Connected', 'Disconnected', 'Syncing'] },
-        { label: 'SIEM Export', description: 'Auto-export audit logs to external SIEM', type: 'toggle', value: defaults.siemExport },
-        { label: 'Maintenance Mode', description: 'Disable non-admin access for system maintenance', type: 'toggle', value: defaults.maintenanceMode }
+        item('adSync', 'Active Directory', 'LDAP directory synchronization status', 'select', { options: ['Connected', 'Disconnected', 'Syncing'] }),
+        item('ehrIntegration', 'EHR System', 'Electronic Health Records integration', 'select', { options: ['Connected', 'Disconnected', 'Syncing'] }),
+        item('siemExport', 'SIEM Export', 'Auto-export audit logs to external SIEM', 'toggle'),
+        item('maintenanceMode', 'Maintenance Mode', 'Disable non-admin access for system maintenance', 'toggle')
       ]
     }
   ]
@@ -118,18 +128,41 @@ const sections = reactive(buildSections())
 function flatten() {
   const map = {}
   for (const s of sections) {
-    for (const i of s.items) map[i.label] = i.value
+    for (const i of s.items) map[i.key] = i.value
   }
   return map
 }
 
-function save() {
+onMounted(async () => {
+  try {
+    const snap = await getDoc(doc(db, 'settings', 'general'))
+    if (snap.exists()) {
+      const data = snap.data()
+      const rebuilt = buildSections(data)
+      sections.length = 0
+      sections.push(...rebuilt)
+    }
+  } catch {}
+})
+
+async function save() {
+  if (saving.value) return
+  saving.value = true
   const vals = flatten()
-  ui.showToast('Settings saved successfully', 'success')
+  try {
+    await saveSettings(vals)
+    ui.showToast('Settings saved successfully', 'success')
+  } catch (err) {
+    ui.showToast(`Save failed: ${err.message}`, 'error')
+  } finally {
+    saving.value = false
+  }
 }
 
 function reset() {
-  buildSections()
+  const rebuilt = buildSections()
+  sections.length = 0
+  sections.push(...rebuilt)
   ui.showToast('Settings reset to defaults', 'info')
 }
 </script>

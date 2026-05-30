@@ -51,20 +51,39 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { db } from '@/lib/firebase'
+import { collection, onSnapshot, query, orderBy } from 'firebase/firestore'
 import { useUIStore } from '@/stores/ui'
 
 const ui = useUIStore()
 const filterAction = ref('')
 const filterUser = ref('')
+const logs = ref([])
 
-const logs = ref([
-  { id: 1, timestamp: '2026-05-30 10:14:22', user: 'Ahmed Al-Rashid', action: 'Update', resource: 'Ticket INC-9042', details: 'Changed status to Investigating' },
-  { id: 2, timestamp: '2026-05-30 09:45:00', user: 'Maria Gonzalez', action: 'Create', resource: 'User EMP-10299', details: 'New user account created' },
-  { id: 3, timestamp: '2026-05-30 08:30:15', user: 'James Okafor', action: 'Login', resource: 'System', details: 'Successful login from 10.0.1.45' },
-  { id: 4, timestamp: '2026-05-29 23:00:00', user: 'System', action: 'Delete', resource: 'Backup Log', details: 'Auto-purged logs older than 90 days' },
-  { id: 5, timestamp: '2026-05-29 16:20:33', user: 'Ahmed Al-Rashid', action: 'Update', resource: 'Configuration', details: 'Changed backup retention policy' }
-])
+let unsubscribe = null
+
+onMounted(() => {
+  const q = query(collection(db, 'auditLogs'), orderBy('timestamp', 'desc'))
+  unsubscribe = onSnapshot(q, (snapshot) => {
+    logs.value = snapshot.docs.map(doc => {
+      const data = doc.data()
+      const ts = data.timestamp?.toDate?.()
+      return {
+        id: doc.id,
+        timestamp: ts ? ts.toLocaleString('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).replace(',', '') : data.timestamp,
+        user: data.user,
+        action: data.action,
+        resource: data.resource,
+        details: data.details
+      }
+    })
+  })
+})
+
+onUnmounted(() => {
+  if (unsubscribe) unsubscribe()
+})
 
 const filteredLogs = computed(() => {
   return logs.value.filter(l => {

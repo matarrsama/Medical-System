@@ -45,24 +45,41 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { db } from '@/lib/firebase'
+import { collection, onSnapshot, query } from 'firebase/firestore'
+import { useUIStore } from '@/stores/ui'
 
-const stats = ref([
-  { label: 'Total Equipment', value: 847 },
-  { label: 'Operational', value: 812 },
-  { label: 'Needs Calibration', value: 23 },
-  { label: 'Out of Service', value: 12 }
-])
+const uiStore = useUIStore()
+const equipment = ref([])
+let unsubscribe = null
 
-const equipment = ref([
-  { id: 'BME-001', name: 'Siemens MRI 3T', department: 'Imaging', status: 'Operational', lastCalibration: '2026-04-15' },
-  { id: 'BME-002', name: 'GE CT Scanner', department: 'Imaging', status: 'Needs Calibration', lastCalibration: '2025-11-20' },
-  { id: 'BME-003', name: 'Philips Ventilator V60', department: 'ICU', status: 'Operational', lastCalibration: '2026-05-01' },
-  { id: 'BME-004', name: 'Defibrillator Zoll X', department: 'ER', status: 'Out of Service', lastCalibration: '2026-01-10' }
-])
+const stats = computed(() => {
+  const total = equipment.value.length
+  const operational = equipment.value.filter(e => e.status === 'Operational').length
+  const needsCal = equipment.value.filter(e => e.status === 'Needs Calibration').length
+  const outOfService = equipment.value.filter(e => e.status === 'Out of Service').length
+  return [
+    { label: 'Total Equipment', value: total },
+    { label: 'Operational', value: operational },
+    { label: 'Needs Calibration', value: needsCal },
+    { label: 'Out of Service', value: outOfService }
+  ]
+})
 
 function statusClass(s) {
   const map = { Operational: 'bg-green-100 text-green-800', 'Needs Calibration': 'bg-amber-100 text-amber-800', 'Out of Service': 'bg-error-container/40 text-on-error-container' }
   return map[s] || ''
 }
+
+onMounted(() => {
+  const q = query(collection(db, 'equipment'))
+  unsubscribe = onSnapshot(q, (snapshot) => {
+    equipment.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+  })
+})
+
+onUnmounted(() => {
+  if (unsubscribe) unsubscribe()
+})
 </script>

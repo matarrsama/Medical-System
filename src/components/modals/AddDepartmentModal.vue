@@ -22,22 +22,29 @@
     </form>
     <div class="flex justify-end gap-3 p-4 border-t border-outline-variant">
       <button @click="$emit('close')" class="px-4 py-2 border border-outline-variant rounded text-label-md text-on-surface hover:bg-surface-container">Cancel</button>
-      <button @click="submit" class="px-4 py-2 bg-primary text-on-primary rounded text-label-md hover:bg-primary-container">Add Department</button>
+      <button @click="submit" :disabled="saving" class="px-4 py-2 bg-primary text-on-primary rounded text-label-md hover:bg-primary-container disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+        <span v-if="saving" class="material-symbols-outlined animate-spin text-[18px]">sync</span>
+        Add Department
+      </button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
 import { useToast } from '@/composables/useToast'
 
 const emit = defineEmits(['close'])
 const toast = useToast()
 
 const form = reactive({ name: '', head: '', location: '' })
+const saving = ref(false)
 
 function submit() {
+  if (saving.value) return
+  saving.value = true
   toast.success('Department added successfully!')
   emit('close')
+  saving.value = false
 }
 </script>

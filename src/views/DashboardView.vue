@@ -22,7 +22,7 @@
           </span>
         </div>
         <div>
-          <h3 class="text-display font-display text-on-surface leading-none mb-1">24</h3>
+          <h3 class="text-display font-display text-on-surface leading-none mb-1">{{ openTickets }}</h3>
           <p class="text-label-md font-label-md text-on-surface-variant">Open Tickets</p>
         </div>
       </div>
@@ -34,7 +34,7 @@
           <span class="text-label-sm font-label-sm text-error flex items-center gap-1 bg-error-container/50 px-2 py-0.5 rounded-full">Action Required</span>
         </div>
         <div>
-          <h3 class="text-display font-display text-on-surface leading-none mb-1">5</h3>
+          <h3 class="text-display font-display text-on-surface leading-none mb-1">{{ criticalTickets }}</h3>
           <p class="text-label-md font-label-md text-on-surface-variant">Critical Tickets</p>
         </div>
       </div>
@@ -46,7 +46,7 @@
           <span class="text-label-sm font-label-sm text-on-surface-variant flex items-center gap-1">Shift 1 Active</span>
         </div>
         <div>
-          <h3 class="text-display font-display text-on-surface leading-none mb-1">12</h3>
+          <h3 class="text-display font-display text-on-surface leading-none mb-1">{{ assignedTechs }}</h3>
           <p class="text-label-md font-label-md text-on-surface-variant">Assigned Technicians</p>
         </div>
       </div>
@@ -58,25 +58,22 @@
           </div>
         </div>
         <div class="relative z-10">
-          <h3 class="text-display font-display text-tertiary leading-none mb-1">3</h3>
+          <h3 class="text-display font-display text-tertiary leading-none mb-1">{{ slaBreach }}</h3>
           <p class="text-label-md font-label-md text-on-surface-variant">SLA Near Breach</p>
         </div>
       </div>
       <div class="col-span-12 lg:col-span-8 bg-surface-container-lowest border border-outline-variant rounded-xl p-lg shadow-[0_2px_8px_rgba(0,0,0,0.02)] flex flex-col min-h-[300px]">
         <div class="flex justify-between items-center mb-6">
           <div>
-            <h3 class="text-headline-sm font-headline-md text-on-surface">Average Resolution Time</h3>
-            <p class="text-body-sm font-body-sm text-on-surface-variant">Past 7 days across all priorities</p>
+            <h3 class="text-headline-sm font-headline-md text-on-surface">Tickets by Status</h3>
+            <p class="text-body-sm font-body-sm text-on-surface-variant">Distribution across all tickets</p>
           </div>
-          <button class="p-1.5 rounded hover:bg-surface-container transition-colors text-on-surface-variant">
-            <span class="material-symbols-outlined">more_vert</span>
-          </button>
         </div>
         <div class="flex-1 relative w-full flex items-end pt-8 pb-4">
           <div class="absolute left-0 top-0 bottom-8 flex flex-col justify-between text-[10px] text-outline pr-2 w-8 text-right font-label-sm">
-            <span>4h</span><span>3h</span><span>2h</span><span>1h</span><span>0h</span>
+            <span>{{ maxStatus }}</span><span>{{ Math.round(maxStatus * 3 / 4) }}</span><span>{{ Math.round(maxStatus / 2) }}</span><span>{{ Math.round(maxStatus / 4) }}</span><span>0</span>
           </div>
-          <div class="ml-8 flex-1 h-full relative border-l border-b border-outline-variant/50 flex items-end justify-between px-2">
+          <div class="ml-8 flex-1 h-full relative border-l border-b border-outline-variant/50 flex items-end justify-between px-4">
             <div class="absolute inset-0 flex flex-col justify-between pointer-events-none">
               <div class="w-full h-px bg-outline-variant/20"></div>
               <div class="w-full h-px bg-outline-variant/20"></div>
@@ -84,11 +81,10 @@
               <div class="w-full h-px bg-outline-variant/20"></div>
               <div class="w-full h-px bg-transparent"></div>
             </div>
-            <div v-for="bar in resolutionTime" :key="bar.day" class="w-2 rounded-t relative group" :class="bar.color" :style="{ height: bar.height }">
-              <span class="absolute -top-6 left-1/2 -translate-x-1/2 bg-surface-container text-xs px-1 rounded opacity-0 group-hover:opacity-100">{{ bar.label }}</span>
-            </div>
-            <div class="absolute -bottom-6 left-0 right-0 flex justify-between px-2 text-[10px] text-outline font-label-sm">
-              <span v-for="day in ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']" :key="day">{{ day }}</span>
+            <div v-for="bar in statusBars" :key="bar.label" class="flex flex-col items-center gap-1 w-14">
+              <span class="text-label-xs font-label-sm text-on-surface-variant">{{ bar.count }}</span>
+              <div class="w-full rounded-t transition-all duration-300" :class="bar.color" :style="{ height: bar.height }"></div>
+              <span class="text-[10px] text-outline font-label-sm text-center truncate w-full">{{ bar.label }}</span>
             </div>
           </div>
         </div>
@@ -165,22 +161,22 @@
           <div class="w-40 h-40 rounded-full border-[16px] border-surface-container flex items-center justify-center relative shadow-inner" style="border-top-color: #2563eb; border-right-color: #4b41e1; border-bottom-color: #c3c6d7; border-left-color: #2563eb; transform: rotate(45deg);">
             <div class="w-full h-full rounded-full bg-surface-container-lowest absolute inset-0 -m-[16px] border-[16px] border-transparent" style="clip-path: polygon(50% 50%, 100% 0, 100% 100%, 0 100%); border-color: transparent;"></div>
             <div class="transform -rotate-45 text-center z-10 bg-surface-container-lowest w-24 h-24 rounded-full flex flex-col items-center justify-center shadow-sm">
-              <span class="text-headline-lg font-headline-md text-on-surface leading-none">142</span>
+              <span class="text-headline-lg font-headline-md text-on-surface leading-none">{{ totalTickets }}</span>
               <span class="text-[10px] text-on-surface-variant uppercase tracking-wider font-label-sm mt-1">Total</span>
             </div>
           </div>
           <div class="w-full mt-8 flex flex-col gap-2">
             <div class="flex items-center justify-between text-body-sm font-body-sm">
               <div class="flex items-center gap-2 text-on-surface"><span class="w-3 h-3 rounded-sm bg-primary-container"></span> Hardware/Devices</div>
-              <span class="font-medium">45%</span>
+              <span class="font-medium">{{ catPct('hardware') }}%</span>
             </div>
             <div class="flex items-center justify-between text-body-sm font-body-sm">
               <div class="flex items-center gap-2 text-on-surface"><span class="w-3 h-3 rounded-sm bg-secondary"></span> Software/Apps</div>
-              <span class="font-medium">35%</span>
+              <span class="font-medium">{{ catPct('software') }}%</span>
             </div>
             <div class="flex items-center justify-between text-body-sm font-body-sm">
               <div class="flex items-center gap-2 text-on-surface"><span class="w-3 h-3 rounded-sm bg-outline-variant"></span> Network/Infra</div>
-              <span class="font-medium">20%</span>
+              <span class="font-medium">{{ catPct('network') }}%</span>
             </div>
           </div>
         </div>
@@ -190,22 +186,93 @@
 </template>
 
 <script setup>
-const resolutionTime = [
-  { day: 'Mon', height: '40%', color: 'bg-primary', label: '1.6h' },
-  { day: 'Tue', height: '60%', color: 'bg-primary', label: '2.4h' },
-  { day: 'Wed', height: '35%', color: 'bg-primary', label: '1.4h' },
-  { day: 'Thu', height: '80%', color: 'bg-error', label: '3.2h' },
-  { day: 'Fri', height: '50%', color: 'bg-primary', label: '2.0h' },
-  { day: 'Sat', height: '20%', color: 'bg-primary', label: '0.8h' },
-  { day: 'Sun', height: '30%', color: 'bg-primary', label: '1.2h' }
-]
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { db } from '@/lib/firebase'
+import { collection, onSnapshot, query, orderBy, where } from 'firebase/firestore'
 
-const incidents = [
-  { id: 'INC-9042', summary: 'Radiology PACS Server Offline', department: 'Imaging', time: '10:14 AM', status: 'Investigating' },
-  { id: 'INC-9038', summary: 'EHR Login Timeout Errors', department: 'ER', time: '09:45 AM', status: 'Assigned' },
-  { id: 'INC-9012', summary: 'Network Switch Failure - Floor 3', department: 'Infrastructure', time: 'Yesterday', status: 'Pending Vendor' },
-  { id: 'INC-8995', summary: 'Pharmacy Dispensing App Crash', department: 'Pharmacy', time: 'Yesterday', status: 'Resolved' }
-]
+const allTickets = ref([])
+const allUsers = ref([])
+let unsubTickets = null
+let unsubUsers = null
+
+onMounted(() => {
+  unsubTickets = onSnapshot(
+    query(collection(db, 'tickets'), orderBy('created', 'desc')),
+    (snap) => { allTickets.value = snap.docs.map(d => ({ ...d.data(), id: d.id })) },
+    () => {}
+  )
+  unsubUsers = onSnapshot(
+    query(collection(db, 'users'), where('role', 'in', ['ICT Officer', 'Sys Administrator'])),
+    (snap) => { allUsers.value = snap.docs.map(d => ({ ...d.data(), id: d.id })) },
+    () => {}
+  )
+})
+
+onUnmounted(() => {
+  if (unsubTickets) unsubTickets()
+  if (unsubUsers) unsubUsers()
+})
+
+const openTickets = computed(() => allTickets.value.filter(t => t.status !== 'Resolved' && t.status !== 'Closed').length)
+const criticalTickets = computed(() => allTickets.value.filter(t => t.priority === 'critical').length)
+const totalTickets = computed(() => allTickets.value.length)
+const assignedTechs = computed(() => allUsers.value.length)
+const slaBreach = computed(() => allTickets.value.filter(t => t.priority === 'critical' && t.status !== 'Resolved' && t.status !== 'Closed').length)
+
+function catPct(cat) {
+  const total = allTickets.value.length || 1
+  const count = allTickets.value.filter(t => {
+    const title = (t.title || '').toLowerCase()
+    if (cat === 'hardware') return title.includes('server') || title.includes('switch') || title.includes('workstation') || title.includes('printer') || title.includes('device')
+    if (cat === 'software') return title.includes('login') || title.includes('app') || title.includes('software') || title.includes('ehr') || title.includes('crash')
+    if (cat === 'network') return title.includes('network') || title.includes('vpn') || title.includes('connectivity') || title.includes('router')
+    return false
+  }).length
+  return Math.round(count / total * 100)
+}
+
+const incidents = computed(() =>
+  allTickets.value
+    .filter(t => t.priority === 'critical' || t.priority === 'high')
+    .slice(0, 5)
+    .map(t => ({
+      id: t.id || t.ticketId,
+      summary: t.title,
+      department: t.department,
+      time: t.created || '',
+      status: t.status
+    }))
+)
+
+const statusColors = {
+  'Investigating': 'bg-error',
+  'Assigned': 'bg-primary',
+  'Pending Vendor': 'bg-tertiary',
+  'Resolved': 'bg-green-500',
+  'Closed': 'bg-outline-variant',
+  'Open': 'bg-primary-container'
+}
+
+const statusBars = computed(() => {
+  const counts = {}
+  for (const t of allTickets.value) {
+    const s = t.status || 'Open'
+    counts[s] = (counts[s] || 0) + 1
+  }
+  const entries = Object.entries(counts).sort((a, b) => b[1] - a[1])
+  const max = Math.max(...entries.map(([, c]) => c), 1)
+  return entries.map(([label, count]) => ({
+    label,
+    count,
+    height: Math.max((count / max) * 100, 8) + '%',
+    color: statusColors[label] || 'bg-primary-container'
+  }))
+})
+
+const maxStatus = computed(() => {
+  if (!statusBars.value.length) return 0
+  return Math.max(...statusBars.value.map(b => b.count))
+})
 
 function statusClass(status) {
   const map = {

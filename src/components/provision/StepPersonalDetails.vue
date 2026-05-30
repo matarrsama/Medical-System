@@ -69,19 +69,7 @@
             class="w-full appearance-none bg-surface-container-highest border-none rounded-xl px-4 py-3.5 text-body-sm text-on-surface focus:ring-1 focus:ring-primary transition-all"
           >
             <option disabled value="">Select Department</option>
-            <option>ER</option>
-            <option>Imaging & Radiology</option>
-            <option>Pharmacy</option>
-            <option>Infrastructure</option>
-            <option>Administration</option>
-            <option>Pathology Lab</option>
-            <option>Finance</option>
-            <option>ICT</option>
-            <option>Maternity</option>
-            <option>LAB</option>
-            <option>Super Admin</option>
-            <option>Procurement</option>
-            <option>Human Resources</option>
+            <option v-for="dept in departments" :key="dept" :value="dept">{{ dept }}</option>
           </select>
           <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-outline">keyboard_arrow_down</span>
         </div>
@@ -91,11 +79,16 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { db } from '@/lib/firebase'
+import { collection, onSnapshot } from 'firebase/firestore'
+
 const props = defineProps({ modelValue: { type: Object, required: true } })
 const emit = defineEmits(['update:modelValue'])
 const fileInput = ref(null)
 const empIdTouched = ref(false)
+const departments = ref([])
+let unsubDepts = null
 
 const empIdValid = computed(() => /^BGH-[A-Z0-9]{3}-[A-Z0-9]{2}$/i.test(props.modelValue.employeeId))
 
@@ -148,4 +141,14 @@ function onNameInput(e) {
 function update(field, value) {
   emit('update:modelValue', { ...props.modelValue, [field]: value })
 }
+
+onMounted(() => {
+  unsubDepts = onSnapshot(collection(db, 'departments'), (snap) => {
+    departments.value = snap.docs.map(d => d.data().name)
+  })
+})
+
+onUnmounted(() => {
+  if (unsubDepts) unsubDepts()
+})
 </script>

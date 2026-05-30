@@ -45,24 +45,42 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { db } from '@/lib/firebase'
+import { collection, onSnapshot, query } from 'firebase/firestore'
+import { useUIStore } from '@/stores/ui'
 
-const stats = ref([
-  { label: 'Scheduled', value: 18 },
-  { label: 'In Progress', value: 6 },
-  { label: 'Completed', value: 142 },
-  { label: 'Overdue', value: 2 }
-])
+const uiStore = useUIStore()
+const tasks = ref([])
+let unsubscribe = null
 
-const tasks = ref([
-  { id: 1, equipment: 'MRI Scanner - Suite A', type: 'Preventive', location: 'Imaging', date: '2026-06-01', status: 'Scheduled' },
-  { id: 2, equipment: 'CT Scanner - Suite B', type: 'Calibration', location: 'Imaging', date: '2026-06-02', status: 'In Progress' },
-  { id: 3, equipment: 'Ventilator Bank - ICU', type: 'Safety Check', location: 'ICU', date: '2026-06-03', status: 'Scheduled' },
-  { id: 4, equipment: 'UPS Backup - Server Room', type: 'Battery Test', location: 'Infrastructure', date: '2026-05-28', status: 'Overdue' }
-])
+const stats = computed(() => {
+  const total = tasks.value.length
+  const scheduled = tasks.value.filter(t => t.status === 'Scheduled').length
+  const inProgress = tasks.value.filter(t => t.status === 'In Progress').length
+  const completed = tasks.value.filter(t => t.status === 'Completed').length
+  const overdue = tasks.value.filter(t => t.status === 'Overdue').length
+  return [
+    { label: 'Scheduled', value: scheduled },
+    { label: 'In Progress', value: inProgress },
+    { label: 'Completed', value: completed },
+    { label: 'Overdue', value: overdue }
+  ]
+})
 
 function statusClass(s) {
   const map = { Scheduled: 'bg-blue-100 text-blue-800', 'In Progress': 'bg-amber-100 text-amber-800', Completed: 'bg-green-100 text-green-800', Overdue: 'bg-error-container/40 text-on-error-container' }
   return map[s] || ''
 }
+
+onMounted(() => {
+  const q = query(collection(db, 'maintenanceTasks'))
+  unsubscribe = onSnapshot(q, (snapshot) => {
+    tasks.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+  })
+})
+
+onUnmounted(() => {
+  if (unsubscribe) unsubscribe()
+})
 </script>

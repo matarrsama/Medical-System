@@ -58,24 +58,32 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useUIStore } from '@/stores/ui'
+import { db } from '@/lib/firebase'
+import { collection, onSnapshot, query, orderBy } from 'firebase/firestore'
 
 const ui = useUIStore()
 const activeTab = ref('pending')
 
-const tabs = [
-  { key: 'pending', label: 'Pending', count: 12 },
-  { key: 'approved', label: 'Approved', count: 48 },
-  { key: 'rejected', label: 'Rejected', count: 3 }
-]
+const allRequests = ref([])
+let unsubscribe = null
 
-const allRequests = ref([
-  { id: 'REQ-2026-001', title: 'MRI Scanner Maintenance Contract Renewal', requester: 'Dr. Sarah Chen', department: 'Imaging', status: 'Pending', date: '2026-05-28' },
-  { id: 'REQ-2026-002', title: 'Additional Workstation for Pharmacy', requester: 'Mark Thompson', department: 'Pharmacy', status: 'Approved', date: '2026-05-27' },
-  { id: 'REQ-2026-003', title: 'VPN Access for Remote Pathologist', requester: 'Dr. James Wilson', department: 'Pathology', status: 'Pending', date: '2026-05-26' },
-  { id: 'REQ-2026-004', title: 'Server Rack UPS Replacement', requester: 'Ahmed Al-Rashid', department: 'Infrastructure', status: 'Rejected', date: '2026-05-25' },
-  { id: 'REQ-2026-005', title: 'EHR Software License Upgrade (10 seats)', requester: 'Lisa Thompson', department: 'Admin', status: 'Pending', date: '2026-05-24' }
+onMounted(() => {
+  const q = query(collection(db, 'requests'), orderBy('date', 'desc'))
+  unsubscribe = onSnapshot(q, (snapshot) => {
+    allRequests.value = snapshot.docs.map(doc => ({ ...doc.data() }))
+  })
+})
+
+onUnmounted(() => {
+  if (unsubscribe) unsubscribe()
+})
+
+const tabs = computed(() => [
+  { key: 'pending', label: 'Pending', count: allRequests.value.filter(r => r.status === 'Pending').length },
+  { key: 'approved', label: 'Approved', count: allRequests.value.filter(r => r.status === 'Approved').length },
+  { key: 'rejected', label: 'Rejected', count: allRequests.value.filter(r => r.status === 'Rejected').length }
 ])
 
 const filteredRequests = computed(() => {

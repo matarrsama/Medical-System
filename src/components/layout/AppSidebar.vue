@@ -5,8 +5,7 @@
         <span class="material-symbols-outlined icon-fill">health_and_safety</span>
       </div>
       <div class="overflow-hidden">
-        <h2 class="text-headline-sm font-headline-md font-black text-on-surface dark:text-inverse-on-surface truncate">ICT Admin Console</h2>
-        <p class="text-label-sm font-label-sm text-on-surface-variant truncate">v2.4.1 - Main Hospital</p>
+        <h2 class="text-headline-sm font-headline-md font-black text-on-surface dark:text-inverse-on-surface truncate">{{ displayName }}</h2>
       </div>
     </div>
     <nav class="flex-1 py-md px-sm flex flex-col gap-xs overflow-y-auto">
@@ -36,18 +35,42 @@
         <span class="text-label-md font-label-md">{{ item.label }}</span>
       </router-link>
     </nav>
-    <div class="p-md border-t border-outline-variant mt-auto">
+    <div class="p-md border-t border-outline-variant mt-auto flex flex-col gap-sm">
       <button class="w-full bg-surface-container-highest text-primary border border-outline-variant hover:bg-surface-variant transition-colors text-label-md font-label-md py-2 rounded-lg flex justify-center items-center gap-2">
         <span class="material-symbols-outlined text-[18px]">download</span>
         Generate Report
+      </button>
+      <button @click="handleLogout" :disabled="signingOut" class="w-full text-outline border border-outline-variant hover:bg-error-container hover:text-on-error-container transition-colors text-label-md font-label-md py-2 rounded-lg flex justify-center items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed">
+        <span v-if="signingOut" class="material-symbols-outlined animate-spin text-[18px]">sync</span>
+        <span v-else class="material-symbols-outlined text-[18px]">logout</span>
+        Sign Out
       </button>
     </div>
   </aside>
 </template>
 
 <script setup>
-import { useRoute } from 'vue-router'
+import { ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+import { useSettings } from '@/composables/useSettings'
 const $route = useRoute()
+const router = useRouter()
+const auth = useAuthStore()
+const { displayName } = useSettings()
+
+const signingOut = ref(false)
+
+async function handleLogout() {
+  if (signingOut.value) return
+  signingOut.value = true
+  try {
+    await auth.logout()
+    router.push('/login')
+  } finally {
+    signingOut.value = false
+  }
+}
 
 const navItems = [
   { to: '/dashboard', icon: 'dashboard', label: 'Dashboard' },

@@ -22,35 +22,31 @@
           <span class="text-label-md font-label-md text-on-surface-variant">Total Active Users</span>
           <span class="material-symbols-outlined text-primary text-headline-md">group</span>
         </div>
-        <div class="text-display font-display text-on-surface mt-sm">1,248</div>
-        <div class="text-label-sm font-label-sm text-primary mt-xs flex items-center">
-          <span class="material-symbols-outlined text-label-sm mr-1">trending_up</span> +12 this week
-        </div>
+        <div class="text-display font-display text-on-surface mt-sm">{{ totalActive }}</div>
+        <div class="text-label-sm font-label-sm text-primary mt-xs flex items-center">Active users across all departments</div>
       </div>
       <div class="bg-surface-container-lowest p-md rounded-lg border border-outline-variant shadow-sm flex flex-col justify-between">
         <div class="flex justify-between items-start">
-          <span class="text-label-md font-label-md text-on-surface-variant">Pending Approvals</span>
+          <span class="text-label-md font-label-md text-on-surface-variant">Pending / Inactive</span>
           <span class="material-symbols-outlined text-tertiary text-headline-md">how_to_reg</span>
         </div>
-        <div class="text-display font-display text-on-surface mt-sm">14</div>
-        <div class="text-label-sm font-label-sm text-tertiary mt-xs flex items-center">
-          <span class="material-symbols-outlined text-label-sm mr-1">schedule</span> Requires attention
-        </div>
+        <div class="text-display font-display text-on-surface mt-sm">{{ pendingApprovals }}</div>
+        <div class="text-label-sm font-label-sm text-tertiary mt-xs flex items-center">Requires attention</div>
       </div>
       <div class="bg-surface-container-lowest p-md rounded-lg border border-outline-variant shadow-sm flex flex-col justify-between">
         <div class="flex justify-between items-start">
           <span class="text-label-md font-label-md text-on-surface-variant">Departments</span>
           <span class="material-symbols-outlined text-secondary text-headline-md">domain</span>
         </div>
-        <div class="text-display font-display text-on-surface mt-sm">24</div>
-        <div class="text-label-sm font-label-sm text-secondary mt-xs flex items-center">Hospital-wide coverage</div>
+        <div class="text-display font-display text-on-surface mt-sm">{{ departmentsCount }}</div>
+        <div class="text-label-sm font-label-sm text-secondary mt-xs flex items-center">Represented in system</div>
       </div>
       <div class="bg-surface-container-lowest p-md rounded-lg border border-outline-variant shadow-sm flex flex-col justify-between">
         <div class="flex justify-between items-start">
           <span class="text-label-md font-label-md text-on-surface-variant">Roles Defined</span>
           <span class="material-symbols-outlined text-primary text-headline-md">security</span>
         </div>
-        <div class="text-display font-display text-on-surface mt-sm">8</div>
+        <div class="text-display font-display text-on-surface mt-sm">{{ rolesCount }}</div>
         <div class="text-label-sm font-label-sm text-primary mt-xs flex items-center">RBAC Active</div>
       </div>
     </div>
@@ -153,12 +149,14 @@
                     Reset Password
                   </button>
                   <hr class="my-1 border-outline-variant/50" />
-                  <button @click="suspendUserHandler(user)" class="w-full flex items-center gap-2.5 px-3.5 py-2 text-label-sm text-amber-700 hover:bg-amber-50 transition-colors text-left">
-                    <span class="material-symbols-outlined text-[16px]">pause_circle</span>
+                  <button @click="suspendUserHandler(user)" :disabled="suspending" class="w-full flex items-center gap-2.5 px-3.5 py-2 text-label-sm text-amber-700 hover:bg-amber-50 transition-colors text-left disabled:opacity-40 disabled:cursor-not-allowed">
+                    <span v-if="suspending" class="material-symbols-outlined animate-spin text-[16px]">sync</span>
+                    <span v-else class="material-symbols-outlined text-[16px]">pause_circle</span>
                     Suspend User
                   </button>
-                  <button @click="deleteUserHandler(user)" class="w-full flex items-center gap-2.5 px-3.5 py-2 text-label-sm text-error hover:bg-error-container/20 transition-colors text-left">
-                    <span class="material-symbols-outlined text-[16px]">delete</span>
+                  <button @click="deleteUserHandler(user)" :disabled="deleting" class="w-full flex items-center gap-2.5 px-3.5 py-2 text-label-sm text-error hover:bg-error-container/20 transition-colors text-left disabled:opacity-40 disabled:cursor-not-allowed">
+                    <span v-if="deleting" class="material-symbols-outlined animate-spin text-[16px]">sync</span>
+                    <span v-else class="material-symbols-outlined text-[16px]">delete</span>
                     Delete User
                   </button>
                 </div>
@@ -188,24 +186,33 @@ const openMenu = ref(null)
 const filterStatus = ref('')
 const users = ref([])
 const loading = ref(true)
+const suspending = ref(false)
+const deleting = ref(false)
 let unsub = null
 let unsubAuth = null
 
 onMounted(() => {
+  console.log('[UsersView] mounted, waiting for auth...')
   unsubAuth = onAuthStateChanged(auth, (user) => {
+    console.log('[UsersView] onAuthStateChanged:', user ? `uid=${user.uid} email=${user.email}` : 'NO USER')
     if (user && !unsub) {
+      console.log('[UsersView] subscribing to Firestore users collection')
       unsub = onSnapshot(
         query(collection(db, 'users'), orderBy('created', 'desc')),
         (snapshot) => {
-          users.value = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }))
+          console.log('[UsersView] Firestore snapshot received, docs count:', snapshot.docs.length)
+          const mapped = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }))
+          console.log('[UsersView] mapped users:', JSON.stringify(mapped.map(u => ({ id: u.id, name: u.name, role: u.role }))))
+          users.value = mapped
           loading.value = false
         },
         (err) => {
-          console.error('Firestore users listener error:', err)
+          console.error('[UsersView] Firestore snapshot error:', err.code, err.message)
           loading.value = false
         }
       )
     } else if (!user) {
+      console.log('[UsersView] no user, setting loading=false')
       loading.value = false
     }
   })
@@ -216,6 +223,17 @@ onUnmounted(() => {
   if (unsubAuth) unsubAuth()
   if (unsub) unsub()
   document.removeEventListener('click', onDocClick)
+})
+
+const totalActive = computed(() => users.value.filter(u => u.status === 'Active').length)
+const pendingApprovals = computed(() => users.value.filter(u => u.status === 'Pending' || u.status === 'Inactive').length)
+const departmentsCount = computed(() => {
+  const depts = new Set(users.value.map(u => u.department).filter(Boolean))
+  return depts.size
+})
+const rolesCount = computed(() => {
+  const roles = new Set(users.value.map(u => u.role).filter(Boolean))
+  return roles.size
 })
 
 const filteredUsers = computed(() => {
@@ -271,27 +289,35 @@ function resetPassword(user) {
 }
 
 async function suspendUserHandler(user) {
+  if (suspending.value) return
   openMenu.value = null
   if (user.status === 'Suspended') {
     ui.showToast(`${user.name} is already suspended`, 'info')
     return
   }
+  suspending.value = true
   try {
     await suspendUser(user.uid, 'Suspended')
     ui.showToast(`${user.name} has been suspended`, 'success')
   } catch (err) {
     ui.showToast(err.message, 'error')
+  } finally {
+    suspending.value = false
   }
 }
 
 async function deleteUserHandler(user) {
   openMenu.value = null
   if (!confirm(`Are you sure you want to delete ${user.name}?`)) return
+  if (deleting.value) return
+  deleting.value = true
   try {
     await deleteUser(user.uid)
     ui.showToast(`${user.name} has been deleted`, 'success')
   } catch (err) {
     ui.showToast(err.message, 'error')
+  } finally {
+    deleting.value = false
   }
 }
 

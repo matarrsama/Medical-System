@@ -7,7 +7,7 @@
 
     <!-- App shell -->
     <template v-else>
-      <AppTopBar @new-ticket="ui.openModal('NewTicket')" @sync-data="syncMockData" />
+      <AppTopBar @new-ticket="ui.openModal('NewTicket')" />
       <div class="flex flex-1 overflow-hidden relative">
         <AppSidebar />
         <div class="ml-64 flex-1 overflow-hidden relative w-full h-full">
@@ -33,7 +33,6 @@ import { computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useUIStore } from '@/stores/ui'
 import { useAuthStore } from '@/stores/auth'
-import { seedAll } from '@/services/api.js'
 import AppTopBar from '@/components/layout/AppTopBar.vue'
 import AppSidebar from '@/components/layout/AppSidebar.vue'
 import ModalOverlay from '@/components/modals/ModalOverlay.vue'
@@ -49,18 +48,7 @@ onMounted(() => {
 
 const isLoginPage = computed(() => route.path === '/login' || route.path === '/')
 
-async function syncMockData() {
-  ui.showToast('Seeding all data to Firestore...', 'info')
-  try {
-    const result = await seedAll()
-    const total = Object.values(result).reduce((sum, c) => sum + c.created, 0)
-    const skipped = Object.values(result).reduce((sum, c) => sum + c.skipped, 0)
-    const errors = Object.values(result).reduce((sum, c) => sum + c.errors.length, 0)
-    ui.showToast(`Seeded ${total} docs (${skipped} skipped, ${errors} errors)`, errors > 0 ? 'warn' : 'success')
-  } catch (err) {
-    ui.showToast(`Seed failed: ${err.message}`, 'error')
-  }
-}
+
 </script>
 
 <style scoped>

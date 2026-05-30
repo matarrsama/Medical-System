@@ -60,20 +60,13 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { db } from '@/lib/firebase'
+import { collection, onSnapshot } from 'firebase/firestore'
 
-const stats = ref([
-  { label: 'Active Tenants', value: 3, subtext: 'Main, North, East campuses' },
-  { label: 'Total Users', value: '12,847', subtext: 'Across all tenants' },
-  { label: 'Open Tickets', value: 347, subtext: 'System-wide' },
-  { label: 'Uptime', value: '99.97%', subtext: 'Last 30 days' }
-])
-
-const tenants = ref([
-  { name: 'Main Hospital', users: '8,234', tickets: 124, status: 'Healthy' },
-  { name: 'North Campus', users: '2,891', tickets: 47, status: 'Healthy' },
-  { name: 'East Campus', users: '1,722', tickets: 176, status: 'Warning' }
-])
+const rawTenants = ref([])
+const rawUsers = ref([])
+const rawTickets = ref([])
 
 const systemHealth = ref([
   { label: 'Server CPU', percent: 67, color: 'bg-green-500' },
@@ -82,4 +75,68 @@ const systemHealth = ref([
   { label: 'Network Bandwidth', percent: 45, color: 'bg-green-500' },
   { label: 'Database Connections', percent: 58, color: 'bg-green-500' }
 ])
+
+const unsubscribers = []
+
+onMounted(() => {
+  const unsubTenants = onSnapshot(collection(db, 'tenants'), (snapshot) => {
+    rawTenants.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+  })
+  unsubscribers.push(unsubTenants)
+
+  const unsubUsers = onSnapshot(collection(db, 'users'), (snapshot) => {
+    rawUsers.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+  })
+  unsubscribers.push(unsubUsers)
+
+  const unsubTickets = onSnapshot(collection(db, 'tickets'), (snapshot) => {
+    rawTickets.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+  })
+  unsubscribers.push(unsubTickets)
+})
+
+onUnmounted(() => {
+  unsubscribers.forEach(fn => fn())
+})
+
+const stats = computed(() => [
+  {
+    label: 'Active Tenants',
+    value: rawTenants.value.length || 1,
+    subtext: rawTenants.value.length ? `${rawTenants.value.length} tenants` : 'Single tenant system'
+  },
+  {
+    label: 'Total Users',
+    value: rawUsers.value.length.toLocaleString(),
+    subtext: 'Across all tenants'
+  },
+  {
+    label: 'Open Tickets',
+    value: rawTickets.value.filter(t => t.status !== 'Resolved' && t.status !== 'Closed').length,
+    subtext: 'System-wide'
+  },
+  {
+    label: 'Uptime',
+    value: '99.97%',
+    subtext: 'Last 30 days'
+  }
+])
+
+const tenants = computed(() => {
+  if (!rawTenants.value.length) {
+    return [
+      { name: 'Default Tenant', users: rawUsers.value.length.toLocaleString(), tickets: rawTickets.value.length, status: 'Healthy' }
+    ]
+  }
+  return rawTenants.value.map(t => {
+    const tenantUsers = rawUsers.value.filter(u => u.tenantId === t.id).length
+    const tenantTickets = rawTickets.value.filter(tk => tk.tenantId === t.id).length
+    return {
+      name: t.name || t.id,
+      users: tenantUsers || '—',
+      tickets: tenantTickets || 0,
+      status: t.status || 'Healthy'
+    }
+  })
+})
 </script>

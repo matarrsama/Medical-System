@@ -28,14 +28,23 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
+import { db } from '@/lib/firebase'
+import { collection, onSnapshot, query } from 'firebase/firestore'
+import { useUIStore } from '@/stores/ui'
 
-const reports = ref([
-  { title: 'Incident Summary', description: 'Monthly incident metrics and trends', icon: 'assessment', updated: '2 hours ago' },
-  { title: 'Asset Inventory', description: 'Complete asset register by department', icon: 'inventory_2', updated: '1 day ago' },
-  { title: 'User Activity', description: 'Login and access logs analysis', icon: 'group', updated: '3 hours ago' },
-  { title: 'SLA Compliance', description: 'Service level agreement adherence', icon: 'timer', updated: '1 day ago' },
-  { title: 'Procurement Spend', description: 'Vendor spending and budget tracking', icon: 'shopping_cart', updated: '1 week ago' },
-  { title: 'Maintenance History', description: 'Equipment maintenance records', icon: 'build', updated: '2 days ago' }
-])
+const ui = useUIStore()
+const reports = ref([])
+let unsubscribe = null
+
+onMounted(() => {
+  const q = query(collection(db, 'reports'))
+  unsubscribe = onSnapshot(q, (snapshot) => {
+    reports.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+  })
+})
+
+onUnmounted(() => {
+  if (unsubscribe) unsubscribe()
+})
 </script>

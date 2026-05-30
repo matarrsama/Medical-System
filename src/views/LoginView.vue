@@ -9,7 +9,7 @@
         <div class="w-16 h-16 rounded-lg bg-primary flex items-center justify-center shadow-sm mb-xs">
           <span class="material-symbols-outlined text-on-primary" style="font-size: 32px;">medical_services</span>
         </div>
-        <h1 class="text-headline-lg font-headline-lg text-primary dark:text-inverse-primary">Hospital ICT Service Management</h1>
+        <h1 class="text-headline-lg font-headline-lg text-primary dark:text-inverse-primary">{{ hospitalName }}</h1>
         <p class="text-body-md font-body-md text-on-surface-variant dark:text-outline">Enterprise Authentication Portal</p>
       </div>
       <div class="glass-panel rounded-xl shadow-lg p-lg flex flex-col gap-lg">
@@ -34,9 +34,10 @@
               </button>
             </div>
           </div>
-          <button type="submit" class="w-full h-10 bg-primary hover:bg-primary-container text-on-primary text-label-md font-label-md rounded flex items-center justify-center gap-xs transition-colors mt-sm shadow-sm">
+          <button type="submit" :disabled="loggingIn" class="w-full h-10 bg-primary hover:bg-primary-container text-on-primary text-label-md font-label-md rounded flex items-center justify-center gap-xs transition-colors mt-sm shadow-sm disabled:opacity-40 disabled:cursor-not-allowed">
             Sign In
-            <span class="material-symbols-outlined text-[18px]">login</span>
+            <span v-if="loggingIn" class="material-symbols-outlined animate-spin text-[18px]">sync</span>
+            <span v-else class="material-symbols-outlined text-[18px]">login</span>
           </button>
         </form>
         <div class="flex items-center gap-sm">
@@ -44,8 +45,9 @@
           <span class="text-label-sm font-label-sm text-outline">OR</span>
           <div class="flex-1 h-px bg-outline-variant dark:bg-outline opacity-50"></div>
         </div>
-        <button type="button" @click="handleSSO" class="w-full h-10 bg-surface dark:bg-inverse-surface border border-outline-variant dark:border-outline hover:bg-surface-container-low dark:hover:bg-surface-variant text-on-surface dark:text-inverse-on-surface text-label-md font-label-md rounded flex items-center justify-center gap-sm transition-colors shadow-sm">
-          <svg class="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <button type="button" @click="handleSSO" :disabled="loggingIn" class="w-full h-10 bg-surface dark:bg-inverse-surface border border-outline-variant dark:border-outline hover:bg-surface-container-low dark:hover:bg-surface-variant text-on-surface dark:text-inverse-on-surface text-label-md font-label-md rounded flex items-center justify-center gap-sm transition-colors shadow-sm disabled:opacity-40 disabled:cursor-not-allowed">
+          <span v-if="loggingIn" class="material-symbols-outlined animate-spin text-[18px]">sync</span>
+          <svg v-else class="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
             <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
             <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
@@ -73,6 +75,7 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useUIStore } from '@/stores/ui'
 import { useToast } from '@/composables/useToast'
+import { useSettings } from '@/composables/useSettings'
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth'
 import { auth as firebaseAuth } from '@/lib/firebase'
 
@@ -80,6 +83,7 @@ const router = useRouter()
 const auth = useAuthStore()
 const ui = useUIStore()
 const toast = useToast()
+const { hospitalName } = useSettings()
 
 const email = ref('')
 const password = ref('')

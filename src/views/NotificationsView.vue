@@ -28,13 +28,21 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
+import { db } from '@/lib/firebase'
+import { collection, onSnapshot, query, orderBy } from 'firebase/firestore'
 
-const notifications = ref([
-  { id: 1, title: 'PACS Server Restored', message: 'Radiology PACS server has been restored after maintenance.', icon: 'check_circle', iconBg: 'bg-green-100', iconColor: 'text-green-600', time: '5 min ago', read: false },
-  { id: 2, title: 'SLA Breach Warning', message: 'Ticket INC-9042 is approaching SLA deadline.', icon: 'warning', iconBg: 'bg-amber-100', iconColor: 'text-amber-600', time: '1 hour ago', read: false },
-  { id: 3, title: 'New User Registered', message: 'Dr. Emily Watson has been registered and pending approval.', icon: 'person_add', iconBg: 'bg-blue-100', iconColor: 'text-blue-600', time: '3 hours ago', read: true },
-  { id: 4, title: 'Backup Completed', message: 'Nightly system backup completed successfully.', icon: 'backup', iconBg: 'bg-surface-container', iconColor: 'text-primary', time: '8 hours ago', read: true },
-  { id: 5, title: 'Certificate Expiry Notice', message: 'SSL certificate for portal.hospital.org expires in 14 days.', icon: 'verified_user', iconBg: 'bg-error-container/40', iconColor: 'text-error', time: '1 day ago', read: true }
-])
+const notifications = ref([])
+let unsubscribe = null
+
+onMounted(() => {
+  const q = query(collection(db, 'notifications'), orderBy('timestamp', 'desc'))
+  unsubscribe = onSnapshot(q, (snapshot) => {
+    notifications.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+  })
+})
+
+onUnmounted(() => {
+  if (unsubscribe) unsubscribe()
+})
 </script>

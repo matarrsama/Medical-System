@@ -55,22 +55,35 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useUIStore } from '@/stores/ui'
+import { db } from '@/lib/firebase'
+import { collection, onSnapshot, query } from 'firebase/firestore'
+
 const ui = useUIStore()
+const purchaseOrders = ref([])
+const vendors = ref([])
+let unsubscribePO = null
+let unsubscribeVendors = null
 
-const purchaseOrders = ref([
-  { id: 'PO-2026-042', vendor: 'MedTech Solutions Inc.', amount: 45000, status: 'Pending' },
-  { id: 'PO-2026-041', vendor: 'Cisco Systems', amount: 120000, status: 'Approved' },
-  { id: 'PO-2026-040', vendor: 'Dell Technologies', amount: 85000, status: 'Delivered' }
-])
+onMounted(() => {
+  const qPO = query(collection(db, 'purchaseOrders'))
+  unsubscribePO = onSnapshot(qPO, (snapshot) => {
+    purchaseOrders.value = snapshot.docs.map(doc => ({ ...doc.data() }))
+  })
+  const qVendors = query(collection(db, 'vendors'))
+  unsubscribeVendors = onSnapshot(qVendors, (snapshot) => {
+    vendors.value = snapshot.docs.map(doc => {
+      const { slug, ...rest } = doc.data()
+      return rest
+    })
+  })
+})
 
-const vendors = ref([
-  { name: 'MedTech Solutions Inc.', contracts: 12, status: 'Active' },
-  { name: 'Cisco Systems', contracts: 8, status: 'Active' },
-  { name: 'Dell Technologies', contracts: 6, status: 'Active' },
-  { name: 'Epic Systems', contracts: 3, status: 'Under Review' }
-])
+onUnmounted(() => {
+  if (unsubscribePO) unsubscribePO()
+  if (unsubscribeVendors) unsubscribeVendors()
+})
 
 function poStatusClass(s) {
   const map = { Pending: 'bg-amber-100 text-amber-800', Approved: 'bg-blue-100 text-blue-800', Delivered: 'bg-green-100 text-green-800' }

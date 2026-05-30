@@ -46,19 +46,7 @@
           <div class="relative">
             <select v-model="form.department" class="w-full appearance-none bg-surface-container-highest border-none rounded-xl px-4 py-3.5 text-body-sm text-on-surface focus:ring-1 focus:ring-primary transition-all">
               <option disabled value="">Select Department</option>
-              <option>ER</option>
-              <option>Imaging & Radiology</option>
-              <option>Pharmacy</option>
-              <option>Infrastructure</option>
-              <option>Administration</option>
-              <option>Pathology Lab</option>
-              <option>Finance</option>
-              <option>ICT</option>
-              <option>Maternity</option>
-              <option>LAB</option>
-              <option>Super Admin</option>
-              <option>Procurement</option>
-              <option>Human Resources</option>
+              <option v-for="dept in departments" :key="dept" :value="dept">{{ dept }}</option>
             </select>
             <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-outline">keyboard_arrow_down</span>
           </div>
@@ -105,7 +93,8 @@
     </div>
     <div class="flex justify-end gap-3 px-6 py-4 border-t border-outline-variant shrink-0">
       <button @click="$emit('close')" class="px-4 py-2 border border-outline-variant rounded-lg text-label-md text-on-surface hover:bg-surface-container transition-colors">Cancel</button>
-      <button @click="save" :disabled="!canSave" class="px-4 py-2 rounded-lg text-label-md font-label-md transition-colors" :class="canSave ? 'bg-primary text-on-primary hover:bg-primary-container' : 'bg-surface-container-high text-on-surface disabled:opacity-40 cursor-not-allowed'">
+      <button @click="save" :disabled="!canSave || saving" class="px-4 py-2 rounded-lg text-label-md font-label-md transition-colors flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed" :class="canSave && !saving ? 'bg-primary text-on-primary hover:bg-primary-container' : 'bg-surface-container-high text-on-surface'">
+        <span v-if="saving" class="material-symbols-outlined animate-spin text-[18px]">sync</span>
         Save Changes
       </button>
     </div>
@@ -113,16 +102,20 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import { useUIStore } from '@/stores/ui'
 import { updateUser } from '@/services/api'
 import { labelToId, idToLabel } from '@/data/roles'
+import { db } from '@/lib/firebase'
+import { collection, onSnapshot } from 'firebase/firestore'
 
 const ui = useUIStore()
 const emit = defineEmits(['close'])
 const fileInput = ref(null)
 const empIdTouched = ref(false)
 const saving = ref(false)
+const departments = ref([])
+let unsubDepts = null
 
 const user = computed(() => ui.modalData || {})
 
@@ -248,4 +241,14 @@ async function save() {
     saving.value = false
   }
 }
+
+onMounted(() => {
+  unsubDepts = onSnapshot(collection(db, 'departments'), (snap) => {
+    departments.value = snap.docs.map(d => d.data().name)
+  })
+})
+
+onUnmounted(() => {
+  if (unsubDepts) unsubDepts()
+})
 </script>
