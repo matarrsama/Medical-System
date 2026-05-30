@@ -801,4 +801,4 @@ window.addEventListener('message', function(e) {
     if (e.data.type === 'closeModal') closeNewTicketModal();
 });
 </script>
-</body></html>
+<script>function setupNotifRefresh(){var n=localStorage.getItem("ci_notifications");setInterval(function(){var c=localStorage.getItem("ci_notifications");if(c!==n){n=c;loadNotifications();}},3000);}setupNotifRefresh();</script></body></html>

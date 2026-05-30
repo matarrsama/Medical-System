@@ -4,7 +4,7 @@ import ScreenFrame from "./components/ScreenFrame";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged, signOut as firebaseSignOut } from "firebase/auth";
 import { auth, db } from "./lib/firebase";
-import { doc, getDoc, onSnapshot, collection } from "firebase/firestore";
+import { doc, getDoc, onSnapshot, collection, setDoc, serverTimestamp } from "firebase/firestore";
 
 interface AuthUser {
   uid: string;
@@ -57,10 +57,13 @@ function AppContent() {
   const [authLoading, setAuthLoading] = useState(true);
 
   useEffect(() => {
+    console.log("[Auth] Setting up onAuthStateChanged listener");
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
+        console.log("[Auth] User authenticated:", firebaseUser.uid, firebaseUser.email);
         let role = "staff";
         try {
+          console.log("[Auth] Reading Firestore users/" + firebaseUser.uid);
           const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
           if (userDoc.exists()) {
             const d = userDoc.data();
@@ -69,15 +72,19 @@ function AppContent() {
               localStorage.setItem("clinicalUser", JSON.stringify({ uid: firebaseUser.uid, email: firebaseUser.email, role, fullName: d.fullName || d.displayName || "" }));
               sessionStorage.setItem("clinicalUser", JSON.stringify({ uid: firebaseUser.uid, email: firebaseUser.email, role, fullName: d.fullName || d.displayName || "" }));
             } catch {}
-            setAuthUser({ uid: firebaseUser.uid, email: firebaseUser.email, role });
-            return;
+          } else {
+            try {
+              localStorage.setItem("clinicalUser", JSON.stringify({ uid: firebaseUser.uid, email: firebaseUser.email, role }));
+              sessionStorage.setItem("clinicalUser", JSON.stringify({ uid: firebaseUser.uid, email: firebaseUser.email, role }));
+            } catch {}
           }
-        } catch {}
+        } catch {
+          try {
+            localStorage.setItem("clinicalUser", JSON.stringify({ uid: firebaseUser.uid, email: firebaseUser.email, role: "staff" }));
+            sessionStorage.setItem("clinicalUser", JSON.stringify({ uid: firebaseUser.uid, email: firebaseUser.email, role: "staff" }));
+          } catch {}
+        }
         setAuthUser({ uid: firebaseUser.uid, email: firebaseUser.email, role });
-        try {
-          localStorage.setItem("clinicalUser", JSON.stringify({ uid: firebaseUser.uid, email: firebaseUser.email, role }));
-          sessionStorage.setItem("clinicalUser", JSON.stringify({ uid: firebaseUser.uid, email: firebaseUser.email, role }));
-        } catch {}
       } else {
         setAuthUser(null);
       }
@@ -87,37 +94,41 @@ function AppContent() {
   }, []);
 
   useEffect(() => {
-    const onError = (err: Error) => console.warn("Firestore listener error:", err.message);
+    if (!authUser) return;
+
+    console.log("[App] Starting onSnapshot listeners (authUser:", authUser?.uid, ")");
     const unsubAppSettings = onSnapshot(doc(db, "appSettings", "current"), (snap) => {
       if (snap.exists()) {
-        try { localStorage.setItem("ci_app_settings", JSON.stringify(snap.data())); } catch {}
+        try { localStorage.setItem("ci_app_settings", JSON.stringify(snap.data())); console.log("[App] onSnapshot: appSettings received"); } catch {}
+      } else {
+        console.log("[App] onSnapshot: appSettings/current does not exist");
       }
-    }, onError);
+    });
     const unsubKbArticles = onSnapshot(collection(db, "kbArticles"), (snap) => {
       const articles: Record<string, unknown>[] = [];
       snap.forEach((d) => articles.push({ id: d.id, ...d.data() }));
-      try { localStorage.setItem("ci_kb_articles", JSON.stringify(articles)); } catch {}
-    }, onError);
+      try { localStorage.setItem("ci_kb_articles", JSON.stringify(articles)); console.log("[App] onSnapshot: kbArticles received, count:", articles.length); } catch {}
+    });
     const unsubUserTypes = onSnapshot(collection(db, "user_types"), (snap) => {
       const types: Record<string, unknown> = {};
       snap.forEach((d) => { types[d.id] = d.data(); });
-      try { localStorage.setItem("ci_user_types", JSON.stringify(types)); } catch {}
-    }, onError);
+      try { localStorage.setItem("ci_user_types", JSON.stringify(types)); console.log("[App] onSnapshot: user_types received, count:", Object.keys(types).length); } catch {}
+    });
     const unsubUsers = onSnapshot(collection(db, "users"), (snap) => {
       const users: Record<string, unknown>[] = [];
       snap.forEach((d) => users.push({ uid: d.id, ...d.data() }));
-      try { localStorage.setItem("ci_provisioned_users", JSON.stringify(users)); } catch {}
-    }, onError);
+      try { localStorage.setItem("ci_provisioned_users", JSON.stringify(users)); console.log("[App] onSnapshot: users received, count:", users.length); } catch {}
+    });
     const unsubTickets = onSnapshot(collection(db, "tickets"), (snap) => {
       const tickets: Record<string, unknown>[] = [];
       snap.forEach((d) => tickets.push({ id: d.id, ...d.data() }));
-      try { localStorage.setItem("ci_tickets", JSON.stringify(tickets)); } catch {}
-    }, onError);
+      try { localStorage.setItem("ci_tickets", JSON.stringify(tickets)); console.log("[App] onSnapshot: tickets received, count:", tickets.length); } catch {}
+    });
     const unsubNotifications = onSnapshot(collection(db, "notifications"), (snap) => {
       const notifs: Record<string, unknown>[] = [];
       snap.forEach((d) => notifs.push({ id: d.id, ...d.data() }));
-      try { localStorage.setItem("ci_notifications", JSON.stringify(notifs)); } catch {}
-    }, onError);
+      try { localStorage.setItem("ci_notifications", JSON.stringify(notifs)); console.log("[App] onSnapshot: notifications received, count:", notifs.length); } catch {}
+    });
     return () => {
       unsubAppSettings();
       unsubKbArticles();
@@ -126,7 +137,7 @@ function AppContent() {
       unsubTickets();
       unsubNotifications();
     };
-  }, []);
+  }, [authUser]);
 
   useEffect(() => {
     const handleMessage = async (event: MessageEvent) => {
@@ -137,6 +148,44 @@ function AppContent() {
         localStorage.removeItem('clinicalUser');
         sessionStorage.removeItem('clinicalUser');
         navigate('/signin');
+      } else if (event.data.type === 'createTicket') {
+        console.log("[App] Received createTicket message:", event.data.data);
+        try {
+          const ticketRef = doc(db, "tickets", event.data.data.id);
+          console.log("[App] Writing to Firestore tickets/" + event.data.data.id);
+          await setDoc(ticketRef, {
+            ...event.data.data,
+            status: "open",
+            createdAt: serverTimestamp(),
+          });
+          console.log("[App] SUCCESS: Ticket written to Firestore");
+          console.log("[App] Creating notification in Firestore notifications collection");
+          const notifRef = doc(collection(db, "notifications"));
+          await setDoc(notifRef, {
+            title: "New Ticket Created",
+            message: `Ticket ${event.data.data.id}: ${event.data.data.description?.substring(0, 80)}`,
+            icon: "assignment",
+            color: "text-primary",
+            type: "ticket",
+            ticketId: event.data.data.id,
+            createdAt: serverTimestamp(),
+          });
+          console.log("[App] SUCCESS: Notification written to Firestore");
+        } catch (e) {
+          console.error("[App] FAILED: createTicket error:", e);
+        }
+      } else if (event.data.type === 'createKbArticle') {
+        console.log("[App] Received createKbArticle message:", event.data.data);
+        try {
+          const articleRef = doc(db, "kbArticles", String(event.data.data.id));
+          await setDoc(articleRef, {
+            ...event.data.data,
+            createdAt: serverTimestamp(),
+          });
+          console.log("[App] SUCCESS: KB article written to Firestore");
+        } catch (e) {
+          console.error("[App] FAILED: createKbArticle error:", e);
+        }
       }
     };
 

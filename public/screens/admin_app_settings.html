@@ -89,6 +89,10 @@
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
         }
     </style>
+  <!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore-compat.js"></script>
 </head>
 <body class="bg-surface font-body text-on-surface min-h-screen">
 <!-- SideNavBar (Desktop Only) -->
@@ -391,6 +395,18 @@ var DEFAULT_SETTINGS = {
     version: 'v1.0.0',
     logoData: ''
 };
+// ── Firebase init ──────────────────────────────
+var firebaseConfig = {
+    apiKey: "AIzaSyA5mqKAq7Hr8J295DBTOx64-ek5qjPVJjM",
+    authDomain: "medical-system-26144.firebaseapp.com",
+    projectId: "medical-system-26144",
+    storageBucket: "medical-system-26144.firebasestorage.app",
+    messagingSenderId: "964074624899",
+    appId: "1:964074624899:web:83adf9cf1802e3069808b6",
+    measurementId: "G-TRFQFRSB38"
+};
+firebase.initializeApp(firebaseConfig);
+var db = firebase.firestore();
 function loadAppSettings() {
     try {
         var raw = localStorage.getItem(APP_SETTINGS_KEY);
@@ -427,17 +443,31 @@ function saveAppSettings() {
         version: document.getElementById('setting-version').value.trim() || DEFAULT_SETTINGS.version,
         logoData: document.getElementById('logo-preview').querySelector('img') ? document.getElementById('logo-preview').querySelector('img').src : ''
     };
+    console.log("[AppSettings] Collected settings object:", settings);
     try {
         localStorage.setItem(APP_SETTINGS_KEY, JSON.stringify(settings));
+        console.log("[AppSettings] Written to localStorage key:", APP_SETTINGS_KEY);
+        db.collection('appSettings').doc('current').set(settings, { merge: true }).then(function() {
+            console.log("[AppSettings] SUCCESS: Written to Firestore appSettings/current");
+        }).catch(function(err) {
+            console.error("[AppSettings] FAILED: Firestore write error:", err);
+        });
         updatePreview(settings);
         showToast('App settings saved successfully', 'success');
     } catch(e) {
+        console.error("[AppSettings] localStorage write failed:", e);
         showToast('Failed to save settings', 'error');
     }
 }
 function resetAppSettings() {
     try {
+        console.log("[AppSettings] Resetting settings");
         localStorage.removeItem(APP_SETTINGS_KEY);
+        db.collection('appSettings').doc('current').delete().then(function() {
+            console.log("[AppSettings] SUCCESS: Deleted Firestore appSettings/current");
+        }).catch(function(err) {
+            console.error("[AppSettings] FAILED: Firestore delete error:", err);
+        });
         document.getElementById('setting-app-name').value = DEFAULT_SETTINGS.appName;
         document.getElementById('setting-tagline').value = DEFAULT_SETTINGS.tagline;
         document.getElementById('setting-footer').value = DEFAULT_SETTINGS.footerText;
@@ -862,4 +892,5 @@ window.addEventListener('message', function(e) {
     if (e.data.type === 'closeModal') closeNewTicketModal();
 });
 </script>
+<script>function setupNotifRefresh(){var n=localStorage.getItem("ci_notifications");setInterval(function(){var c=localStorage.getItem("ci_notifications");if(c!==n){n=c;loadNotifications();}},3000);}setupNotifRefresh();</script>
 </body></html>

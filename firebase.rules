@@ -56,14 +56,16 @@ service cloud.firestore {
     // ── Knowledge Base Articles ───────────────────────
     match /kbArticles/{articleId} {
       allow read: if isAuthenticated();
-      allow create, update, delete: if isIctOrHigher();
+      allow create: if isAuthenticated();
+      allow update, delete: if isAuthenticated()
+        && isOwner(get(/databases/$(database)/documents/kbArticles/$(articleId)).data.createdBy)
+        || isIctOrHigher();
     }
 
     // ── Notifications ─────────────────────────────────
     match /notifications/{notificationId} {
-      allow read, write: if isAuthenticated()
-        && (isOwner(get(/databases/$(database)/documents/notifications/$(notificationId)).data.targetUserId)
-            || isAdmin());
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
     }
 
     // ── User Types ────────────────────────────────────

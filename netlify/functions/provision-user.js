@@ -11,7 +11,7 @@ exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return { statusCode: 405, headers, body: 'Method Not Allowed' };
 
   try {
-    const { email, password, displayName, role, department } = JSON.parse(event.body);
+    const { email, password, displayName, role, department, staffId } = JSON.parse(event.body);
 
     if (!email || !password) {
       return { statusCode: 400, headers, body: JSON.stringify({ error: 'Email and password are required' }) };
@@ -30,6 +30,7 @@ exports.handler = async (event) => {
       displayName: displayName || '',
       user_role: role || 'staff',
       department: department || '',
+      staffId: staffId || '',
       disabled: false,
       createdAt: new Date().toISOString(),
     });

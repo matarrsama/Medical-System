@@ -268,7 +268,7 @@
 <div class="bg-white p-6 rounded-2xl shadow-sm border border-surface-container flex items-center justify-between">
 <div>
 <p class="text-xs font-bold text-outline uppercase tracking-wider mb-1">Open Tickets</p>
-                    <h3 class="text-3xl font-headline font-extrabold text-primary">0</h3>
+                    <h3 id="stat-open" class="text-3xl font-headline font-extrabold text-primary">0</h3>
 </div>
 <div class="w-12 h-12 bg-primary-fixed rounded-xl flex items-center justify-center text-primary">
 <span class="material-symbols-outlined text-2xl">pending_actions</span>
@@ -277,7 +277,7 @@
 <div class="bg-white p-6 rounded-2xl shadow-sm border border-surface-container flex items-center justify-between">
 <div>
 <p class="text-xs font-bold text-outline uppercase tracking-wider mb-1">In Progress</p>
-                    <h3 class="text-3xl font-headline font-extrabold text-primary">0</h3>
+                    <h3 id="stat-in-progress" class="text-3xl font-headline font-extrabold text-primary">0</h3>
 </div>
 <div class="w-12 h-12 bg-secondary-fixed rounded-xl flex items-center justify-center text-secondary">
 <span class="material-symbols-outlined text-2xl">sync</span>
@@ -286,7 +286,7 @@
 <div class="bg-white p-6 rounded-2xl shadow-sm border border-surface-container flex items-center justify-between">
 <div>
 <p class="text-xs font-bold text-outline uppercase tracking-wider mb-1">Urgent (P1)</p>
-                    <h3 class="text-3xl font-headline font-extrabold text-error">0</h3>
+                    <h3 id="stat-urgent" class="text-3xl font-headline font-extrabold text-error">0</h3>
 </div>
 <div class="w-12 h-12 bg-error-container rounded-xl flex items-center justify-center text-error animate-pulse">
 <span class="material-symbols-outlined text-2xl">priority_high</span>
@@ -295,7 +295,7 @@
 <div class="bg-white p-6 rounded-2xl shadow-sm border border-surface-container flex items-center justify-between">
 <div>
 <p class="text-xs font-bold text-outline uppercase tracking-wider mb-1">Solved Today</p>
-                    <h3 class="text-3xl font-headline font-extrabold text-secondary">0</h3>
+                    <h3 id="stat-solved" class="text-3xl font-headline font-extrabold text-secondary">0</h3>
 </div>
 <div class="w-12 h-12 bg-secondary-fixed rounded-xl flex items-center justify-center text-on-secondary-fixed-variant">
 <span class="material-symbols-outlined text-2xl">task_alt</span>
@@ -744,5 +744,93 @@ document.addEventListener('click', function(e) {
 window.addEventListener('message', function(e) {
     if (e.data.type === 'closeModal') closeNewTicketModal();
 });
+function loadTickets() {
+    var tbody = document.querySelector('table tbody');
+    if (!tbody) return;
+    var paginationText = document.querySelector('.px-8.py-4 .text-xs.text-outline.font-medium');
+    try {
+        var raw = localStorage.getItem('ci_tickets');
+        if (!raw || JSON.parse(raw).length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="px-8 py-12 text-center text-sm text-outline">No tickets to display</td></tr>';
+            if (paginationText) paginationText.textContent = 'No tickets to display';
+            clearStats();
+            return;
+        }
+        var tickets = JSON.parse(raw);
+        var html = '';
+        var openCount = 0, inProgressCount = 0, urgentCount = 0, solvedToday = 0;
+        var today = new Date().toDateString();
+        for (var i = 0; i < tickets.length; i++) {
+            var t = tickets[i];
+            var id = t.id || t.ticketId || '-';
+            var desc = t.description || t.subject || 'No description';
+            var urgency = t.urgency || 'low';
+            var status = t.status || 'open';
+            var created = t.createdAt || t.submittedAt || '';
+            var createdStr = '';
+            if (created && created.seconds) {
+                createdStr = new Date(created.seconds * 1000).toLocaleDateString();
+            } else if (created) {
+                createdStr = new Date(created).toLocaleDateString();
+            } else {
+                createdStr = '-';
+            }
+            if (status === 'open') openCount++;
+            else if (status === 'in_progress') inProgressCount++;
+            if (urgency === 'critical' || urgency === 'high') urgentCount++;
+            if ((status === 'resolved' || status === 'closed') && created && created.seconds) {
+                var d = new Date(created.seconds * 1000).toDateString();
+                if (d === today) solvedToday++;
+            }
+            var urgencyLabel = urgency.charAt(0).toUpperCase() + urgency.slice(1);
+            var urgencyColors = { low: 'bg-surface-container-high text-on-surface', medium: 'bg-secondary-container text-on-secondary-container', high: 'bg-tertiary-fixed text-on-tertiary-container', critical: 'bg-error-container text-error' };
+            var urgencyColor = urgencyColors[urgency] || urgencyColors.low;
+            var statusColors = { open: 'bg-green-100 text-green-800', in_progress: 'bg-blue-100 text-blue-800', resolved: 'bg-surface-container-high text-on-surface', closed: 'bg-surface-container-high text-on-surface' };
+            var statusColor = statusColors[status] || 'bg-surface-container-high text-on-surface';
+            var statusLabel = status.replace(/_/g, ' ').replace(/\b\w/g, function(l) { return l.toUpperCase(); });
+            html += '<tr class="hover:bg-surface-container-low/50 transition-colors">';
+            html += '<td class="px-8 py-4"><span class="text-sm font-bold text-primary font-mono">' + id + '</span></td>';
+            html += '<td class="px-8 py-4"><div class="text-sm font-medium text-on-surface max-w-[240px] truncate">' + desc + '</div></td>';
+            html += '<td class="px-8 py-4 text-center"><span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase ' + urgencyColor + '">' + urgencyLabel + '</span></td>';
+            html += '<td class="px-8 py-4"><span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase ' + statusColor + '">' + statusLabel + '</span></td>';
+            html += '<td class="px-8 py-4 text-sm text-on-surface-variant">' + createdStr + '</td>';
+            html += '<td class="px-8 py-4 text-right"><button class="px-3 py-1.5 rounded-lg text-xs font-bold text-primary hover:bg-primary-fixed transition-colors">View</button></td>';
+            html += '</tr>';
+        }
+        tbody.innerHTML = html;
+        if (paginationText) paginationText.textContent = tickets.length + ' ticket' + (tickets.length !== 1 ? 's' : '');
+        updateStats(openCount, inProgressCount, urgentCount, solvedToday);
+    } catch(e) {
+        console.log('[Tickets] Error loading:', e);
+    }
+}
+function updateStats(open, inProgress, urgent, solved) {
+    var el = document.getElementById('stat-open');
+    if (el) el.textContent = String(open);
+    el = document.getElementById('stat-in-progress');
+    if (el) el.textContent = String(inProgress);
+    el = document.getElementById('stat-urgent');
+    if (el) el.textContent = String(urgent);
+    el = document.getElementById('stat-solved');
+    if (el) el.textContent = String(solved);
+}
+function clearStats() {
+    updateStats(0, 0, 0, 0);
+}
+function setupAutoRefresh() {
+    var lastTickets = localStorage.getItem('ci_tickets');
+    var lastNotifs = localStorage.getItem('ci_notifications');
+    setInterval(function() {
+        var curT = localStorage.getItem('ci_tickets');
+        var curN = localStorage.getItem('ci_notifications');
+        if (curT !== lastTickets) { lastTickets = curT; loadTickets(); }
+        if (curN !== lastNotifs) { lastNotifs = curN; loadNotifications(); }
+    }, 3000);
+}
+document.addEventListener('DOMContentLoaded', function() {
+    loadTickets();
+    loadNotifications();
+    setupAutoRefresh();
+});
 </script>
-</body></html>
+<script>function setupNotifRefresh(){var n=localStorage.getItem("ci_notifications");setInterval(function(){var c=localStorage.getItem("ci_notifications");if(c!==n){n=c;loadNotifications();}},3000);}setupNotifRefresh();</script></body></html>

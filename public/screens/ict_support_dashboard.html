@@ -408,23 +408,62 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     } catch(e) {}
-    // Load cached dashboard data from localStorage
-    var cached = cacheLoad('dashboardData', null);
-    if (cached) {
-        var activeTicketsEl = document.querySelector('.text-3xl.font-bold.font-headline.text-primary');
-        if (activeTicketsEl && cached.activeTickets !== undefined) {
-            activeTicketsEl.textContent = String(cached.activeTickets).padStart(2, '0');
-        }
-    }
     // Add click handler to "Raise a New Ticket" button
-    const newTicketBtn = document.querySelector('button[class*="bg-secondary-fixed"]');
+    var newTicketBtn = document.querySelector('button[class*="bg-secondary-fixed"]');
     if (newTicketBtn) {
         newTicketBtn.addEventListener('click', createNewTicket);
     }
-    setTimeout(() => {
+    loadDashboardStats();
+    setupDashboardRefresh();
+    setTimeout(function() {
         showNotification('Dashboard loaded successfully', 'success');
     }, 1000);
 });
+function loadDashboardStats() {
+    try {
+        var raw = localStorage.getItem('ci_tickets');
+        if (!raw) return;
+        var tickets = JSON.parse(raw);
+        var active = 0;
+        var urgent = 0;
+        for (var i = 0; i < tickets.length; i++) {
+            var s = tickets[i].status || 'open';
+            if (s === 'open' || s === 'in_progress') active++;
+            if (tickets[i].urgency === 'critical' || tickets[i].urgency === 'high') urgent++;
+        }
+        var activeEl = document.querySelector('.text-3xl.font-bold.font-headline.text-primary');
+        if (activeEl) activeEl.textContent = String(active).padStart(2, '0');
+        var recentEl = document.querySelector('.space-y-4');
+        if (recentEl) {
+            if (tickets.length === 0) {
+                recentEl.innerHTML = '<p class="text-sm text-on-surface-variant">No recent updates</p>';
+            } else {
+                var recent = tickets.slice(-3).reverse();
+                var h = '';
+                for (var i = 0; i < recent.length; i++) {
+                    var t = recent[i];
+                    var id = t.id || '';
+                    var desc = (t.description || 'No description').substring(0, 60);
+                    h += '<div class="flex items-center gap-3 py-2"><span class="w-2 h-2 rounded-full bg-primary"></span><p class="text-sm text-on-surface-variant flex-1 truncate">' + desc + '</p><span class="text-[10px] text-outline font-mono">' + id + '</span></div>';
+                }
+                recentEl.innerHTML = h;
+            }
+        }
+        var criticalEl = document.querySelector('.text-sm.text-on-error-container\\/80');
+        if (criticalEl) {
+            criticalEl.textContent = urgent > 0 ? urgent + ' urgent ticket' + (urgent > 1 ? 's' : '') + ' requiring immediate attention' : 'No critical alerts at this time';
+        }
+    } catch(e) {
+        console.log('[Dashboard] Error loading stats:', e);
+    }
+}
+function setupDashboardRefresh() {
+    var lastVal = localStorage.getItem('ci_tickets');
+    setInterval(function() {
+        var cur = localStorage.getItem('ci_tickets');
+        if (cur !== lastVal) { lastVal = cur; loadDashboardStats(); }
+    }, 3000);
+}
 </script>
 <script>
 // Cache helpers
@@ -505,12 +544,12 @@ document.addEventListener('keydown', function(e) {
 });
 // Add hover effects to interactive elements
 document.addEventListener('mouseover', function(e) {
-    if (e.target.closest('.hover:bg-surface-container-high')) {
+    if (e.target.closest('[class*="hover:bg-surface-container-high"]')) {
         e.target.style.transform = 'translateX(2px)';
     }
 });
 document.addEventListener('mouseout', function(e) {
-    if (e.target.closest('.hover:bg-surface-container-high')) {
+    if (e.target.closest('[class*="hover:bg-surface-container-high"]')) {
         e.target.style.transform = 'translateX(0)';
     }
     });
@@ -779,4 +818,4 @@ window.addEventListener('message', function(e) {
     if (e.data.type === 'closeModal') closeNewTicketModal();
 });
 </script>
-</body></html>
+<script>function setupNotifRefresh(){var n=localStorage.getItem("ci_notifications");setInterval(function(){var c=localStorage.getItem("ci_notifications");if(c!==n){n=c;loadNotifications();}},3000);}setupNotifRefresh();</script></body></html>

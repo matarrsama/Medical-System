@@ -102,6 +102,10 @@
         }
         .animate-slide-up { animation: slideUp 0.3s ease-out; }
     </style>
+  <!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore-compat.js"></script>
 <script>
 (function() {
     var raw = localStorage.getItem('clinicalUser') || sessionStorage.getItem('clinicalUser');
@@ -299,7 +303,7 @@
                         View all articles <span class="material-symbols-outlined text-sm">arrow_forward</span>
 </button>
 </div>
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 h-auto md:h-[420px]">
+        <div id="featured-articles-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6 h-auto md:h-[420px]">
 <!-- Main Featured -->
 <div class="md:col-span-2 group relative overflow-hidden rounded-3xl bg-primary-container p-10 flex flex-col justify-end text-white cursor-pointer shadow-lg">
 <div class="absolute inset-0 z-0">
@@ -340,7 +344,7 @@
 <!-- Category Grid -->
 <section class="mb-16">
 <h2 class="font-headline text-2xl font-bold text-primary mb-8">Browse by Department</h2>
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div id="category-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
 <!-- Category 1 -->
 <div class="bg-surface-container-low rounded-3xl p-6 hover:bg-surface-container transition-colors cursor-pointer group">
 <div class="flex items-center justify-between mb-8">
@@ -396,7 +400,7 @@
 <!-- List of Popular Articles -->
 <div class="lg:col-span-2">
 <h2 class="font-headline text-2xl font-bold text-primary mb-6">Popular Articles</h2>
-<div class="space-y-4">
+<div id="popular-articles-list" class="space-y-4">
 <div class="group flex items-center gap-6 p-4 rounded-2xl hover:bg-surface-container-high transition-colors cursor-pointer">
 <div class="flex-1 text-center py-2">
 <p class="text-sm text-on-surface-variant">No popular articles yet</p>
@@ -764,6 +768,28 @@ function closeNewTicketModal() {
     document.getElementById('new-ticket-overlay').classList.remove('flex');
     document.body.style.overflow = '';
 }
+// ── Firebase init ──────────────────────────────
+var firebaseConfig = {
+    apiKey: "AIzaSyA5mqKAq7Hr8J295DBTOx64-ek5qjPVJjM",
+    authDomain: "medical-system-26144.firebaseapp.com",
+    projectId: "medical-system-26144",
+    storageBucket: "medical-system-26144.firebasestorage.app",
+    messagingSenderId: "964074624899",
+    appId: "1:964074624899:web:83adf9cf1802e3069808b6",
+    measurementId: "G-TRFQFRSB38"
+};
+firebase.initializeApp(firebaseConfig);
+var auth = firebase.auth();
+var db = firebase.firestore();
+var authReady = false;
+auth.onAuthStateChanged(function(user) {
+    authReady = true;
+    if (user) {
+        console.log("[KB] Firebase Auth: user signed in as", user.email);
+    } else {
+        console.warn("[KB] Firebase Auth: NO user signed in");
+    }
+});
 function switchArticleTab(tab) {
     var manual = document.getElementById('article-manual-form');
     var link = document.getElementById('article-link-form');
@@ -821,20 +847,33 @@ function saveNewArticle() {
         article.description = description;
         article.category = category;
     }
-    var existing = JSON.parse(localStorage.getItem('ci_kb_articles') || '[]');
-    existing.unshift(article);
-    localStorage.setItem('ci_kb_articles', JSON.stringify(existing));
-    closeNewArticleModal();
-    showArticleToast('Article saved successfully!');
-    // Reset form
-    document.getElementById('article-title').value = '';
-    document.getElementById('article-content').value = '';
-    document.getElementById('article-tags').value = '';
-    document.getElementById('article-category').value = '';
-    document.getElementById('link-title').value = '';
-    document.getElementById('link-url').value = '';
-    document.getElementById('link-description').value = '';
-    document.getElementById('link-category').value = '';
+    console.log("[KB] Article object built:", article);
+    var currentUser = auth.currentUser;
+    if (!currentUser) {
+        console.warn("[KB] No authenticated user - trying postMessage to parent");
+        showArticleToast('Syncing...');
+        window.top.postMessage({ type: 'createKbArticle', data: article }, '*');
+        closeNewArticleModal();
+        return;
+    }
+    console.log("[KB] Authenticated as:", currentUser.email);
+    db.collection('kbArticles').doc(String(article.id)).set(article).then(function() {
+        console.log("[KB] SUCCESS: Written to Firestore kbArticles/" + article.id);
+        closeNewArticleModal();
+        showArticleToast('Article saved successfully!');
+        loadArticles();
+        document.getElementById('article-title').value = '';
+        document.getElementById('article-content').value = '';
+        document.getElementById('article-tags').value = '';
+        document.getElementById('article-category').value = '';
+        document.getElementById('link-title').value = '';
+        document.getElementById('link-url').value = '';
+        document.getElementById('link-description').value = '';
+        document.getElementById('link-category').value = '';
+    }).catch(function(err) {
+        console.error("[KB] FAILED: Firestore write error:", err);
+        showArticleToast('Failed to save article: ' + err.message);
+    });
 }
 function showArticleToast(msg) {
     var t = document.createElement('div');
@@ -958,4 +997,81 @@ window.addEventListener('message', function(e) {
 </div>
 </div>
 </div>
-</body></html>
+<script>
+function loadArticles() {
+    try {
+        var raw = localStorage.getItem('ci_kb_articles');
+        if (!raw) return;
+        var articles = JSON.parse(raw);
+        if (articles.length === 0) return;
+
+        // Featured articles grid - 3 most recent
+        var featuredGrid = document.getElementById('featured-articles-grid');
+        if (featuredGrid) {
+            var featured = articles.slice(-3).reverse();
+            var h = '';
+            h += '<div class="md:col-span-2 group relative overflow-hidden rounded-3xl bg-primary-container p-10 flex flex-col justify-end text-white cursor-pointer shadow-lg">';
+            h += '<div class="relative z-10">';
+            h += '<span class="inline-block px-3 py-1 bg-secondary-container text-on-secondary-container rounded-full text-[10px] font-bold uppercase tracking-widest mb-4">' + (featured[0].category || 'Featured') + '</span>';
+            h += '<h3 class="font-headline text-3xl font-extrabold mb-4 leading-tight">' + (featured[0].title || '') + '</h3>';
+            h += '<p class="text-primary-fixed/80 max-w-lg mb-6 leading-relaxed">' + (featured[0].content || featured[0].description || '').substring(0, 150) + '</p>';
+            h += '</div></div>';
+            for (var i = 1; i < featured.length && i < 3; i++) {
+                h += '<div class="group relative overflow-hidden rounded-3xl bg-surface-container-lowest p-8 flex flex-col border border-white shadow-sm cursor-pointer hover:bg-surface-container transition-colors">';
+                h += '<div class="w-12 h-12 rounded-2xl bg-secondary-fixed flex items-center justify-center text-on-secondary-fixed mb-6 group-hover:scale-110 transition-transform"><span class="material-symbols-outlined">article</span></div>';
+                h += '<h3 class="font-headline text-xl font-bold text-primary mb-3">' + (featured[i].title || '') + '</h3>';
+                h += '<p class="text-on-surface-variant text-sm mb-auto">' + (featured[i].content || featured[i].description || '').substring(0, 100) + '</p>';
+                h += '<div class="flex items-center justify-between mt-6 pt-6 border-t border-outline-variant/10">';
+                h += '<span class="text-[10px] font-bold text-outline-variant uppercase tracking-wider">' + (featured[i].category || 'Category') + '</span>';
+                h += '<span class="material-symbols-outlined text-primary group-hover:translate-x-1 transition-transform">arrow_forward</span>';
+                h += '</div></div>';
+            }
+            featuredGrid.innerHTML = h;
+        }
+
+        // Category counts
+        var categories = {};
+        for (var c = 0; c < articles.length; c++) {
+            var cat = articles[c].category || 'Other';
+            categories[cat] = (categories[cat] || 0) + 1;
+        }
+        var catItems = document.querySelectorAll('#category-grid > div');
+        for (var c = 0; c < catItems.length; c++) {
+            var catName = catItems[c].querySelector('h4');
+            var catCount = catItems[c].querySelector('span.text-xs.font-bold.text-primary-container');
+            if (catName && catCount) {
+                var name = catName.textContent.trim();
+                catCount.textContent = (categories[name] || 0) + ' Articles';
+            }
+        }
+
+        // Popular articles list
+        var popList = document.getElementById('popular-articles-list');
+        if (popList) {
+            var h = '';
+            for (var i = 0; i < articles.length; i++) {
+                var a = articles[i];
+                h += '<div class="group flex items-center justify-between gap-6 p-4 rounded-2xl hover:bg-surface-container-high transition-colors cursor-pointer">';
+                h += '<div class="flex items-center gap-4"><span class="material-symbols-outlined text-primary text-xl">article</span>';
+                h += '<div><p class="text-sm font-semibold text-primary">' + (a.title || '') + '</p>';
+                h += '<p class="text-xs text-on-surface-variant">' + (a.category || '') + '</p></div></div>';
+                h += '<span class="material-symbols-outlined text-outline-variant text-sm group-hover:text-primary transition-colors">chevron_right</span>';
+                h += '</div>';
+            }
+            popList.innerHTML = h;
+        }
+    } catch(e) {
+        console.log('[KB] Error loading articles:', e);
+    }
+}
+function setupKBRefresh() {
+    var lastVal = localStorage.getItem('ci_kb_articles');
+    setInterval(function() {
+        var cur = localStorage.getItem('ci_kb_articles');
+        if (cur !== lastVal) { lastVal = cur; loadArticles(); }
+    }, 3000);
+}
+loadArticles();
+setupKBRefresh();
+</script>
+<script>function setupNotifRefresh(){var n=localStorage.getItem("ci_notifications");setInterval(function(){var c=localStorage.getItem("ci_notifications");if(c!==n){n=c;loadNotifications();}},3000);}setupNotifRefresh();</script></body></html>
