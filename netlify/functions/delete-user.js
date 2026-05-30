@@ -1,25 +1,14 @@
-const { getFirebaseAdmin } = require('./_shared/firebase-admin');
+import { db, auth } from './_shared/admin.js'
 
-exports.handler = async (event) => {
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  };
-
-  if (event.httpMethod === 'OPTIONS') return { statusCode: 204, headers, body: '' };
-  if (event.httpMethod !== 'POST') return { statusCode: 405, headers, body: 'Method Not Allowed' };
-
+export const handler = async (event) => {
   try {
-    const { uid } = JSON.parse(event.body);
-    if (!uid) return { statusCode: 400, headers, body: JSON.stringify({ error: 'uid is required' }) };
+    const { uid } = JSON.parse(event.body)
 
-    const { auth, firestore } = getFirebaseAdmin();
-    await auth.deleteUser(uid);
-    await firestore.collection('users').doc(uid).delete();
+    await auth.deleteUser(uid)
+    await db.collection('users').doc(uid).delete()
 
-    return { statusCode: 200, headers, body: JSON.stringify({ message: 'User deleted' }) };
+    return { statusCode: 200, body: JSON.stringify({ uid }) }
   } catch (err) {
-    return { statusCode: 500, headers, body: JSON.stringify({ error: err.message }) };
+    return { statusCode: 500, body: JSON.stringify({ error: err.message }) }
   }
-};
+}

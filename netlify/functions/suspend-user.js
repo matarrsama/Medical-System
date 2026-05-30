@@ -1,29 +1,19 @@
-const { getFirebaseAdmin } = require('./_shared/firebase-admin');
+import { db, auth } from './_shared/admin.js'
 
-exports.handler = async (event) => {
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  };
-
-  if (event.httpMethod === 'OPTIONS') return { statusCode: 204, headers, body: '' };
-  if (event.httpMethod !== 'POST') return { statusCode: 405, headers, body: 'Method Not Allowed' };
-
+export const handler = async (event) => {
   try {
-    const { uid, disabled } = JSON.parse(event.body);
-    if (!uid) return { statusCode: 400, headers, body: JSON.stringify({ error: 'uid is required' }) };
+    const { uid, status } = JSON.parse(event.body)
 
-    const { auth, firestore } = getFirebaseAdmin();
-    await auth.updateUser(uid, { disabled: !!disabled });
-    await firestore.collection('users').doc(uid).update({ disabled: !!disabled });
+    if (status === 'Suspended') {
+      await auth.updateUser(uid, { disabled: true })
+    } else {
+      await auth.updateUser(uid, { disabled: false })
+    }
 
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify({ message: `User ${disabled ? 'suspended' : 'reactivated'}` }),
-    };
+    await db.collection('users').doc(uid).update({ status })
+
+    return { statusCode: 200, body: JSON.stringify({ uid, status }) }
   } catch (err) {
-    return { statusCode: 500, headers, body: JSON.stringify({ error: err.message }) };
+    return { statusCode: 500, body: JSON.stringify({ error: err.message }) }
   }
-};
+}

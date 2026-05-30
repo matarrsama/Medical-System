@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Hospital ICT Service Management - Tickets</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "error-container": "#ffdad6",
+                      "surface": "#f8f9ff",
+                      "on-surface-variant": "#434655",
+                      "secondary-fixed-dim": "#c3c0ff",
+                      "surface-container-high": "#dce9ff",
+                      "secondary-container": "#645efb",
+                      "outline": "#737686",
+                      "tertiary-container": "#bc4800",
+                      "on-error-container": "#93000a",
+                      "surface-dim": "#cbdbf5",
+                      "on-secondary-fixed": "#0f0069",
+                      "on-primary-fixed": "#00174b",
+                      "primary": "#004ac6",
+                      "inverse-surface": "#213145",
+                      "surface-container-low": "#eff4ff",
+                      "surface-container-highest": "#d3e4fe",
+                      "on-tertiary": "#ffffff",
+                      "tertiary": "#943700",
+                      "surface-bright": "#f8f9ff",
+                      "inverse-on-surface": "#eaf1ff",
+                      "on-secondary": "#ffffff",
+                      "secondary": "#4b41e1",
+                      "surface-variant": "#d3e4fe",
+                      "on-primary-fixed-variant": "#003ea8",
+                      "secondary-fixed": "#e2dfff",
+                      "surface-container": "#e5eeff",
+                      "inverse-primary": "#b4c5ff",
+                      "surface-container-lowest": "#ffffff",
+                      "on-tertiary-container": "#ffede6",
+                      "tertiary-fixed-dim": "#ffb596",
+                      "surface-tint": "#0053db",
+                      "primary-container": "#2563eb",
+                      "primary-fixed": "#dbe1ff",
+                      "tertiary-fixed": "#ffdbcd",
+                      "on-error": "#ffffff",
+                      "on-background": "#0b1c30",
+                      "outline-variant": "#c3c6d7",
+                      "on-primary": "#ffffff",
+                      "primary-fixed-dim": "#b4c5ff",
+                      "on-primary-container": "#eeefff",
+                      "on-surface": "#0b1c30",
+                      "error": "#ba1a1a",
+                      "on-secondary-fixed-variant": "#3323cc",
+                      "background": "#f8f9ff",
+                      "on-tertiary-fixed": "#360f00",
+                      "on-tertiary-fixed-variant": "#7d2d00",
+                      "on-secondary-container": "#fffbff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "gutter": "16px",
+                      "base": "4px",
+                      "xs": "4px",
+                      "container-padding": "24px",
+                      "md": "16px",
+                      "xl": "32px",
+                      "sm": "8px",
+                      "lg": "24px"
+              },
+              "fontFamily": {
+                      "label-sm": ["Inter"],
+                      "display": ["Inter"],
+                      "body-md": ["Inter"],
+                      "body-lg": ["Inter"],
+                      "body-sm": ["Inter"],
+                      "label-md": ["Inter"],
+                      "headline-lg-mobile": ["Inter"],
+                      "headline-md": ["Inter"],
+                      "headline-lg": ["Inter"]
+              },
+              "fontSize": {
+                      "label-sm": ["11px", {"lineHeight": "14px", "fontWeight": "500"}],
+                      "display": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                      "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                      "headline-lg-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "headline-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        /* Hide scrollbar for IE, Edge and Firefox */
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+    </style>
+</head>
+<body class="bg-surface h-full text-on-surface font-body-md flex overflow-hidden selection:bg-primary-container selection:text-on-primary-container">
+<!-- SideNavBar (Hidden on Mobile) -->
+<nav class="hidden md:flex flex-col bg-surface-container border-r border-outline-variant h-screen w-64 fixed left-0 top-0 pt-16 z-40 overflow-y-auto no-scrollbar">
+<div class="p-container-padding flex-1 mt-6">
+<div class="mb-8 px-2 flex items-center space-x-3">
+<img alt="Hospital ICT Logo" class="h-10 w-10 rounded bg-primary-container text-on-primary-container p-1 object-cover" data-alt="A clean, minimalist hospital medical cross logo rendered in deep blues and clinical whites. The style is flat, modern corporate vector art with precise geometry. The image feels authoritative and trustworthy, suitable for enterprise software." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAo1pXrNMfKvXmIGzxFqCNaLENDu2xl3XR3fEbX_bBWwKFOdibXKVU5mj-RApz5SI6IUqDYxLmizBQYBfHXjRHaLZOqWkS-QXgCTodXt6emP0Jlg-JdMD1qx2SGOkXd_qdEHrb1d3m_fgssOfHGHcXu_M_yUX2adX8ymzwS9fXtaRuGpGefG28gAWdWgfCHGfGSHQeLlwXClPgNCriXkoON_dgu_34RhzeuO4uLt5Kxr-46-68xCwoTWoIvTKztKZF-49tXet5rf7g"/>
+<div>
+<h1 class="text-headline-sm font-headline-sm font-black text-on-surface truncate w-36">ICT Admin Console</h1>
+<p class="text-label-sm font-label-sm text-on-surface-variant">v2.4.1 - Main Hospital</p>
+</div>
+</div>
+<ul class="space-y-xs">
+<li>
+<a class="text-on-surface-variant flex items-center px-4 py-2 hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors group" href="#/dashboard">
+<span class="material-symbols-outlined mr-3 text-outline group-hover:text-on-surface transition-colors" style="font-size: 20px;">dashboard</span>
+<span class="text-label-md font-label-md">Dashboard</span>
+</a>
+</li>
+<li>
+<a class="bg-secondary-container text-on-secondary-container font-bold rounded-lg flex items-center px-4 py-2 hover:bg-surface-container-high hover:text-on-surface transition-colors group scale-95 transition-transform duration-100" href="#/tickets">
+<span class="material-symbols-outlined mr-3 text-on-secondary-container transition-colors" style="font-variation-settings: 'FILL' 1;">confirmation_number</span>
+<span class="text-label-md font-label-md">Tickets</span>
+</a>
+</li>
+<li>
+<a class="text-on-surface-variant flex items-center px-4 py-2 hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors group" href="#/requests">
+<span class="material-symbols-outlined mr-3 text-outline group-hover:text-on-surface transition-colors" style="font-size: 20px;">assignment_returned</span>
+<span class="text-label-md font-label-md">Requests</span>
+</a>
+</li>
+<li>
+<a class="text-on-surface-variant flex items-center px-4 py-2 hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors group" href="#/inventory">
+<span class="material-symbols-outlined mr-3 text-outline group-hover:text-on-surface transition-colors" style="font-size: 20px;">inventory_2</span>
+<span class="text-label-md font-label-md">Inventory</span>
+</a>
+</li>
+<li>
+<a class="text-on-surface-variant flex items-center px-4 py-2 hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors group" href="#/procurement">
+<span class="material-symbols-outlined mr-3 text-outline group-hover:text-on-surface transition-colors" style="font-size: 20px;">shopping_cart</span>
+<span class="text-label-md font-label-md">Procurement</span>
+</a>
+</li>
+<li>
+<a class="text-on-surface-variant flex items-center px-4 py-2 hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors group" href="#/maintenance">
+<span class="material-symbols-outlined mr-3 text-outline group-hover:text-on-surface transition-colors" style="font-size: 20px;">build</span>
+<span class="text-label-md font-label-md">Maintenance</span>
+</a>
+</li>
+<li>
+<a class="text-on-surface-variant flex items-center px-4 py-2 hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors group" href="#/biomedical">
+<span class="material-symbols-outlined mr-3 text-outline group-hover:text-on-surface transition-colors" style="font-size: 20px;">medical_services</span>
+<span class="text-label-md font-label-md">Biomedical</span>
+</a>
+</li>
+<li>
+<a class="text-on-surface-variant flex items-center px-4 py-2 hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors group" href="#/departments">
+<span class="material-symbols-outlined mr-3 text-outline group-hover:text-on-surface transition-colors" style="font-size: 20px;">domain</span>
+<span class="text-label-md font-label-md">Departments</span>
+</a>
+</li>
+<li>
+<a class="text-on-surface-variant flex items-center px-4 py-2 hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors group" href="#/reports">
+<span class="material-symbols-outlined mr-3 text-outline group-hover:text-on-surface transition-colors" style="font-size: 20px;">analytics</span>
+<span class="text-label-md font-label-md">Reports</span>
+</a>
+</li>
+<li>
+<a class="text-on-surface-variant flex items-center px-4 py-2 hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors group" href="#/users">
+<span class="material-symbols-outlined mr-3 text-outline group-hover:text-on-surface transition-colors" style="font-size: 20px;">group</span>
+<span class="text-label-md font-label-md">Users</span>
+</a>
+</li>
+<li>
+<a class="text-on-surface-variant flex items-center px-4 py-2 hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors group" href="#/users">
+<span class="material-symbols-outlined mr-3 text-outline group-hover:text-on-surface transition-colors" style="font-size: 20px;">notifications</span>
+<span class="text-label-md font-label-md">Notifications</span>
+</a>
+</li>
+<li>
+<a class="text-on-surface-variant flex items-center px-4 py-2 hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors group" href="#/users">
+<span class="material-symbols-outlined mr-3 text-outline group-hover:text-on-surface transition-colors" style="font-size: 20px;">history_edu</span>
+<span class="text-label-md font-label-md">Audit Logs</span>
+</a>
+</li>
+<li>
+<a class="text-on-surface-variant flex items-center px-4 py-2 hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors group" href="#/users">
+<span class="material-symbols-outlined mr-3 text-outline group-hover:text-on-surface transition-colors" style="font-size: 20px;">settings</span>
+<span class="text-label-md font-label-md">Settings</span>
+</a>
+</li>
+</ul>
+</div>
+<div class="p-container-padding pb-xl">
+<button class="w-full py-2 px-4 bg-surface-container-highest text-on-surface-variant font-label-md text-label-md rounded border border-outline-variant hover:bg-surface-variant transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined mr-2" style="font-size: 16px;">download</span> Generate Report
+            </button>
+</div>
+</nav>
+<!-- Main Content Wrapper -->
+<div class="flex-1 flex flex-col md:ml-64 h-full relative">
+<!-- TopAppBar -->
+<header class="bg-surface-container-lowest border-b border-outline-variant flex justify-between items-center w-full px-lg h-16 sticky top-0 z-50">
+<div class="flex items-center space-x-md flex-1">
+<div class="text-headline-md font-headline-md font-bold text-primary flex items-center md:hidden">
+<span class="material-symbols-outlined mr-2">medical_services</span> HISM
+                </div>
+<!-- Search Bar -->
+<div class="hidden md:flex items-center bg-surface-container-low border border-outline-variant rounded-full px-4 py-1.5 w-96 max-w-md focus-within:ring-2 focus-within:ring-primary focus-within:border-primary transition-all">
+<span class="material-symbols-outlined text-on-surface-variant mr-2" style="font-size: 18px;">search</span>
+<input class="bg-transparent border-none outline-none text-body-sm font-body-sm w-full text-on-surface placeholder:text-on-surface-variant focus:ring-0 p-0" placeholder="Search tickets, assets, users..." type="text"/>
+</div>
+</div>
+<div class="flex items-center space-x-md">
+<button class="text-on-surface-variant hover:bg-surface-container-low p-2 rounded-full transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined">terminal</span>
+</button>
+<button class="text-on-surface-variant hover:bg-surface-container-low p-2 rounded-full transition-colors flex items-center justify-center relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-error"></span>
+</button>
+<button class="text-on-surface-variant hover:bg-surface-container-low p-2 rounded-full transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined">contrast</span>
+</button>
+<div class="h-6 w-px bg-outline-variant mx-2"></div>
+<button class="hidden lg:flex text-body-sm font-body-sm text-on-surface-variant hover:text-on-surface transition-colors px-2">Help</button>
+<button class="hidden lg:flex bg-primary text-on-primary text-label-md font-label-md px-4 py-2 rounded shadow-sm hover:bg-primary-container transition-colors items-center" onclick="openModal('new-ticket-modal.html')">
+<span class="material-symbols-outlined mr-1" style="font-size: 16px;">add</span> New Ticket
+                </button>
+<img alt="User profile with role badge" class="h-8 w-8 rounded-full ml-2 object-cover border border-outline-variant cursor-pointer" data-alt="A small, circular avatar portrait of a female medical professional wearing scrubs, shot in clean, bright hospital lighting. The image is cropped tightly on her face, conveying approachability and competence." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCglxWW2z7wU2eFKO_-26YlFMFjIpVtxcFdL4gMASoDsYtJtvVopEq2CF9_GG4h3fNtiPXuVeEhVt3pa2uPQjaAxRqEHFqAKmi0LziECPT162XOtahUUsJql0_1mz1X8agRXsmnD9CFgE3eqtYlUAKsUN9ag9RTJoJD0g4YwmCJurnAzZBp41jlhydakofISGioObiT4xAQhxyLhA5JE7QxW-8VXvQkN78lkS_5EDAFfO9h0XSKHzHI4rKau536oJd2TjShu1zylCU"/>
+</div>
+</header>
+<!-- Main Workspace -->
+<main class="flex-1 overflow-y-auto p-container-padding bg-surface no-scrollbar">
+<!-- Page Header -->
+<div class="flex flex-col sm:flex-row sm:items-end justify-between mb-lg space-y-4 sm:space-y-0">
+<div>
+<div class="flex items-center space-x-2 text-label-md font-label-md text-on-surface-variant mb-1">
+<span>Service Desk</span>
+<span class="material-symbols-outlined" style="font-size: 14px;">chevron_right</span>
+<span class="text-primary font-bold">Active Tickets</span>
+</div>
+<h2 class="text-display font-display text-on-surface">Tickets</h2>
+<p class="text-body-md font-body-md text-on-surface-variant mt-1">Manage and resolve hospital ICT service requests and incidents.</p>
+</div>
+<div class="flex items-center space-x-3">
+<!-- View Toggles -->
+<div class="flex bg-surface-container border border-outline-variant rounded-lg p-0.5">
+<button aria-label="Table View" class="bg-surface border border-outline shadow-sm text-on-surface p-1.5 rounded-md flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-size: 18px;">table_rows</span>
+</button>
+<button aria-label="Kanban View" class="text-on-surface-variant hover:text-on-surface p-1.5 rounded-md flex items-center justify-center transition-colors">
+<span class="material-symbols-outlined" style="font-size: 18px;">view_kanban</span>
+</button>
+<button aria-label="Calendar View" class="text-on-surface-variant hover:text-on-surface p-1.5 rounded-md flex items-center justify-center transition-colors">
+<span class="material-symbols-outlined" style="font-size: 18px;">calendar_month</span>
+</button>
+</div>
+<!-- Mobile Primary Action -->
+<button class="lg:hidden bg-primary text-on-primary text-label-md font-label-md px-4 py-2 rounded shadow-sm hover:bg-primary-container transition-colors items-center flex">
+<span class="material-symbols-outlined mr-1" style="font-size: 16px;">add</span> New
+                    </button>
+</div>
+</div>
+<!-- Data Surface -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden flex flex-col h-[calc(100vh-220px)] min-h-[500px]">
+<!-- Filter Bar -->
+<div class="border-b border-outline-variant p-4 bg-surface-container-lowest flex flex-wrap gap-3 items-center justify-between">
+<div class="flex flex-wrap gap-3 items-center flex-1">
+<!-- Local Search -->
+<div class="relative w-full sm:w-64">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" style="font-size: 18px;">search</span>
+<input class="w-full bg-surface-container pl-9 pr-3 py-1.5 rounded border border-outline-variant text-body-sm font-body-sm placeholder:text-on-surface-variant focus:ring-1 focus:ring-primary focus:border-primary focus:bg-surface-container-lowest transition-colors" placeholder="Filter by subject or ID..." type="text"/>
+</div>
+<!-- Filter Dropdowns (Simulated) -->
+<div class="relative hidden sm:block">
+<select class="appearance-none bg-surface-container border border-outline-variant rounded pl-3 pr-8 py-1.5 text-body-sm font-body-sm text-on-surface focus:ring-1 focus:ring-primary focus:border-primary focus:bg-surface-container-lowest transition-colors cursor-pointer">
+<option>Category: All</option>
+<option>Network</option>
+<option>Hardware</option>
+<option>Software (EMR)</option>
+<option>Access</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" style="font-size: 16px;">arrow_drop_down</span>
+</div>
+<div class="relative hidden sm:block">
+<select class="appearance-none bg-surface-container border border-outline-variant rounded pl-3 pr-8 py-1.5 text-body-sm font-body-sm text-on-surface focus:ring-1 focus:ring-primary focus:border-primary focus:bg-surface-container-lowest transition-colors cursor-pointer">
+<option>Status: Open</option>
+<option>In Progress</option>
+<option>Pending 3rd Party</option>
+<option>Resolved</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" style="font-size: 16px;">arrow_drop_down</span>
+</div>
+<div class="relative hidden md:block">
+<select class="appearance-none bg-surface-container border border-outline-variant rounded pl-3 pr-8 py-1.5 text-body-sm font-body-sm text-on-surface focus:ring-1 focus:ring-primary focus:border-primary focus:bg-surface-container-lowest transition-colors cursor-pointer">
+<option>Priority: All</option>
+<option>Critical (P1)</option>
+<option>High (P2)</option>
+<option>Medium (P3)</option>
+<option>Low (P4)</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" style="font-size: 16px;">arrow_drop_down</span>
+</div>
+</div>
+<button class="text-body-sm font-body-sm text-primary font-medium hover:text-primary-container flex items-center">
+<span class="material-symbols-outlined mr-1" style="font-size: 16px;">filter_list</span> Advanced
+                    </button>
+</div>
+<!-- Table Container -->
+<div class="flex-1 overflow-auto bg-surface-container-lowest relative">
+<table class="w-full text-left border-collapse min-w-[900px]">
+<thead class="bg-surface-container text-on-surface-variant text-label-sm font-label-sm uppercase tracking-wider sticky top-0 z-10 border-b border-outline-variant">
+<tr>
+<th class="px-4 py-3 font-medium w-12 text-center">
+<input class="rounded border-outline-variant text-primary focus:ring-primary w-4 h-4" type="checkbox"/>
+</th>
+<th class="px-4 py-3 font-medium cursor-pointer hover:text-on-surface group w-24">
+                                    ID <span class="material-symbols-outlined text-[14px] opacity-0 group-hover:opacity-100 align-middle ml-1">arrow_downward</span>
+</th>
+<th class="px-4 py-3 font-medium w-1/3">Subject</th>
+<th class="px-4 py-3 font-medium w-28">Priority</th>
+<th class="px-4 py-3 font-medium w-32">Status</th>
+<th class="px-4 py-3 font-medium">Requested By</th>
+<th class="px-4 py-3 font-medium">Assigned To</th>
+<th class="px-4 py-3 font-medium w-32 cursor-pointer hover:text-on-surface group">
+                                    SLA Clock <span class="material-symbols-outlined text-[14px] opacity-100 align-middle ml-1">arrow_upward</span>
+</th>
+<th class="px-4 py-3 font-medium w-16 text-right"></th>
+</tr>
+</thead>
+<tbody class="text-body-sm font-body-sm text-on-surface divide-y divide-outline-variant bg-surface-container-lowest">
+<!-- Row 1: Critical -->
+<tr class="hover:bg-surface-container-low transition-colors group cursor-pointer">
+<td class="px-4 py-3 text-center">
+<input class="rounded border-outline-variant text-primary focus:ring-primary w-4 h-4" type="checkbox"/>
+</td>
+<td class="px-4 py-3 font-mono text-primary font-medium">INC-8492</td>
+<td class="px-4 py-3">
+<div class="font-medium text-on-surface truncate pr-4" title="EMR System Timeout in ER Triage">EMR System Timeout in ER Triage</div>
+<div class="text-label-sm font-label-sm text-on-surface-variant mt-0.5 truncate pr-4">EPIC application unresponsive at nursing station 3.</div>
+</td>
+<td class="px-4 py-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-error-container text-on-error-container border border-error/20">
+<span class="w-1.5 h-1.5 rounded-full bg-error mr-1.5"></span>P1 - Critical
+                                    </span>
+</td>
+<td class="px-4 py-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-surface-container-highest text-on-surface-variant border border-outline-variant">
+<span class="material-symbols-outlined text-[12px] mr-1">pending</span> Open
+                                    </span>
+</td>
+<td class="px-4 py-3">
+<div class="flex items-center">
+<div class="h-6 w-6 rounded bg-tertiary-container text-on-tertiary-container flex items-center justify-center text-[10px] font-bold mr-2">DR</div>
+<span class="truncate">Dr. R. Chen</span>
+</div>
+</td>
+<td class="px-4 py-3 text-on-surface-variant">
+<span class="italic text-xs text-outline">Unassigned</span>
+</td>
+<td class="px-4 py-3">
+<div class="flex items-center text-error font-medium">
+<span class="material-symbols-outlined text-[14px] mr-1">timer</span> 14m left
+                                    </div>
+</td>
+<td class="px-4 py-3 text-right">
+<button class="text-on-surface-variant hover:text-primary opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-surface-container">
+<span class="material-symbols-outlined" style="font-size: 20px;">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 2: High -->
+<tr class="hover:bg-surface-container-low transition-colors group cursor-pointer bg-surface/50">
+<td class="px-4 py-3 text-center">
+<input class="rounded border-outline-variant text-primary focus:ring-primary w-4 h-4" type="checkbox"/>
+</td>
+<td class="px-4 py-3 font-mono text-primary font-medium">INC-8491</td>
+<td class="px-4 py-3">
+<div class="font-medium text-on-surface truncate pr-4" title="MRI Scanner Workstation Network Drop">MRI Scanner Workstation Network Drop</div>
+<div class="text-label-sm font-label-sm text-on-surface-variant mt-0.5 truncate pr-4">Intermittent connectivity to PACS server.</div>
+</td>
+<td class="px-4 py-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-tertiary-fixed text-on-tertiary-fixed border border-tertiary/20">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary mr-1.5"></span>P2 - High
+                                    </span>
+</td>
+<td class="px-4 py-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-secondary-fixed text-on-secondary-fixed border border-secondary/20">
+<span class="material-symbols-outlined text-[12px] mr-1">autorenew</span> In Progress
+                                    </span>
+</td>
+<td class="px-4 py-3">
+<div class="flex items-center">
+<div class="h-6 w-6 rounded bg-surface-container-highest text-on-surface flex items-center justify-center text-[10px] font-bold mr-2">SJ</div>
+<span class="truncate">S. Jenkins (Rad)</span>
+</div>
+</td>
+<td class="px-4 py-3">
+<div class="flex items-center">
+<img alt="Tech" class="h-6 w-6 rounded-full mr-2 object-cover" data-alt="A small circular avatar portrait of a male IT technician wearing a casual collared shirt. Soft, neutral office lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuChzl25qXDgW14XtP9anxBFj2sNoHjquNJwWYW43q4Y_8As1XOPz8Kqf5tlf4CNPrdYDmtdj70pz1jk7POZt3yGOESojKIcN2DZE42WdHJIJlrx4Bfy8tTT50xK2Q5NdtFu3l3mwsnYO1-sC4R2K1Hn_ZSAujQFziBV8fDSI53IevabeuRN0oCvL4VFqUkVjSXZgKuOYidhpZpG0hFnKsqv1TQIloZiNmu3eoOVKnPlqVCH96C1ev0qpRaj54FWlv8368LBoiJwR8M"/>
+<span class="truncate">M. Torres</span>
+</div>
+</td>
+<td class="px-4 py-3">
+<div class="flex items-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[14px] mr-1">timer</span> 1h 45m
+                                    </div>
+</td>
+<td class="px-4 py-3 text-right">
+<button class="text-on-surface-variant hover:text-primary opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-surface-container">
+<span class="material-symbols-outlined" style="font-size: 20px;">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 3: Medium -->
+<tr class="hover:bg-surface-container-low transition-colors group cursor-pointer">
+<td class="px-4 py-3 text-center">
+<input class="rounded border-outline-variant text-primary focus:ring-primary w-4 h-4" type="checkbox"/>
+</td>
+<td class="px-4 py-3 font-mono text-primary font-medium">REQ-9012</td>
+<td class="px-4 py-3">
+<div class="font-medium text-on-surface truncate pr-4" title="New User Provisioning - ICU Ward">New User Provisioning - ICU Ward</div>
+<div class="text-label-sm font-label-sm text-on-surface-variant mt-0.5 truncate pr-4">Access required for 3 new traveling nurses starting Monday.</div>
+</td>
+<td class="px-4 py-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-primary-fixed text-on-primary-fixed border border-primary/20">
+<span class="w-1.5 h-1.5 rounded-full bg-primary mr-1.5"></span>P3 - Medium
+                                    </span>
+</td>
+<td class="px-4 py-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-surface-container-highest text-on-surface-variant border border-outline-variant">
+<span class="material-symbols-outlined text-[12px] mr-1">hourglass_empty</span> Pending Approval
+                                    </span>
+</td>
+<td class="px-4 py-3">
+<div class="flex items-center">
+<div class="h-6 w-6 rounded bg-surface-container-highest text-on-surface flex items-center justify-center text-[10px] font-bold mr-2">AW</div>
+<span class="truncate">A. Wallace (HR)</span>
+</div>
+</td>
+<td class="px-4 py-3">
+<div class="flex items-center">
+<div class="h-6 w-6 rounded bg-surface-dim text-on-surface flex items-center justify-center text-[10px] font-bold mr-2">SA</div>
+<span class="truncate">SysAdmin Team</span>
+</div>
+</td>
+<td class="px-4 py-3">
+<div class="flex items-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[14px] mr-1">timer</span> 2d 4h
+                                    </div>
+</td>
+<td class="px-4 py-3 text-right">
+<button class="text-on-surface-variant hover:text-primary opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-surface-container">
+<span class="material-symbols-outlined" style="font-size: 20px;">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 4: Low (Resolved) -->
+<tr class="hover:bg-surface-container-low transition-colors group cursor-pointer bg-surface/30 opacity-75">
+<td class="px-4 py-3 text-center">
+<input class="rounded border-outline-variant text-primary focus:ring-primary w-4 h-4" type="checkbox"/>
+</td>
+<td class="px-4 py-3 font-mono text-on-surface-variant font-medium">INC-8480</td>
+<td class="px-4 py-3">
+<div class="font-medium text-on-surface line-through truncate pr-4" title="Printer Jam in Pediatrics Admin">Printer Jam in Pediatrics Admin</div>
+<div class="text-label-sm font-label-sm text-on-surface-variant mt-0.5 truncate pr-4">Lexmark C4150 indicating paper tray error.</div>
+</td>
+<td class="px-4 py-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-surface-container-highest text-on-surface-variant border border-outline-variant">
+<span class="w-1.5 h-1.5 rounded-full bg-outline mr-1.5"></span>P4 - Low
+                                    </span>
+</td>
+<td class="px-4 py-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-surface-variant text-on-surface border border-outline/30">
+<span class="material-symbols-outlined text-[12px] mr-1 text-primary">check_circle</span> Resolved
+                                    </span>
+</td>
+<td class="px-4 py-3">
+<div class="flex items-center">
+<div class="h-6 w-6 rounded bg-surface-container-highest text-on-surface flex items-center justify-center text-[10px] font-bold mr-2">LT</div>
+<span class="truncate">L. Thompson</span>
+</div>
+</td>
+<td class="px-4 py-3">
+<div class="flex items-center">
+<img alt="Tech" class="h-6 w-6 rounded-full mr-2 object-cover grayscale opacity-80" data-alt="A small circular avatar portrait of a female IT technician smiling slightly. Soft office lighting, professional attire." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA26VVyZwih-e3Ft4C9PqJjar8S71Wbm-nnGImp4u-mFYr4n0orEp3mQq4ALvUL5Kx54n1l2ZCSToM62i6SFNqTHMkgmTNseI4GI-GqqPfchdmh7lV8p6RWaUuorsbfMKoEsx4boWcDX9JPNV-pQvwncULAnhxj3HJclRnLrrZieNYNM1v3UxS0G1AG3qLsFgbjRN6-ygpKIJmFhrJspTRmrvoxZUqQqui3jrGhjFayMgosxxu-mn5VUL_DQy1qHw8MeqylnL3kJ5s"/>
+<span class="truncate">J. Davis</span>
+</div>
+</td>
+<td class="px-4 py-3">
+<div class="flex items-center text-outline">
+                                        --
+                                    </div>
+</td>
+<td class="px-4 py-3 text-right">
+<button class="text-on-surface-variant hover:text-primary opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-surface-container">
+<span class="material-symbols-outlined" style="font-size: 20px;">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination Footer -->
+<div class="border-t border-outline-variant p-3 bg-surface-container-lowest flex items-center justify-between text-body-sm font-body-sm text-on-surface-variant">
+<div>
+                        Showing <span class="font-medium text-on-surface">1</span> to <span class="font-medium text-on-surface">4</span> of <span class="font-medium text-on-surface">128</span> tickets
+                    </div>
+<div class="flex items-center space-x-4">
+<div class="hidden sm:flex items-center">
+<span class="mr-2">Rows per page:</span>
+<select class="appearance-none bg-transparent border-none py-1 pr-6 focus:ring-0 cursor-pointer font-medium text-on-surface">
+<option>25</option>
+<option>50</option>
+<option>100</option>
+</select>
+</div>
+<div class="flex items-center space-x-1">
+<button class="p-1 rounded hover:bg-surface-container-low text-outline disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined" style="font-size: 20px;">first_page</span>
+</button>
+<button class="p-1 rounded hover:bg-surface-container-low text-outline disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined" style="font-size: 20px;">chevron_left</span>
+</button>
+<button class="p-1 rounded hover:bg-surface-container-low text-on-surface transition-colors">
+<span class="material-symbols-outlined" style="font-size: 20px;">chevron_right</span>
+</button>
+<button class="p-1 rounded hover:bg-surface-container-low text-on-surface transition-colors">
+<span class="material-symbols-outlined" style="font-size: 20px;">last_page</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom spacing for mobile -->
+<div class="h-8"></div>
+</main>
+</div>
+</body></html>

@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Hospital ICT Service Management - User Detail</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary": "#943700",
+                        "surface-bright": "#f8f9ff",
+                        "on-secondary": "#ffffff",
+                        "inverse-on-surface": "#eaf1ff",
+                        "surface-container-low": "#eff4ff",
+                        "surface-container-highest": "#d3e4fe",
+                        "on-tertiary": "#ffffff",
+                        "surface-container": "#e5eeff",
+                        "secondary": "#4b41e1",
+                        "surface-variant": "#d3e4fe",
+                        "secondary-fixed": "#e2dfff",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "surface-container-high": "#dce9ff",
+                        "secondary-container": "#645efb",
+                        "outline": "#737686",
+                        "tertiary-container": "#bc4800",
+                        "surface": "#f8f9ff",
+                        "error-container": "#ffdad6",
+                        "on-surface-variant": "#434655",
+                        "secondary-fixed-dim": "#c3c0ff",
+                        "primary": "#004ac6",
+                        "on-primary-fixed": "#00174b",
+                        "inverse-surface": "#213145",
+                        "on-error-container": "#93000a",
+                        "surface-dim": "#cbdbf5",
+                        "on-secondary-fixed": "#0f0069",
+                        "on-surface": "#0b1c30",
+                        "on-primary-container": "#eeefff",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed-variant": "#3323cc",
+                        "background": "#f8f9ff",
+                        "outline-variant": "#c3c6d7",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "on-primary": "#ffffff",
+                        "on-secondary-container": "#fffbff",
+                        "on-tertiary-fixed-variant": "#7d2d00",
+                        "on-tertiary-fixed": "#360f00",
+                        "surface-tint": "#0053db",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-primary": "#b4c5ff",
+                        "on-tertiary-container": "#ffede6",
+                        "tertiary-fixed-dim": "#ffb596",
+                        "on-error": "#ffffff",
+                        "on-background": "#0b1c30",
+                        "primary-container": "#2563eb",
+                        "primary-fixed": "#dbe1ff",
+                        "tertiary-fixed": "#ffdbcd"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "lg": "24px",
+                        "xl": "32px",
+                        "md": "16px",
+                        "xs": "4px",
+                        "container-padding": "24px",
+                        "gutter": "16px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "display": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "500" }],
+                        "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "display": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+</head>
+<body class="bg-surface-container-low text-on-surface font-body-md antialiased overflow-hidden h-screen w-screen flex relative">
+<!-- SideNavBar (Suppressed for slide-over context, assuming it's overlaid on top, but including structural placeholder as per JSON if needed. Given rules, this is a linear/task focus, so suppressing global nav to focus on the modal.) -->
+<!-- Main Workspace Area - Simulated background -->
+<div class="flex-1 flex flex-col h-full bg-surface-container-lowest opacity-40">
+<!-- TopAppBar Placeholder -->
+<header class="flex justify-between items-center w-full px-lg h-16 border-b border-outline-variant bg-surface-container-lowest">
+<div class="text-headline-md font-headline-md font-bold text-primary">Hospital ICT Service Management</div>
+<div class="flex gap-md">
+<span class="material-symbols-outlined text-primary">terminal</span>
+<span class="material-symbols-outlined text-primary">notifications</span>
+</div>
+</header>
+<main class="p-lg">
+<div class="h-64 w-full bg-surface-container rounded-lg border border-outline-variant mb-md"></div>
+<div class="h-64 w-full bg-surface-container rounded-lg border border-outline-variant"></div>
+</main>
+</div>
+<!-- Slide-over Overlay -->
+<div aria-hidden="true" class="fixed inset-0 bg-on-surface/20 z-40 transition-opacity"></div>
+<!-- User Detail Slide-over -->
+<div class="fixed inset-y-0 right-0 z-50 w-full max-w-2xl bg-surface-container-lowest shadow-2xl flex flex-col transform transition-transform duration-300 border-l border-outline-variant">
+<!-- Header -->
+<div class="flex items-center justify-between px-lg py-md border-b border-outline-variant shrink-0">
+<h2 class="font-headline-md text-headline-md text-on-surface">User Details</h2>
+<button class="text-on-surface-variant hover:text-on-surface transition-colors p-xs rounded-full hover:bg-surface-container" onclick="closeModal()">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<!-- Scrollable Content -->
+<div class="flex-1 overflow-y-auto p-lg flex flex-col gap-lg">
+<!-- Profile Overview Bento -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md">
+<!-- Main Identity Card -->
+<div class="col-span-1 md:col-span-2 bg-surface-container-low rounded-xl p-md border border-outline-variant flex items-start gap-md">
+<img alt="Profile Picture" class="w-20 h-20 rounded-full border-2 border-primary object-cover shrink-0" data-alt="A professional headshot of a female doctor in her 40s wearing a crisp white lab coat over scrubs. She is standing in a brightly lit, modern hospital corridor with a clean, clinical aesthetic. The lighting is soft and even, highlighting her approachable yet authoritative expression. The color palette emphasizes cool blues and pristine whites to match a modern healthcare IT environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6-rFN_wBTdLnATLkCpiwOeF4Qh_Z3VI0RZff-UCf0UdFhQJxh9tsw5nn1Qi2r0ACDFAS3_dO3F_dDYqy-0yYnPe8jRBTjIKnss9RRBVj0aDVJvA2CxyDikF8wqxknsdBuj7ho7D6t4doqJ1S4pWU9ULsoybTvNRoA7N__LBQbUzamgcILbq0ubimechxuHNHSyZ4xrreWzNHeudEcAqJStH74cWQ60Qron7F22KroONCs_dqRwjZRS4GwIjYOQtUf3QOf8DPk4e8"/>
+<div class="flex-1">
+<div class="flex items-center gap-sm mb-xs">
+<h3 class="font-headline-md text-headline-md text-on-surface">Dr. Sarah Jenkins</h3>
+<span class="inline-flex items-center px-2 py-1 rounded-full bg-primary-container/10 text-primary text-label-sm font-label-sm">Active</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-xs">Chief of Surgery • ID: USR-84729</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">domain</span> Surgery Department
+                        </p>
+</div>
+</div>
+<!-- Quick Actions -->
+<div class="col-span-1 bg-surface-container-low rounded-xl p-md border border-outline-variant flex flex-col gap-sm justify-center">
+<button class="w-full flex items-center justify-center gap-sm px-4 py-2 bg-primary text-on-primary rounded-lg font-label-md text-label-md hover:bg-on-primary-fixed-variant transition-colors">
+<span class="material-symbols-outlined text-[18px]">edit</span> Edit Profile
+                    </button>
+<button class="w-full flex items-center justify-center gap-sm px-4 py-2 bg-surface text-on-surface-variant border border-outline-variant rounded-lg font-label-md text-label-md hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[18px]">lock_reset</span> Reset Password
+                    </button>
+<button class="w-full flex items-center justify-center gap-sm px-4 py-2 bg-error-container/20 text-error rounded-lg font-label-md text-label-md hover:bg-error-container/40 transition-colors mt-auto">
+<span class="material-symbols-outlined text-[18px]">block</span> Deactivate
+                    </button>
+</div>
+</div>
+<!-- Contact & Info Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<div class="bg-surface-container-low rounded-xl p-md border border-outline-variant">
+<h4 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-md">Contact Information</h4>
+<div class="space-y-md">
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-xs">Email Address</p>
+<p class="font-body-md text-body-md text-on-surface flex items-center gap-sm">
+<span class="material-symbols-outlined text-[16px] text-primary">mail</span> s.jenkins@hospital.org
+                            </p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-xs">Phone Number</p>
+<p class="font-body-md text-body-md text-on-surface flex items-center gap-sm">
+<span class="material-symbols-outlined text-[16px] text-primary">call</span> +1 (555) 019-2834
+                            </p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-xs">Office Location</p>
+<p class="font-body-md text-body-md text-on-surface flex items-center gap-sm">
+<span class="material-symbols-outlined text-[16px] text-primary">location_on</span> East Wing, Floor 4, Room 402
+                            </p>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-low rounded-xl p-md border border-outline-variant">
+<h4 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-md">System Access</h4>
+<div class="space-y-md">
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-xs">Role</p>
+<p class="font-body-md text-body-md text-on-surface">Clinical Staff - Tier 2</p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-xs">Last Login</p>
+<p class="font-body-md text-body-md text-on-surface">Oct 24, 2023 - 08:42 AM</p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-xs">Account Created</p>
+<p class="font-body-md text-body-md text-on-surface">Jan 15, 2019</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Active Assets -->
+<div>
+<div class="flex items-center justify-between mb-sm">
+<h4 class="font-headline-md text-headline-md text-on-surface">Assigned Assets</h4>
+<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-surface-container-high text-on-surface font-label-md text-label-md">3</span>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant">
+<th class="py-2 px-md font-label-md text-label-md text-on-surface-variant uppercase">Asset Tag</th>
+<th class="py-2 px-md font-label-md text-label-md text-on-surface-variant uppercase">Type</th>
+<th class="py-2 px-md font-label-md text-label-md text-on-surface-variant uppercase">Status</th>
+</tr>
+</thead>
+<tbody class="font-body-sm text-body-sm">
+<tr class="border-b border-outline-variant/50 hover:bg-surface-container-low/50">
+<td class="py-3 px-md text-primary font-medium">AST-10492</td>
+<td class="py-3 px-md text-on-surface flex items-center gap-xs"><span class="material-symbols-outlined text-[16px] text-on-surface-variant">laptop_mac</span> Dell Latitude 7420</td>
+<td class="py-3 px-md"><span class="inline-flex items-center px-2 py-0.5 rounded bg-surface-container-highest text-on-surface text-[10px] uppercase font-bold tracking-wider">In Use</span></td>
+</tr>
+<tr class="border-b border-outline-variant/50 hover:bg-surface-container-low/50">
+<td class="py-3 px-md text-primary font-medium">AST-22841</td>
+<td class="py-3 px-md text-on-surface flex items-center gap-xs"><span class="material-symbols-outlined text-[16px] text-on-surface-variant">smartphone</span> iPhone 13 Pro (Work)</td>
+<td class="py-3 px-md"><span class="inline-flex items-center px-2 py-0.5 rounded bg-surface-container-highest text-on-surface text-[10px] uppercase font-bold tracking-wider">In Use</span></td>
+</tr>
+<tr class="hover:bg-surface-container-low/50">
+<td class="py-3 px-md text-primary font-medium">AST-09322</td>
+<td class="py-3 px-md text-on-surface flex items-center gap-xs"><span class="material-symbols-outlined text-[16px] text-on-surface-variant">monitor</span> Dell Ultrasharp 27"</td>
+<td class="py-3 px-md"><span class="inline-flex items-center px-2 py-0.5 rounded bg-surface-container-highest text-on-surface text-[10px] uppercase font-bold tracking-wider">In Use</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Recent Tickets -->
+<div>
+<div class="flex items-center justify-between mb-sm">
+<h4 class="font-headline-md text-headline-md text-on-surface">Recent Ticket History</h4>
+<button class="text-primary font-label-md text-label-md hover:underline">View All</button>
+</div>
+<div class="space-y-sm">
+<!-- Ticket Card 1 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-sm flex flex-col md:flex-row gap-sm md:items-center justify-between hover:border-primary transition-colors cursor-pointer">
+<div class="flex items-start gap-md">
+<div class="mt-1">
+<span class="material-symbols-outlined text-error p-1 bg-error-container/20 rounded-md">warning</span>
+</div>
+<div>
+<div class="flex items-center gap-sm mb-xs">
+<span class="font-label-sm text-label-sm text-on-surface-variant">INC-9942</span>
+<span class="inline-flex items-center px-1.5 py-0.5 rounded-sm bg-error-container/30 text-error text-[10px] uppercase font-bold tracking-wider">High</span>
+</div>
+<h5 class="font-body-md text-body-md text-on-surface font-medium">EMR software crashing on load</h5>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Reported 2 hours ago • Assigned to IT-Helpdesk</p>
+</div>
+</div>
+<div class="shrink-0 flex items-center gap-2">
+<span class="inline-flex items-center px-2 py-1 rounded bg-surface-container text-on-surface-variant text-label-sm font-label-sm border border-outline-variant/50">Open</span>
+<span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+</div>
+</div>
+<!-- Ticket Card 2 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-sm flex flex-col md:flex-row gap-sm md:items-center justify-between hover:border-primary transition-colors cursor-pointer">
+<div class="flex items-start gap-md">
+<div class="mt-1">
+<span class="material-symbols-outlined text-primary p-1 bg-primary-container/10 rounded-md">check_circle</span>
+</div>
+<div>
+<div class="flex items-center gap-sm mb-xs">
+<span class="font-label-sm text-label-sm text-on-surface-variant">REQ-8821</span>
+<span class="inline-flex items-center px-1.5 py-0.5 rounded-sm bg-surface-container text-on-surface-variant text-[10px] uppercase font-bold tracking-wider">Low</span>
+</div>
+<h5 class="font-body-md text-body-md text-on-surface font-medium">Request for additional monitor</h5>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Closed on Oct 20, 2023 • Resolved by J. Smith</p>
+</div>
+</div>
+<div class="shrink-0 flex items-center gap-2">
+<span class="inline-flex items-center px-2 py-1 rounded bg-surface-container-highest text-on-surface-variant text-label-sm font-label-sm border border-outline-variant/50">Closed</span>
+<span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body></html>

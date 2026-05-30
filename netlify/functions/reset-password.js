@@ -1,24 +1,19 @@
-const { getFirebaseAdmin } = require('./_shared/firebase-admin');
+import { auth } from './_shared/admin.js'
 
-exports.handler = async (event) => {
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  };
-
-  if (event.httpMethod === 'OPTIONS') return { statusCode: 204, headers, body: '' };
-  if (event.httpMethod !== 'POST') return { statusCode: 405, headers, body: 'Method Not Allowed' };
-
+export const handler = async (event) => {
   try {
-    const { email } = JSON.parse(event.body);
-    if (!email) return { statusCode: 400, headers, body: JSON.stringify({ error: 'email is required' }) };
+    const { uid } = JSON.parse(event.body)
 
-    const { auth } = getFirebaseAdmin();
-    const link = await auth.generatePasswordResetLink(email);
+    const tempPassword = Array.from({ length: 8 }, () => 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'[Math.floor(Math.random() * 62)]).join('')
+    await auth.updateUser(uid, { password: tempPassword })
 
-    return { statusCode: 200, headers, body: JSON.stringify({ link }) };
+    const userRecord = await auth.getUser(uid)
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ tempPassword, email: userRecord.email })
+    }
   } catch (err) {
-    return { statusCode: 500, headers, body: JSON.stringify({ error: err.message }) };
+    return { statusCode: 500, body: JSON.stringify({ error: err.message }) }
   }
-};
+}

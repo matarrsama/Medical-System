@@ -1,0 +1,85 @@
+rules_version = '2'
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helpers ───────────────────────────────────
+    function isAuth() { return request.auth != null }
+
+    function role() { return request.auth.token.role }
+
+    // Returns permission level (0=none, 1=view, 2=create, 3=edit, 4=full)
+    // for a given role and area (tickets/inventory/users/reports/settings).
+    function level(area) {
+      return role() == 'Sys Administrator' ? 4
+           : role() == 'ICT Officer' ? (area == 'tickets' || area == 'inventory' ? 4
+                                      : area == 'users' ? 3
+                                      : 1)
+           : role() == 'Physician' ? (area == 'tickets' ? 2 : area == 'settings' ? 0 : 1)
+           : role() == 'Nurse' ? (area == 'tickets' ? 2 : 0)
+           : role() == 'Viewer' ? 1
+           : role() == 'Accounting' ? (area == 'tickets' ? 2 : area == 'reports' ? 4 : 1)
+           : role() == 'Procurement' ? (area == 'tickets' ? 2 : area == 'inventory' ? 3 : 1)
+           : role() == 'Hospital Admin' ? (area == 'settings' ? 1 : area == 'users' ? 3 : 4)
+           : role() == 'Lab Technician' ? (area == 'tickets' ? 2 : 0)
+           : role() == 'Pharmacist' ? (area == 'tickets' ? 2 : 0)
+           : role() == 'Doctor' ? (area == 'tickets' ? 2 : area == 'settings' ? 0 : 1)
+           : 0
+    }
+
+    function minLevel(area, min) { return isAuth() && level(area) >= min }
+
+    // ── Users ─────────────────────────────────────
+    match /users/{userId} {
+      allow read: if isAuth() && (request.auth.uid == userId || minLevel('users', 1))
+      allow create, update: if isAuth() && (request.auth.uid == userId || minLevel('users', 3))
+      allow delete: if isAuth() && minLevel('users', 4)
+    }
+
+    // ── Tickets ───────────────────────────────────
+    match /tickets/{ticketId} {
+      allow read: if isAuth() && minLevel('tickets', 1)
+      allow create: if isAuth() && minLevel('tickets', 2)
+      allow update, delete: if isAuth() && minLevel('tickets', 3)
+    }
+
+    // ── Inventory ────────────────────────────────
+    match /inventory/{itemId} {
+      allow read: if isAuth() && minLevel('inventory', 1)
+      allow create: if isAuth() && minLevel('inventory', 2)
+      allow update, delete: if isAuth() && minLevel('inventory', 3)
+    }
+
+    // ── Reports ──────────────────────────────────
+    match /reports/{reportId} {
+      allow read: if isAuth() && minLevel('reports', 1)
+      allow create: if isAuth() && minLevel('reports', 2)
+      allow update, delete: if isAuth() && minLevel('reports', 3)
+    }
+
+    // ── Settings ─────────────────────────────────
+    match /settings/{settingId} {
+      allow read: if isAuth() && minLevel('settings', 1)
+      allow create: if isAuth() && minLevel('settings', 2)
+      allow update, delete: if isAuth() && minLevel('settings', 3)
+    }
+
+    // ── Departments ──────────────────────────────
+    match /departments/{deptId} {
+      allow read: if isAuth()
+      allow write: if isAuth() && minLevel('users', 4)
+    }
+
+    // ── Requests ─────────────────────────────────
+    match /requests/{requestId} {
+      allow read: if isAuth() && minLevel('tickets', 1)
+      allow create: if isAuth() && minLevel('tickets', 2)
+      allow update, delete: if isAuth() && minLevel('tickets', 3)
+    }
+
+    // ── Audit Logs ────────────────────────────────
+    match /auditLogs/{logId} {
+      allow read: if isAuth() && level('settings') >= 3
+      allow write: if isAuth() && minLevel('users', 4)
+    }
+  }
+}

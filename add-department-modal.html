@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Hospital ICT Service Management - Add Department</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary": "#943700",
+                    "surface-bright": "#f8f9ff",
+                    "on-secondary": "#ffffff",
+                    "inverse-on-surface": "#eaf1ff",
+                    "surface-container-low": "#eff4ff",
+                    "surface-container-highest": "#d3e4fe",
+                    "on-tertiary": "#ffffff",
+                    "surface-container": "#e5eeff",
+                    "secondary": "#4b41e1",
+                    "surface-variant": "#d3e4fe",
+                    "secondary-fixed": "#e2dfff",
+                    "on-primary-fixed-variant": "#003ea8",
+                    "surface-container-high": "#dce9ff",
+                    "secondary-container": "#645efb",
+                    "outline": "#737686",
+                    "tertiary-container": "#bc4800",
+                    "surface": "#f8f9ff",
+                    "error-container": "#ffdad6",
+                    "on-surface-variant": "#434655",
+                    "secondary-fixed-dim": "#c3c0ff",
+                    "primary": "#004ac6",
+                    "on-primary-fixed": "#00174b",
+                    "inverse-surface": "#213145",
+                    "on-error-container": "#93000a",
+                    "surface-dim": "#cbdbf5",
+                    "on-secondary-fixed": "#0f0069",
+                    "on-surface": "#0b1c30",
+                    "on-primary-container": "#eeefff",
+                    "error": "#ba1a1a",
+                    "on-secondary-fixed-variant": "#3323cc",
+                    "background": "#f8f9ff",
+                    "outline-variant": "#c3c6d7",
+                    "primary-fixed-dim": "#b4c5ff",
+                    "on-primary": "#ffffff",
+                    "on-secondary-container": "#fffbff",
+                    "on-tertiary-fixed-variant": "#7d2d00",
+                    "on-tertiary-fixed": "#360f00",
+                    "surface-tint": "#0053db",
+                    "surface-container-lowest": "#ffffff",
+                    "inverse-primary": "#b4c5ff",
+                    "on-tertiary-container": "#ffede6",
+                    "tertiary-fixed-dim": "#ffb596",
+                    "on-error": "#ffffff",
+                    "on-background": "#0b1c30",
+                    "primary-container": "#2563eb",
+                    "primary-fixed": "#dbe1ff",
+                    "tertiary-fixed": "#ffdbcd"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "sm": "8px",
+                    "lg": "24px",
+                    "xl": "32px",
+                    "md": "16px",
+                    "xs": "4px",
+                    "container-padding": "24px",
+                    "gutter": "16px",
+                    "base": "4px"
+            },
+            "fontFamily": {
+                    "label-sm": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "body-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "display": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "label-md": ["Inter"],
+                    "headline-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "label-sm": ["11px", {"lineHeight": "14px", "fontWeight": "500"}],
+                    "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "display": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md text-body-md h-screen w-screen overflow-hidden flex flex-col">
+<!-- TopAppBar -->
+<header class="bg-surface-container-lowest text-primary text-headline-md font-headline-md border-b border-outline-variant flex justify-between items-center w-full px-lg h-16 sticky top-0 z-50 shrink-0">
+<div class="flex items-center gap-md">
+<span class="text-headline-md font-headline-md font-bold text-primary">Hospital ICT Service Management</span>
+</div>
+<div class="flex items-center gap-md">
+<!-- Search Bar (on_left logic implemented but shifted to center for balance as per common patterns if not strictly forced to exact left edge of header) -->
+<div class="relative hidden md:flex items-center">
+<span class="material-symbols-outlined absolute left-sm text-on-surface-variant" style="font-size: 20px;">search</span>
+<input class="pl-xl pr-sm py-sm bg-surface-container-low border border-outline-variant rounded-full text-body-sm focus:outline-none focus:ring-2 focus:ring-primary w-64" placeholder="Search..." type="text"/>
+</div>
+<button aria-label="Terminal" class="flex items-center justify-center p-sm rounded-full text-on-surface-variant hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined">terminal</span>
+</button>
+<button aria-label="Notifications" class="flex items-center justify-center p-sm rounded-full text-on-surface-variant hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button aria-label="Contrast" class="flex items-center justify-center p-sm rounded-full text-on-surface-variant hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined">contrast</span>
+</button>
+<button class="text-label-md font-label-md text-on-surface-variant hover:bg-surface-container-low px-md py-sm rounded-lg transition-colors">Help</button>
+<button class="bg-primary text-on-primary text-label-md font-label-md px-md py-sm rounded-lg hover:opacity-90 transition-opacity" onclick="openModal('new-ticket-modal.html')">New Ticket</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant ml-sm cursor-pointer">
+<img alt="User profile with role badge" class="w-full h-full object-cover" data-alt="A small, circular headshot of a healthcare IT professional wearing scrubs and an ID badge, smiling slightly against a plain, well-lit white background. Professional, high-key lighting, modern corporate style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpDIJf1enlILuJ4-dnZSs-qOUgCgWFxCj1WF-WI4ytLBu0ZyxzQ_tk5eeojrk2M4hxjeLkWtj-dPCDzI1StlOIv8Z5BYu3FnetCwUolLsMJ7ZqVnuaAfBBXfphT3hLpfPHbM2nEuu2moBeB9ve2Z_qFCiXeKAKCVl9OG0Ip2O8OnaBetx-gAy_PucBd17BzunngnLxwJsgm26X475pVGIC12Q9opogDQyw3Zl849gTGsMkJK0bp57CPYCwziINFmvIm9wqnt3vBaM"/>
+</div>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<!-- SideNavBar -->
+<nav class="bg-surface-container text-primary flex flex-col h-full fixed left-0 top-0 pt-16 z-40 overflow-y-auto w-64 border-r border-outline-variant hidden md:flex shrink-0 relative pt-0">
+<div class="p-md flex flex-col gap-xs border-b border-outline-variant mb-md">
+<div class="flex items-center gap-sm">
+<img alt="Hospital ICT Logo" class="w-8 h-8 rounded-sm object-cover" data-alt="A stylized, minimalist logo featuring a medical cross integrated with a digital circuit board pattern, rendered in crisp blue and white tones. Clean, modern, vector-style corporate identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB1uCy1SBe-WdW9YWJaYa17XmRqch3pPLlWZ3qtIAGgDHiYNz-1rl_i07QqZ_53UJgN6MIGZlmONeT7zq-dAz62QPm8hWINh1vDE0G1v1ZRTnBr8AslbHLcM0vzfN2q-fXEErtTlCm1sSGc_yRckeEVIBQsHJxj0-GxrN3ry_D3f36vtpE3zOHt28mOljL-L8w6a9nX8M64f1VqG2TKlx9oAh988XpAG9PtP-n1oWzCPPOwwSRDkMfK3biIfYtX8zd2ZipQQl3qnrg"/>
+<div>
+<div class="text-headline-sm font-headline-sm font-black text-on-surface leading-tight">ICT Admin Console</div>
+<div class="text-body-sm font-body-sm text-on-surface-variant leading-tight">v2.4.1 - Main Hospital</div>
+</div>
+</div>
+</div>
+<ul class="flex flex-col gap-xs px-sm flex-1">
+<li><a class="text-on-surface-variant flex items-center px-4 py-2 text-label-md font-label-md hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors group" href="#/dashboard"><span class="material-symbols-outlined mr-sm group-hover:text-primary transition-colors">dashboard</span>Dashboard</a></li>
+<li><a class="text-on-surface-variant flex items-center px-4 py-2 text-label-md font-label-md hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors group" href="#/tickets"><span class="material-symbols-outlined mr-sm group-hover:text-primary transition-colors">confirmation_number</span>Tickets</a></li>
+<li><a class="text-on-surface-variant flex items-center px-4 py-2 text-label-md font-label-md hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors group" href="#/requests"><span class="material-symbols-outlined mr-sm group-hover:text-primary transition-colors">assignment_returned</span>Requests</a></li>
+<li><a class="text-on-surface-variant flex items-center px-4 py-2 text-label-md font-label-md hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors group" href="#/inventory"><span class="material-symbols-outlined mr-sm group-hover:text-primary transition-colors">inventory_2</span>Inventory</a></li>
+<li><a class="text-on-surface-variant flex items-center px-4 py-2 text-label-md font-label-md hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors group" href="#/procurement"><span class="material-symbols-outlined mr-sm group-hover:text-primary transition-colors">shopping_cart</span>Procurement</a></li>
+<li><a class="text-on-surface-variant flex items-center px-4 py-2 text-label-md font-label-md hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors group" href="#/maintenance"><span class="material-symbols-outlined mr-sm group-hover:text-primary transition-colors">build</span>Maintenance</a></li>
+<li><a class="text-on-surface-variant flex items-center px-4 py-2 text-label-md font-label-md hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors group" href="#/biomedical"><span class="material-symbols-outlined mr-sm group-hover:text-primary transition-colors">medical_services</span>Biomedical</a></li>
+<li><a class="bg-secondary-container text-on-secondary-container font-bold rounded-lg flex items-center px-4 py-2 text-label-md font-label-md opacity-80 scale-95 transition-all duration-150" href="#/departments"><span class="material-symbols-outlined mr-sm" style="font-variation-settings: 'FILL' 1;">domain</span>Departments</a></li>
+<li><a class="text-on-surface-variant flex items-center px-4 py-2 text-label-md font-label-md hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors group" href="#/reports"><span class="material-symbols-outlined mr-sm group-hover:text-primary transition-colors">analytics</span>Reports</a></li>
+<li><a class="text-on-surface-variant flex items-center px-4 py-2 text-label-md font-label-md hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors group" href="#/users"><span class="material-symbols-outlined mr-sm group-hover:text-primary transition-colors">group</span>Users</a></li>
+<li><a class="text-on-surface-variant flex items-center px-4 py-2 text-label-md font-label-md hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors group" href="#/users"><span class="material-symbols-outlined mr-sm group-hover:text-primary transition-colors">notifications</span>Notifications</a></li>
+<li><a class="text-on-surface-variant flex items-center px-4 py-2 text-label-md font-label-md hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors group" href="#/users"><span class="material-symbols-outlined mr-sm group-hover:text-primary transition-colors">history_edu</span>Audit Logs</a></li>
+<li><a class="text-on-surface-variant flex items-center px-4 py-2 text-label-md font-label-md hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors group" href="#/users"><span class="material-symbols-outlined mr-sm group-hover:text-primary transition-colors">settings</span>Settings</a></li>
+</ul>
+<div class="p-md mt-auto">
+<button class="w-full border border-outline text-primary text-label-md font-label-md py-2 rounded-lg hover:bg-surface-container-low transition-colors flex items-center justify-center gap-xs">
+<span class="material-symbols-outlined" style="font-size: 18px;">download</span> Generate Report
+                </button>
+</div>
+</nav>
+<!-- Main Content Area with Modal Overlay -->
+<main class="flex-1 bg-surface relative overflow-y-auto p-lg flex justify-center items-start">
+<!-- Simulated background content to give context -->
+<div class="w-full max-w-5xl opacity-40 pointer-events-none select-none filter blur-[2px]">
+<h1 class="text-display font-display text-on-background mb-lg">Departments Directory</h1>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-lg mb-md flex justify-between items-center shadow-sm">
+<div>
+<div class="text-headline-md font-headline-md text-on-surface">Cardiology</div>
+<div class="text-body-sm font-body-sm text-on-surface-variant">Head: Dr. Sarah Jenkins • East Wing, Floor 3</div>
+</div>
+<div class="px-sm py-xs bg-surface-container text-primary rounded-full text-label-sm font-label-sm">Active</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-lg mb-md flex justify-between items-center shadow-sm">
+<div>
+<div class="text-headline-md font-headline-md text-on-surface">Radiology</div>
+<div class="text-body-sm font-body-sm text-on-surface-variant">Head: Dr. Mark Peterson • Basement Level 1</div>
+</div>
+<div class="px-sm py-xs bg-surface-container text-primary rounded-full text-label-sm font-label-sm">Active</div>
+</div>
+</div>
+<!-- Modal Backdrop -->
+<div class="absolute inset-0 bg-on-background/30 backdrop-blur-sm z-50 flex items-center justify-center p-md overflow-y-auto" id="modal-backdrop">
+<!-- Add Department Modal -->
+<div aria-labelledby="modal-title" aria-modal="true" class="bg-surface-container-lowest w-full max-w-2xl rounded-xl border border-outline-variant shadow-2xl flex flex-col relative my-auto" role="dialog">
+<!-- Modal Header -->
+<div class="px-lg py-md border-b border-outline-variant flex justify-between items-center bg-surface-bright rounded-t-xl">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-size: 20px;">domain_add</span>
+</div>
+<div>
+<h2 class="text-headline-md font-headline-md text-on-surface" id="modal-title">Add New Department</h2>
+<p class="text-body-sm font-body-sm text-on-surface-variant">Register a new organizational unit within the ICT framework.</p>
+</div>
+</div>
+<button aria-label="Close modal" class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low p-xs rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary" onclick="closeModal()">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<!-- Modal Body (Form) -->
+<div class="p-lg flex-1 overflow-y-auto">
+<form class="space-y-lg">
+<!-- Section: General Info -->
+<div class="bg-surface rounded-lg border border-outline-variant p-md">
+<h3 class="text-label-md font-label-md text-on-surface-variant mb-md uppercase tracking-wider">General Information</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<div class="col-span-1 md:col-span-2">
+<label class="block text-label-md font-label-md text-on-surface mb-xs" for="dept-name">Department Name <span class="text-error">*</span></label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline" style="font-size: 18px;">business</span>
+<input class="w-full pl-xl pr-sm py-2 bg-surface-bright border border-outline-variant rounded-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all placeholder:text-outline-variant" id="dept-name" placeholder="e.g., Intensive Care Unit (ICU)" required="" type="text"/>
+</div>
+</div>
+<div>
+<label class="block text-label-md font-label-md text-on-surface mb-xs" for="cost-center">Cost Center Code <span class="text-error">*</span></label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline" style="font-size: 18px;">account_balance_wallet</span>
+<input class="w-full pl-xl pr-sm py-2 bg-surface-bright border border-outline-variant rounded-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all placeholder:text-outline-variant" id="cost-center" placeholder="e.g., CC-4029" required="" type="text"/>
+</div>
+<p class="text-label-sm font-label-sm text-on-surface-variant mt-xs">Used for IT billing allocation.</p>
+</div>
+<div>
+<label class="block text-label-md font-label-md text-on-surface mb-xs" for="location">Location / Building</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline" style="font-size: 18px;">location_on</span>
+<select class="w-full pl-xl pr-sm py-2 bg-surface-bright border border-outline-variant rounded-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all appearance-none cursor-pointer" id="location">
+<option disabled="" selected="" value="">Select location...</option>
+<option value="main">Main Hospital Building</option>
+<option value="east">East Wing Annex</option>
+<option value="west">West Tower</option>
+<option value="clinic">Outpatient Clinic A</option>
+</select>
+<span class="material-symbols-outlined absolute right-sm top-1/2 -translate-y-1/2 text-outline pointer-events-none" style="font-size: 18px;">arrow_drop_down</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Section: Personnel -->
+<div class="bg-surface rounded-lg border border-outline-variant p-md">
+<h3 class="text-label-md font-label-md text-on-surface-variant mb-md uppercase tracking-wider">Key Personnel</h3>
+<div class="space-y-md">
+<div>
+<label class="block text-label-md font-label-md text-on-surface mb-xs" for="dept-head">Department Head</label>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-sm text-outline" style="font-size: 18px;">badge</span>
+<input class="w-full pl-xl pr-sm py-2 bg-surface-bright border border-outline-variant rounded-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all placeholder:text-outline-variant" id="dept-head" placeholder="Search by name or staff ID..." type="text"/>
+</div>
+</div>
+<div>
+<label class="block text-label-md font-label-md text-on-surface mb-xs" for="primary-contact">Primary ICT Contact <span class="text-error">*</span></label>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-sm text-outline" style="font-size: 18px;">contact_phone</span>
+<input class="w-full pl-xl pr-sm py-2 bg-surface-bright border border-outline-variant rounded-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all placeholder:text-outline-variant" id="primary-contact" placeholder="Search by name or staff ID..." required="" type="text"/>
+</div>
+<div class="flex items-center gap-xs mt-sm bg-surface-container-low p-sm rounded border border-outline-variant inline-flex">
+<span class="material-symbols-outlined text-primary" style="font-size: 16px;">info</span>
+<span class="text-label-sm font-label-sm text-on-surface-variant">This person will receive critical IT outage alerts for this department.</span>
+</div>
+</div>
+</div>
+</div>
+</form>
+</div>
+<!-- Modal Footer (Actions) -->
+<div class="px-lg py-md border-t border-outline-variant bg-surface-bright rounded-b-xl flex justify-end gap-sm">
+<button class="px-md py-2 text-label-md font-label-md text-on-surface-variant hover:bg-surface-container border border-transparent rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-outline" type="button" onclick="closeModal()">
+                            Cancel
+                        </button>
+<button class="px-md py-2 text-label-md font-label-md bg-primary text-on-primary rounded-lg hover:opacity-90 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 flex items-center gap-xs" type="button">
+<span class="material-symbols-outlined" style="font-size: 18px;">save</span> Save Department
+                        </button>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

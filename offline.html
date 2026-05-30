@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Offline State - Hospital ICT Service Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed": "#00174b",
+                        "surface-tint": "#0053db",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "primary-fixed": "#dbe1ff",
+                        "tertiary-fixed-dim": "#ffb596",
+                        "surface-variant": "#d3e4fe",
+                        "on-surface": "#0b1c30",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "inverse-surface": "#213145",
+                        "secondary-container": "#645efb",
+                        "on-secondary-container": "#fffbff",
+                        "on-tertiary-container": "#ffede6",
+                        "on-error": "#ffffff",
+                        "surface-bright": "#f8f9ff",
+                        "on-secondary-fixed": "#0f0069",
+                        "tertiary-fixed": "#ffdbcd",
+                        "surface-container-highest": "#d3e4fe",
+                        "on-tertiary-fixed-variant": "#7d2d00",
+                        "on-error-container": "#93000a",
+                        "inverse-on-surface": "#eaf1ff",
+                        "secondary-fixed-dim": "#c3c0ff",
+                        "on-primary-container": "#eeefff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "on-surface-variant": "#434655",
+                        "error": "#ba1a1a",
+                        "primary": "#004ac6",
+                        "tertiary": "#943700",
+                        "surface-container-high": "#dce9ff",
+                        "secondary": "#4b41e1",
+                        "surface-container-low": "#eff4ff",
+                        "on-tertiary-fixed": "#360f00",
+                        "surface-container": "#e5eeff",
+                        "outline-variant": "#c3c6d7",
+                        "on-secondary-fixed-variant": "#3323cc",
+                        "surface-dim": "#cbdbf5",
+                        "error-container": "#ffdad6",
+                        "surface": "#f8f9ff",
+                        "outline": "#737686",
+                        "on-secondary": "#ffffff",
+                        "on-background": "#0b1c30",
+                        "tertiary-container": "#bc4800",
+                        "on-tertiary": "#ffffff",
+                        "primary-container": "#2563eb",
+                        "inverse-primary": "#b4c5ff",
+                        "background": "#f8f9ff",
+                        "secondary-fixed": "#e2dfff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "base": "4px",
+                        "sm": "8px",
+                        "gutter": "16px",
+                        "md": "16px",
+                        "lg": "24px",
+                        "xl": "32px",
+                        "xs": "4px",
+                        "container-padding": "24px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "display": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "display": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "500" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background h-full font-body-md antialiased overflow-hidden flex flex-col">
+<!-- TopAppBar -->
+<header class="bg-surface-container-lowest text-primary text-headline-md font-headline-md border-b border-outline-variant flex justify-between items-center w-full px-lg h-16 sticky top-0 z-50">
+<div class="flex items-center gap-md">
+<span class="text-headline-md font-headline-md font-bold text-primary">Hospital ICT Service Management</span>
+</div>
+<div class="flex items-center gap-sm">
+<button class="p-2 rounded-full hover:bg-surface-container-low transition-colors text-on-surface-variant flex items-center justify-center">
+<span class="material-symbols-outlined">terminal</span>
+</button>
+<button class="p-2 rounded-full hover:bg-surface-container-low transition-colors text-on-surface-variant flex items-center justify-center relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="p-2 rounded-full hover:bg-surface-container-low transition-colors text-on-surface-variant flex items-center justify-center">
+<span class="material-symbols-outlined">contrast</span>
+</button>
+<div class="h-6 w-px bg-outline-variant mx-2"></div>
+<button class="text-on-surface-variant text-label-md font-label-md px-3 py-2 rounded hover:bg-surface-container-low transition-colors">Help</button>
+<button class="bg-primary text-on-primary text-label-md font-label-md px-4 py-2 rounded-lg hover:bg-on-primary-fixed-variant transition-colors ml-2" onclick="openModal('new-ticket-modal.html')">New Ticket</button>
+<img alt="User profile with role badge" class="w-8 h-8 rounded-full ml-4 border border-outline-variant object-cover" data-alt="A professional headshot of a female IT administrator in a clinical setting, wearing a lanyard with an ID badge. Bright, sterile hospital lighting, high-contrast crisp image, modern corporate aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDk7XWAXXyHVyHC4_6SzBoM81_5VLM9s1hiyi-yYms2Fs8zPyeFNiaWOAoRGZ8znfmOmTtpm36mgCSX-Rp5Y4KQTnjIZyKDqA7qZyuwQuOaM4IjMhRu-ZkKt5kBUzNMHP9K5MCz-bwN0BIpiCShBTyEZuVGFYK0T-EqZW3x96WnDWKtGDzyXM2qPK2hpiAGadDquJZC_B2aPaXIoCJ_eRo-2HmKAr4jlHFJxa9DL2MHZg3gVt2mWM5ocZO7Sz68iPI_sPeuB5WQIFU"/>
+</div>
+</header>
+<div class="flex flex-1 h-[calc(100vh-64px)] overflow-hidden">
+<!-- SideNavBar -->
+<nav class="bg-surface-container text-primary flex flex-col h-full fixed left-0 top-0 pt-16 z-40 overflow-y-auto border-r border-outline-variant w-64 hidden md:flex">
+<div class="p-lg border-b border-outline-variant mb-sm">
+<div class="flex items-center gap-3 mb-4">
+<div class="w-10 h-10 bg-primary-container rounded flex items-center justify-center text-on-primary-container">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">admin_panel_settings</span>
+</div>
+<div>
+<h2 class="text-headline-sm font-headline-sm font-black text-on-surface">ICT Admin Console</h2>
+<p class="text-label-sm font-label-sm text-on-surface-variant">v2.4.1 - Main Hospital</p>
+</div>
+</div>
+<button class="w-full bg-surface-container-high border border-outline text-on-surface text-label-md font-label-md py-2 rounded-lg hover:bg-surface-container-highest transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">summarize</span>
+                    Generate Report
+                </button>
+</div>
+<ul class="flex-1 px-3 space-y-1 overflow-y-auto pb-lg">
+<!-- Dashboard (Active Semantic Fallback as we are in an unknown state) -->
+<li>
+<a class="bg-secondary-container text-on-secondary-container font-bold rounded-lg flex items-center px-4 py-2 opacity-80 transition-all duration-150 scale-95 gap-3" href="#/dashboard">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="text-label-md font-label-md">Dashboard</span>
+</a>
+</li>
+<li>
+<a class="text-on-surface-variant flex items-center px-4 py-2 hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors gap-3" href="#/tickets">
+<span class="material-symbols-outlined">confirmation_number</span>
+<span class="text-label-md font-label-md">Tickets</span>
+</a>
+</li>
+<li>
+<a class="text-on-surface-variant flex items-center px-4 py-2 hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors gap-3" href="#/requests">
+<span class="material-symbols-outlined">assignment_returned</span>
+<span class="text-label-md font-label-md">Requests</span>
+</a>
+</li>
+<li>
+<a class="text-on-surface-variant flex items-center px-4 py-2 hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors gap-3" href="#/inventory">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="text-label-md font-label-md">Inventory</span>
+</a>
+</li>
+<li>
+<a class="text-on-surface-variant flex items-center px-4 py-2 hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors gap-3" href="#/procurement">
+<span class="material-symbols-outlined">shopping_cart</span>
+<span class="text-label-md font-label-md">Procurement</span>
+</a>
+</li>
+<li>
+<a class="text-on-surface-variant flex items-center px-4 py-2 hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors gap-3" href="#/maintenance">
+<span class="material-symbols-outlined">build</span>
+<span class="text-label-md font-label-md">Maintenance</span>
+</a>
+</li>
+<li>
+<a class="text-on-surface-variant flex items-center px-4 py-2 hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors gap-3" href="#/biomedical">
+<span class="material-symbols-outlined">medical_services</span>
+<span class="text-label-md font-label-md">Biomedical</span>
+</a>
+</li>
+<li>
+<a class="text-on-surface-variant flex items-center px-4 py-2 hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors gap-3" href="#/departments">
+<span class="material-symbols-outlined">domain</span>
+<span class="text-label-md font-label-md">Departments</span>
+</a>
+</li>
+<li>
+<a class="text-on-surface-variant flex items-center px-4 py-2 hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors gap-3" href="#/reports">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-label-md font-label-md">Reports</span>
+</a>
+</li>
+<li>
+<a class="text-on-surface-variant flex items-center px-4 py-2 hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors gap-3" href="#/users">
+<span class="material-symbols-outlined">group</span>
+<span class="text-label-md font-label-md">Users</span>
+</a>
+</li>
+<li>
+<a class="text-on-surface-variant flex items-center px-4 py-2 hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors gap-3" href="#/notifications">
+<span class="material-symbols-outlined">notifications</span>
+<span class="text-label-md font-label-md">Notifications</span>
+</a>
+</li>
+<li>
+<a class="text-on-surface-variant flex items-center px-4 py-2 hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors gap-3" href="#/audit-logs">
+<span class="material-symbols-outlined">history_edu</span>
+<span class="text-label-md font-label-md">Audit Logs</span>
+</a>
+</li>
+</ul>
+<div class="p-3 border-t border-outline-variant mt-auto bg-surface-container">
+<a class="text-on-surface-variant flex items-center px-4 py-2 hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors gap-3" href="#/settings">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-label-md font-label-md">Settings</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 ml-0 md:ml-64 bg-surface flex flex-col h-full overflow-hidden relative">
+<!-- Cached Banner -->
+<div class="bg-surface-variant border-b border-outline-variant px-lg py-3 flex items-center justify-between shadow-sm z-10 shrink-0">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-sm">cloud_off</span>
+</div>
+<div>
+<p class="text-body-sm font-body-sm text-on-surface font-semibold">Offline Mode</p>
+<p class="text-label-sm font-label-sm text-on-surface-variant">You are currently viewing a cached version of this page. Some actions may be unavailable.</p>
+</div>
+</div>
+<div class="text-label-sm font-label-sm text-outline flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">history</span>
+                    Last synced: 14 mins ago
+                </div>
+</div>
+<!-- Central Error State -->
+<div class="flex-1 overflow-y-auto p-lg flex flex-col items-center justify-center relative">
+<!-- Abstract Background Pattern for Depth -->
+<div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(circle at 2px 2px, #00174b 1px, transparent 0); background-size: 24px 24px;"></div>
+<div class="max-w-md w-full bg-surface-container-lowest border border-outline-variant rounded-xl p-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] text-center relative z-10 flex flex-col items-center">
+<!-- Icon Container -->
+<div class="w-24 h-24 rounded-full bg-surface-container mb-6 flex items-center justify-center relative shadow-inner">
+<div class="absolute inset-0 rounded-full border-2 border-dashed border-outline-variant animate-[spin_10s_linear_infinite] opacity-50"></div>
+<span class="material-symbols-outlined text-5xl text-outline-variant" style="font-variation-settings: 'wght' 300;">wifi_off</span>
+<!-- Status indicator dot -->
+<div class="absolute bottom-2 right-2 w-4 h-4 bg-error rounded-full border-2 border-surface-container-lowest shadow-sm"></div>
+</div>
+<!-- Typography -->
+<h1 class="text-display font-display text-on-surface mb-2">No Connection</h1>
+<p class="text-body-md font-body-md text-on-surface-variant mb-8 max-w-sm">
+                        The connection to the main hospital servers has been lost. Real-time ticket updates and infrastructure monitoring are temporarily paused.
+                    </p>
+<!-- Diagnostics Card -->
+<div class="w-full bg-surface text-left rounded-lg border border-outline-variant p-4 mb-8">
+<h3 class="text-label-md font-label-md text-on-surface uppercase mb-3 flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">monitor_heart</span>
+                            Diagnostic Status
+                        </h3>
+<ul class="space-y-3">
+<li class="flex items-center justify-between text-body-sm font-body-sm">
+<span class="text-on-surface-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-[14px] text-error">cancel</span>
+                                    Core API Gateway
+                                </span>
+<span class="text-error font-mono text-xs bg-error-container px-2 py-0.5 rounded">Unreachable</span>
+</li>
+<li class="flex items-center justify-between text-body-sm font-body-sm">
+<span class="text-on-surface-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-[14px] text-primary">check_circle</span>
+                                    Local Cache DB
+                                </span>
+<span class="text-primary font-mono text-xs bg-primary-container/20 px-2 py-0.5 rounded">Active</span>
+</li>
+<li class="flex items-center justify-between text-body-sm font-body-sm">
+<span class="text-on-surface-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-[14px] text-outline">pending</span>
+                                    Network Interface
+                                </span>
+<span class="text-on-surface-variant font-mono text-xs bg-surface-variant px-2 py-0.5 rounded">Polling...</span>
+</li>
+</ul>
+</div>
+<!-- Actions -->
+<div class="flex flex-col w-full gap-3">
+<button class="w-full bg-primary text-on-primary h-10 rounded-lg text-label-md font-label-md hover:bg-on-primary-fixed-variant transition-colors flex items-center justify-center gap-2 shadow-sm focus:ring-2 focus:ring-offset-2 focus:ring-primary outline-none" onclick="location.reload()">
+<span class="material-symbols-outlined text-[18px]">refresh</span>
+                            Try Again
+                        </button>
+<button class="w-full bg-transparent border border-outline text-on-surface h-10 rounded-lg text-label-md font-label-md hover:bg-surface-container-high transition-colors focus:ring-2 focus:ring-offset-2 focus:ring-primary outline-none">
+                            View Offline Dashboard
+                        </button>
+</div>
+</div>
+<div class="mt-8 text-label-sm font-label-sm text-outline-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-xs">info</span>
+                    Error Code: ERR_CONN_REFUSED_503
+                </div>
+</div>
+</main>
+</div>
+<script>
+        // Simple script to simulate a retry checking animation
+        document.querySelector('button.bg-primary').addEventListener('click', function(e) {
+            e.preventDefault();
+            const btn = this;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<span class="material-symbols-outlined text-[18px] animate-spin">sync</span> Checking...`;
+            btn.classList.add('opacity-80', 'cursor-not-allowed');
+            
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.classList.remove('opacity-80', 'cursor-not-allowed');
+                // You could add a toast here in a real implementation
+            }, 2000);
+        });
+    </script>
+</body></html>

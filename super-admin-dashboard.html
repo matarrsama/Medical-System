@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Hospital ICT Super Admin Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary": "#943700",
+                        "surface-bright": "#f8f9ff",
+                        "on-secondary": "#ffffff",
+                        "inverse-on-surface": "#eaf1ff",
+                        "surface-container-low": "#eff4ff",
+                        "surface-container-highest": "#d3e4fe",
+                        "on-tertiary": "#ffffff",
+                        "surface-container": "#e5eeff",
+                        "secondary": "#4b41e1",
+                        "surface-variant": "#d3e4fe",
+                        "secondary-fixed": "#e2dfff",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "surface-container-high": "#dce9ff",
+                        "secondary-container": "#645efb",
+                        "outline": "#737686",
+                        "tertiary-container": "#bc4800",
+                        "surface": "#f8f9ff",
+                        "error-container": "#ffdad6",
+                        "on-surface-variant": "#434655",
+                        "secondary-fixed-dim": "#c3c0ff",
+                        "primary": "#004ac6",
+                        "on-primary-fixed": "#00174b",
+                        "inverse-surface": "#213145",
+                        "on-error-container": "#93000a",
+                        "surface-dim": "#cbdbf5",
+                        "on-secondary-fixed": "#0f0069",
+                        "on-surface": "#0b1c30",
+                        "on-primary-container": "#eeefff",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed-variant": "#3323cc",
+                        "background": "#f8f9ff",
+                        "outline-variant": "#c3c6d7",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "on-primary": "#ffffff",
+                        "on-secondary-container": "#fffbff",
+                        "on-tertiary-fixed-variant": "#7d2d00",
+                        "on-tertiary-fixed": "#360f00",
+                        "surface-tint": "#0053db",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-primary": "#b4c5ff",
+                        "on-tertiary-container": "#ffede6",
+                        "tertiary-fixed-dim": "#ffb596",
+                        "on-error": "#ffffff",
+                        "on-background": "#0b1c30",
+                        "primary-container": "#2563eb",
+                        "primary-fixed": "#dbe1ff",
+                        "tertiary-fixed": "#ffdbcd"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "lg": "24px",
+                        "xl": "32px",
+                        "md": "16px",
+                        "xs": "4px",
+                        "container-padding": "24px",
+                        "gutter": "16px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "display": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "500" }],
+                        "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "display": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: #f8f9ff; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="text-on-surface bg-background flex h-screen overflow-hidden">
+<!-- SideNavBar -->
+<nav class="bg-surface-container text-primary flex flex-col h-full fixed left-0 top-0 pt-16 z-40 overflow-y-auto docked left-0 h-screen w-64 border-r border-outline-variant flat no shadows hidden md:flex">
+<div class="px-lg pb-md flex flex-col items-center border-b border-outline-variant mb-md">
+<div class="w-16 h-16 rounded-full bg-primary-container flex items-center justify-center mb-sm shadow-sm overflow-hidden border border-outline-variant">
+<img alt="Hospital ICT Logo" class="w-full h-full object-cover" data-alt="A modern, abstract logo design representing a hospital technology division. The logo features clean, interlocking geometric shapes in a bright, modern light-mode aesthetic using deep blues and crisp whites. Soft lighting highlights the crisp edges, evoking a sense of reliability, precision, and advanced healthcare infrastructure." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJU-57aqz5pkbAw1e7DpGlFLhOy2sr65lRDPBK3DcdBvOPiKmQj4ryMirSfu7_2ybo4MDtN7uDSwj8AHkbBADlhDzRPybHP8gxAhfOXQvKCuvlrpHNm3gdiP9T81rY3aeNBM281RQwCgK49sRyFyEugA0CF-uDJgxctTogtca6ug8mohU7MPAD0uQAs7CxP_ljmSvETzGxpj42vRRRYNXoSoMujRXSUDlW8PwtzrnKb_yM4cQNZcVzkxc9fpFLSox_iPqIsesMW2A"/>
+</div>
+<h2 class="text-headline-sm font-headline-sm font-black text-on-surface">ICT Admin Console</h2>
+<span class="text-label-sm font-label-sm text-on-surface-variant mt-xs">v2.4.1 - Main Hospital</span>
+</div>
+<div class="flex-1 px-sm overflow-y-auto hide-scrollbar space-y-xs">
+<a class="bg-secondary-container text-on-secondary-container font-bold rounded-lg flex items-center px-4 py-2 hover:bg-surface-container-high hover:text-on-surface scale-95 transition-transform duration-100" href="#/dashboard">
+<span class="material-symbols-outlined mr-3 text-[20px]">dashboard</span>
+<span class="text-label-md font-label-md">Dashboard</span>
+</a>
+<a class="text-on-surface-variant flex items-center px-4 py-2 hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors" href="#/tickets">
+<span class="material-symbols-outlined mr-3 text-[20px]">confirmation_number</span>
+<span class="text-label-md font-label-md">Tickets</span>
+</a>
+<a class="text-on-surface-variant flex items-center px-4 py-2 hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors" href="#/requests">
+<span class="material-symbols-outlined mr-3 text-[20px]">assignment_returned</span>
+<span class="text-label-md font-label-md">Requests</span>
+</a>
+<a class="text-on-surface-variant flex items-center px-4 py-2 hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors" href="#/inventory">
+<span class="material-symbols-outlined mr-3 text-[20px]">inventory_2</span>
+<span class="text-label-md font-label-md">Inventory</span>
+</a>
+<a class="text-on-surface-variant flex items-center px-4 py-2 hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors" href="#/procurement">
+<span class="material-symbols-outlined mr-3 text-[20px]">shopping_cart</span>
+<span class="text-label-md font-label-md">Procurement</span>
+</a>
+<a class="text-on-surface-variant flex items-center px-4 py-2 hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors" href="#/maintenance">
+<span class="material-symbols-outlined mr-3 text-[20px]">build</span>
+<span class="text-label-md font-label-md">Maintenance</span>
+</a>
+<a class="text-on-surface-variant flex items-center px-4 py-2 hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors" href="#/biomedical">
+<span class="material-symbols-outlined mr-3 text-[20px]">medical_services</span>
+<span class="text-label-md font-label-md">Biomedical</span>
+</a>
+<a class="text-on-surface-variant flex items-center px-4 py-2 hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors" href="#/departments">
+<span class="material-symbols-outlined mr-3 text-[20px]">domain</span>
+<span class="text-label-md font-label-md">Departments</span>
+</a>
+<a class="text-on-surface-variant flex items-center px-4 py-2 hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors" href="#/reports">
+<span class="material-symbols-outlined mr-3 text-[20px]">analytics</span>
+<span class="text-label-md font-label-md">Reports</span>
+</a>
+<a class="text-on-surface-variant flex items-center px-4 py-2 hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors" href="#/users">
+<span class="material-symbols-outlined mr-3 text-[20px]">group</span>
+<span class="text-label-md font-label-md">Users</span>
+</a>
+<a class="text-on-surface-variant flex items-center px-4 py-2 hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors" href="#/notifications">
+<span class="material-symbols-outlined mr-3 text-[20px]">notifications</span>
+<span class="text-label-md font-label-md">Notifications</span>
+</a>
+<a class="text-on-surface-variant flex items-center px-4 py-2 hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors" href="#/audit-logs">
+<span class="material-symbols-outlined mr-3 text-[20px]">history_edu</span>
+<span class="text-label-md font-label-md">Audit Logs</span>
+</a>
+<a class="text-on-surface-variant flex items-center px-4 py-2 hover:bg-surface-container-high hover:text-on-surface rounded-lg transition-colors" href="#/settings">
+<span class="material-symbols-outlined mr-3 text-[20px]">settings</span>
+<span class="text-label-md font-label-md">Settings</span>
+</a>
+</div>
+<div class="p-md border-t border-outline-variant mt-auto">
+<button class="w-full bg-primary text-on-primary py-2 rounded-lg text-label-md font-label-md hover:bg-primary-container hover:text-on-primary-container transition-colors shadow-sm flex items-center justify-center">
+<span class="material-symbols-outlined mr-2 text-[18px]">add_chart</span>
+                 Generate Report
+             </button>
+</div>
+</nav>
+<!-- Main Content Wrapper -->
+<div class="flex-1 flex flex-col md:ml-64 w-full h-full">
+<!-- TopAppBar -->
+<header class="bg-surface-container-lowest text-primary flex justify-between items-center w-full px-lg h-16 sticky top-0 z-50 border-b border-outline-variant flat no shadows">
+<div class="flex items-center">
+<h1 class="text-headline-md font-headline-md font-bold text-primary mr-lg">Hospital ICT Service Management</h1>
+</div>
+<div class="flex items-center gap-md">
+<div class="hidden lg:flex relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="pl-10 pr-4 py-1.5 bg-surface-container-low border border-outline-variant rounded-full text-body-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent w-64 text-on-surface transition-all placeholder-on-surface-variant" placeholder="Search across system..." type="text"/>
+</div>
+<div class="flex items-center gap-sm">
+<button class="p-2 rounded-full hover:bg-surface-container-low transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined">terminal</span>
+</button>
+<button class="p-2 rounded-full hover:bg-surface-container-low transition-colors text-on-surface-variant relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 bg-error rounded-full border border-surface-container-lowest"></span>
+</button>
+<button class="p-2 rounded-full hover:bg-surface-container-low transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined">contrast</span>
+</button>
+</div>
+<div class="h-6 w-px bg-outline-variant mx-xs"></div>
+<button class="text-label-md font-label-md text-on-surface-variant hover:text-primary transition-colors">Help</button>
+<button class="bg-primary text-on-primary px-4 py-1.5 rounded-lg text-label-md font-label-md hover:opacity-90 transition-opacity shadow-sm flex items-center" onclick="openModal('new-ticket-modal.html')">
+<span class="material-symbols-outlined mr-1.5 text-[18px]">add</span>
+                    New Ticket
+                </button>
+<div class="w-8 h-8 rounded-full border border-outline-variant overflow-hidden ml-sm cursor-pointer hover:ring-2 hover:ring-primary transition-all">
+<img alt="User profile with role badge" class="w-full h-full object-cover" data-alt="A professional headshot of a confident tech administrator in a crisp white shirt, softly lit in a modern, light-mode clinical office setting. The palette is dominated by pure whites and subtle grays. The mood is authoritative yet approachable, fitting for a senior hospital ICT manager." src="https://lh3.googleusercontent.com/aida-public/AB6AXuABGntjTE0KYiwQFogWJhmQGwnkp2lZS90iQnWkfNiYWqMqg3mPtmlu1wFbtsFuSB6cKGiRLOYODsNW0qllXTWIfaaxd2UM8yBF9rKZmUL0eACqVTeO4FARft5Y15EPKopwsnxlaycQAfS6nhGnZ6MLwMD2qkm5poEYyBprK187SwCfrky6ohwVsc9l1lyMiTU38walpb6Dsupp2AqdLR6SMP4G6_0gfEwPMkjtXAUddnz1HBFoW_sZzNK06hwx5gtUtSHyHUekJQM"/>
+</div>
+</div>
+</header>
+<!-- Main Dashboard Canvas -->
+<main class="flex-1 overflow-y-auto p-lg bg-background">
+<div class="mb-lg flex justify-between items-end">
+<div>
+<h2 class="text-display font-display text-on-surface">Global Metrics</h2>
+<p class="text-body-lg font-body-lg text-on-surface-variant mt-1">System-wide operational overview across all hospital departments.</p>
+</div>
+<div class="flex gap-sm">
+<select class="bg-surface-container-lowest border border-outline-variant text-body-sm font-body-sm rounded-lg px-3 py-1.5 focus:ring-primary">
+<option>Last 24 Hours</option>
+<option>Last 7 Days</option>
+<option selected="">Last 30 Days</option>
+<option>This Quarter</option>
+</select>
+</div>
+</div>
+<!-- Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-md mb-md">
+<!-- KPI Card 1: Users -->
+<div class="bg-surface-container-lowest rounded-xl p-md border border-outline-variant flex flex-col justify-between hover:shadow-sm transition-shadow">
+<div class="flex justify-between items-start mb-sm">
+<div class="p-2 bg-primary-container rounded-lg text-on-primary-container">
+<span class="material-symbols-outlined">group</span>
+</div>
+<span class="text-label-sm font-label-sm text-secondary bg-secondary-fixed px-2 py-0.5 rounded-full">+4.2%</span>
+</div>
+<div>
+<p class="text-body-sm font-body-sm text-on-surface-variant mb-1">Total Users</p>
+<h3 class="text-headline-lg font-headline-lg text-on-surface">12,482</h3>
+<p class="text-label-sm font-label-sm text-on-surface-variant mt-1">2,841 Active Now</p>
+</div>
+</div>
+<!-- KPI Card 2: Tickets -->
+<div class="bg-surface-container-lowest rounded-xl p-md border border-outline-variant flex flex-col justify-between hover:shadow-sm transition-shadow relative overflow-hidden">
+<div class="absolute -right-4 -top-4 w-24 h-24 bg-surface-container rounded-full opacity-50 pointer-events-none"></div>
+<div class="flex justify-between items-start mb-sm relative z-10">
+<div class="p-2 bg-tertiary-container rounded-lg text-on-tertiary-container">
+<span class="material-symbols-outlined">confirmation_number</span>
+</div>
+<span class="text-label-sm font-label-sm text-error bg-error-container px-2 py-0.5 rounded-full">+12.1%</span>
+</div>
+<div class="relative z-10">
+<p class="text-body-sm font-body-sm text-on-surface-variant mb-1">Total Tickets (Month)</p>
+<h3 class="text-headline-lg font-headline-lg text-on-surface">4,892</h3>
+<p class="text-label-sm font-label-sm text-tertiary mt-1 font-semibold">142 Open Incidents</p>
+</div>
+</div>
+<!-- KPI Card 3: SLAs -->
+<div class="bg-surface-container-lowest rounded-xl p-md border border-outline-variant flex flex-col justify-between hover:shadow-sm transition-shadow">
+<div class="flex justify-between items-start mb-sm">
+<div class="p-2 bg-error-container rounded-lg text-on-error-container">
+<span class="material-symbols-outlined">timer_off</span>
+</div>
+<span class="text-label-sm font-label-sm text-on-surface-variant bg-surface-container px-2 py-0.5 rounded-full">-2.4%</span>
+</div>
+<div>
+<p class="text-body-sm font-body-sm text-on-surface-variant mb-1">SLA Breaches</p>
+<h3 class="text-headline-lg font-headline-lg text-on-surface">34</h3>
+<p class="text-label-sm font-label-sm text-error mt-1 font-semibold">Critical Attention Required</p>
+</div>
+</div>
+<!-- KPI Card 4: Inventory -->
+<div class="bg-surface-container-lowest rounded-xl p-md border border-outline-variant flex flex-col justify-between hover:shadow-sm transition-shadow">
+<div class="flex justify-between items-start mb-sm">
+<div class="p-2 bg-surface-variant rounded-lg text-on-surface-variant">
+<span class="material-symbols-outlined">devices</span>
+</div>
+<span class="text-label-sm font-label-sm text-secondary bg-secondary-fixed px-2 py-0.5 rounded-full">+1.8%</span>
+</div>
+<div>
+<p class="text-body-sm font-body-sm text-on-surface-variant mb-1">Inventory Items</p>
+<h3 class="text-headline-lg font-headline-lg text-on-surface">42,109</h3>
+<p class="text-label-sm font-label-sm text-on-surface-variant mt-1">18 Procurement Pending</p>
+</div>
+</div>
+</div>
+<!-- Charts Section -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-md mb-md">
+<!-- Main Chart: Ticket Trends -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant lg:col-span-2 flex flex-col">
+<div class="p-md border-b border-outline-variant flex justify-between items-center">
+<div>
+<h3 class="text-headline-md font-headline-md text-on-surface">Ticket Volume Trends</h3>
+<p class="text-body-sm font-body-sm text-on-surface-variant">Inbound vs Resolved (30 Days)</p>
+</div>
+<button class="p-1.5 hover:bg-surface-container rounded-md text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<div class="p-md flex-1 min-h-[250px] relative">
+<!-- Placeholder for Chart -->
+<div class="absolute inset-x-md inset-y-md flex items-end gap-2 px-4 pb-8 pt-4 border-l border-b border-outline-variant">
+<!-- Bar Chart Simulation -->
+<div class="flex-1 bg-surface-container rounded-t-sm h-[40%] relative hover:bg-surface-variant transition-colors group">
+<div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 bg-inverse-surface text-inverse-on-surface text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap">Day 1</div>
+</div>
+<div class="flex-1 bg-primary rounded-t-sm h-[60%] relative group"></div>
+<div class="flex-1 bg-surface-container rounded-t-sm h-[45%] relative group"></div>
+<div class="flex-1 bg-primary rounded-t-sm h-[55%] relative group"></div>
+<div class="flex-1 bg-surface-container rounded-t-sm h-[30%] relative group"></div>
+<div class="flex-1 bg-primary rounded-t-sm h-[80%] relative group"></div>
+<div class="flex-1 bg-surface-container rounded-t-sm h-[50%] relative group"></div>
+<div class="flex-1 bg-primary rounded-t-sm h-[75%] relative group"></div>
+<div class="flex-1 bg-tertiary rounded-t-sm h-[95%] relative group"></div>
+<div class="flex-1 bg-primary rounded-t-sm h-[65%] relative group"></div>
+<!-- Grid lines -->
+<div class="absolute w-full h-px bg-outline-variant/30 bottom-1/4 left-0"></div>
+<div class="absolute w-full h-px bg-outline-variant/30 bottom-2/4 left-0"></div>
+<div class="absolute w-full h-px bg-outline-variant/30 bottom-3/4 left-0"></div>
+</div>
+</div>
+</div>
+<!-- Secondary Metric: System Health -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant flex flex-col">
+<div class="p-md border-b border-outline-variant">
+<h3 class="text-headline-md font-headline-md text-on-surface">Core Infrastructure Health</h3>
+</div>
+<div class="p-md flex-1 flex flex-col gap-sm">
+<!-- Server Health -->
+<div class="bg-surface-bright border border-outline-variant rounded-lg p-3 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary">dns</span>
+<div>
+<p class="text-body-md font-body-md text-on-surface font-semibold">EMR Servers</p>
+<p class="text-label-sm font-label-sm text-on-surface-variant">Uptime: 99.98%</p>
+</div>
+</div>
+<span class="w-3 h-3 rounded-full bg-[#10b981] shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
+</div>
+<!-- Network -->
+<div class="bg-surface-bright border border-outline-variant rounded-lg p-3 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">router</span>
+<div>
+<p class="text-body-md font-body-md text-on-surface font-semibold">Core Network</p>
+<p class="text-label-sm font-label-sm text-on-surface-variant">Bandwidth: 68%</p>
+</div>
+</div>
+<span class="w-3 h-3 rounded-full bg-[#10b981] shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
+</div>
+<!-- Telecom -->
+<div class="bg-surface-bright border border-outline-variant rounded-lg p-3 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-tertiary">call</span>
+<div>
+<p class="text-body-md font-body-md text-on-surface font-semibold">VoIP Subsystem</p>
+<p class="text-label-sm font-label-sm text-error">Latency Spike Detected</p>
+</div>
+</div>
+<span class="w-3 h-3 rounded-full bg-error shadow-[0_0_8px_rgba(186,26,26,0.5)] animate-pulse"></span>
+</div>
+<!-- Storage -->
+<div class="bg-surface-bright border border-outline-variant rounded-lg p-3 flex items-center justify-between mt-auto">
+<div class="w-full">
+<div class="flex justify-between mb-1">
+<span class="text-label-sm font-label-sm text-on-surface font-semibold">SAN Storage Capacity</span>
+<span class="text-label-sm font-label-sm text-on-surface-variant">82%</span>
+</div>
+<div class="w-full bg-surface-container h-2 rounded-full overflow-hidden">
+<div class="bg-tertiary h-full rounded-full" style="width: 82%"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Data List: Department Performance -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden">
+<div class="p-md border-b border-outline-variant flex justify-between items-center bg-surface-bright">
+<h3 class="text-headline-md font-headline-md text-on-surface">Department SLA Performance</h3>
+<button class="text-primary text-label-md font-label-md hover:underline">View All Departments</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant text-label-md font-label-md text-on-surface-variant uppercase tracking-wider">
+<th class="p-3 font-semibold">Department</th>
+<th class="p-3 font-semibold">Active Tickets</th>
+<th class="p-3 font-semibold">Avg Resolution</th>
+<th class="p-3 font-semibold">SLA Compliance</th>
+<th class="p-3 font-semibold">Status</th>
+</tr>
+</thead>
+<tbody class="text-body-sm font-body-sm text-on-surface">
+<tr class="border-b border-outline-variant hover:bg-surface-container-lowest transition-colors">
+<td class="p-3 font-medium">Emergency (ER)</td>
+<td class="p-3">42</td>
+<td class="p-3">1.2 Hours</td>
+<td class="p-3">
+<div class="flex items-center gap-2">
+<div class="w-16 bg-surface-container h-1.5 rounded-full overflow-hidden">
+<div class="bg-[#10b981] h-full" style="width: 98%"></div>
+</div>
+<span>98%</span>
+</div>
+</td>
+<td class="p-3"><span class="bg-[#10b981]/10 text-[#10b981] px-2 py-1 rounded text-label-sm font-bold">Optimal</span></td>
+</tr>
+<tr class="border-b border-outline-variant hover:bg-surface-container-lowest transition-colors bg-surface-bright">
+<td class="p-3 font-medium">Radiology</td>
+<td class="p-3 text-tertiary font-bold">115</td>
+<td class="p-3">4.5 Hours</td>
+<td class="p-3">
+<div class="flex items-center gap-2">
+<div class="w-16 bg-surface-container h-1.5 rounded-full overflow-hidden">
+<div class="bg-tertiary h-full" style="width: 85%"></div>
+</div>
+<span>85%</span>
+</div>
+</td>
+<td class="p-3"><span class="bg-tertiary-container/20 text-tertiary px-2 py-1 rounded text-label-sm font-bold">Warning</span></td>
+</tr>
+<tr class="border-b border-outline-variant hover:bg-surface-container-lowest transition-colors">
+<td class="p-3 font-medium">ICU</td>
+<td class="p-3">18</td>
+<td class="p-3">0.8 Hours</td>
+<td class="p-3">
+<div class="flex items-center gap-2">
+<div class="w-16 bg-surface-container h-1.5 rounded-full overflow-hidden">
+<div class="bg-[#10b981] h-full" style="width: 100%"></div>
+</div>
+<span>100%</span>
+</div>
+</td>
+<td class="p-3"><span class="bg-[#10b981]/10 text-[#10b981] px-2 py-1 rounded text-label-sm font-bold">Optimal</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Spacing for bottom -->
+<div class="h-lg"></div>
+</main>
+</div>
+</body></html>

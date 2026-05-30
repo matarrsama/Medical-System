@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>New Equipment/Service Request</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary": "#943700",
+                        "surface-bright": "#f8f9ff",
+                        "on-secondary": "#ffffff",
+                        "inverse-on-surface": "#eaf1ff",
+                        "surface-container-low": "#eff4ff",
+                        "surface-container-highest": "#d3e4fe",
+                        "on-tertiary": "#ffffff",
+                        "surface-container": "#e5eeff",
+                        "secondary": "#4b41e1",
+                        "surface-variant": "#d3e4fe",
+                        "secondary-fixed": "#e2dfff",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "surface-container-high": "#dce9ff",
+                        "secondary-container": "#645efb",
+                        "outline": "#737686",
+                        "tertiary-container": "#bc4800",
+                        "surface": "#f8f9ff",
+                        "error-container": "#ffdad6",
+                        "on-surface-variant": "#434655",
+                        "secondary-fixed-dim": "#c3c0ff",
+                        "primary": "#004ac6",
+                        "on-primary-fixed": "#00174b",
+                        "inverse-surface": "#213145",
+                        "on-error-container": "#93000a",
+                        "surface-dim": "#cbdbf5",
+                        "on-secondary-fixed": "#0f0069",
+                        "on-surface": "#0b1c30",
+                        "on-primary-container": "#eeefff",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed-variant": "#3323cc",
+                        "background": "#f8f9ff",
+                        "outline-variant": "#c3c6d7",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "on-primary": "#ffffff",
+                        "on-secondary-container": "#fffbff",
+                        "on-tertiary-fixed-variant": "#7d2d00",
+                        "on-tertiary-fixed": "#360f00",
+                        "surface-tint": "#0053db",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-primary": "#b4c5ff",
+                        "on-tertiary-container": "#ffede6",
+                        "tertiary-fixed-dim": "#ffb596",
+                        "on-error": "#ffffff",
+                        "on-background": "#0b1c30",
+                        "primary-container": "#2563eb",
+                        "primary-fixed": "#dbe1ff",
+                        "tertiary-fixed": "#ffdbcd"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "lg": "24px",
+                        "xl": "32px",
+                        "md": "16px",
+                        "xs": "4px",
+                        "container-padding": "24px",
+                        "gutter": "16px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "display": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "500" }],
+                        "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "display": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.filled {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+</head>
+<body class="bg-surface-container-low text-on-surface font-body-md min-h-screen flex items-center justify-center p-lg">
+<!-- Modal Backdrop -->
+<div class="fixed inset-0 bg-inverse-surface/40 backdrop-blur-sm z-40 transition-opacity"></div>
+<!-- Modal Container -->
+<div class="relative bg-surface-container-lowest rounded-xl shadow-xl w-full max-w-4xl z-50 flex flex-col max-h-[921px] overflow-hidden border border-outline-variant">
+<!-- Modal Header -->
+<div class="flex items-center justify-between px-lg py-md border-b border-outline-variant bg-surface-container-lowest sticky top-0 z-10">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container">
+<span class="material-symbols-outlined filled">shopping_cart</span>
+</div>
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface">New Equipment/Service Request</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Submit a request for new hardware, software, or IT services.</p>
+</div>
+</div>
+<button class="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container transition-colors" onclick="closeModal()">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<!-- Modal Body (Scrollable) -->
+<div class="flex-1 overflow-y-auto p-lg custom-scrollbar bg-surface flex flex-col md:flex-row gap-xl">
+<!-- Left Column: Form -->
+<div class="flex-1 space-y-lg">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<!-- Request Type -->
+<div class="space-y-xs">
+<label class="font-label-md text-label-md text-on-surface-variant block">Request Type</label>
+<div class="relative">
+<select class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-md py-[10px] font-body-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary appearance-none">
+<option disabled="" selected="" value="">Select category...</option>
+<option>Hardware (Laptops, Monitors)</option>
+<option>Software License</option>
+<option>Network Equipment</option>
+<option>IT Service / Consultancy</option>
+</select>
+<span class="material-symbols-outlined absolute right-md top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
+</div>
+</div>
+<!-- Urgency -->
+<div class="space-y-xs">
+<label class="font-label-md text-label-md text-on-surface-variant block">Urgency</label>
+<div class="relative">
+<select class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-md py-[10px] font-body-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary appearance-none">
+<option>Low (Standard SLA)</option>
+<option>Medium</option>
+<option>High (Critical Need)</option>
+</select>
+<span class="material-symbols-outlined absolute right-md top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
+</div>
+</div>
+</div>
+<!-- Item Description -->
+<div class="space-y-xs">
+<label class="font-label-md text-label-md text-on-surface-variant block">Item/Service Description</label>
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-md py-[10px] font-body-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary placeholder-outline-variant" placeholder="e.g., Dell Latitude 5000 Series Laptop, 16GB RAM" type="text"/>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<!-- Quantity -->
+<div class="space-y-xs">
+<label class="font-label-md text-label-md text-on-surface-variant block">Quantity</label>
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-md py-[10px] font-body-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary" min="1" type="number" value="1"/>
+</div>
+<!-- Budget Code -->
+<div class="space-y-xs">
+<label class="font-label-md text-label-md text-on-surface-variant block">Budget Code (Optional)</label>
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-md py-[10px] font-body-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary placeholder-outline-variant" placeholder="e.g., DEPT-IT-2024" type="text"/>
+</div>
+</div>
+<!-- Justification -->
+<div class="space-y-xs">
+<label class="font-label-md text-label-md text-on-surface-variant block flex justify-between">
+<span>Justification</span>
+<span class="font-body-sm text-body-sm font-normal">Required</span>
+</label>
+<textarea class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-md py-[10px] font-body-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary resize-none placeholder-outline-variant" placeholder="Explain the business need for this equipment or service..." rows="4"></textarea>
+</div>
+<!-- Attachments -->
+<div class="border-2 border-dashed border-outline-variant rounded-lg p-md text-center bg-surface-container-lowest hover:bg-surface-container-low transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-outline text-[32px] mb-xs">cloud_upload</span>
+<p class="font-label-md text-label-md text-on-surface">Click to upload or drag and drop</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Quotes, specs, or supporting documents (PDF, JPG, max 5MB)</p>
+</div>
+</div>
+<!-- Right Column: Approval Preview -->
+<div class="w-full md:w-64 flex-shrink-0">
+<div class="bg-surface-container-low border border-outline-variant rounded-lg p-md h-full">
+<h3 class="font-label-md text-label-md text-on-surface-variant mb-md uppercase tracking-wider">Approval Workflow</h3>
+<div class="relative">
+<!-- Vertical Line -->
+<div class="absolute left-[15px] top-4 bottom-4 w-0.5 bg-outline-variant z-0"></div>
+<!-- Step 1: Requester -->
+<div class="flex gap-md relative z-10 mb-lg">
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary shadow-sm flex-shrink-0">
+<span class="material-symbols-outlined text-[16px] filled">check</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">You (Requester)</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Auto-approved on submission</p>
+</div>
+</div>
+<!-- Step 2: HOD -->
+<div class="flex gap-md relative z-10 mb-lg opacity-70">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest border-2 border-outline-variant flex items-center justify-center text-on-surface-variant flex-shrink-0">
+<span class="font-label-sm text-label-sm">2</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Head of Department</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Pending review</p>
+</div>
+</div>
+<!-- Step 3: ICT -->
+<div class="flex gap-md relative z-10 mb-lg opacity-70">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest border-2 border-outline-variant flex items-center justify-center text-on-surface-variant flex-shrink-0">
+<span class="font-label-sm text-label-sm">3</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">ICT Procurement</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Technical assessment</p>
+</div>
+</div>
+<!-- Step 4: Finance -->
+<div class="flex gap-md relative z-10 opacity-70">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest border-2 border-outline-variant flex items-center justify-center text-on-surface-variant flex-shrink-0">
+<span class="font-label-sm text-label-sm">4</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Finance Director</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Budget clearance</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Modal Footer -->
+<div class="px-lg py-md border-t border-outline-variant bg-surface-container-lowest flex justify-end gap-md">
+<button class="px-md py-[8px] font-label-md text-label-md text-on-surface-variant border border-outline-variant rounded-lg hover:bg-surface-container transition-colors" onclick="closeModal()">Cancel</button>
+<button class="px-md py-[8px] font-label-md text-label-md bg-primary text-on-primary rounded-lg hover:bg-primary-container hover:text-on-primary-container transition-colors shadow-sm flex items-center gap-sm">
+<span>Submit Request</span>
+<span class="material-symbols-outlined text-[18px]">send</span>
+</button>
+</div>
+</div>
+</body></html>

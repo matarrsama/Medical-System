@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Hospital ICT Service Management - Role Matrix</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary": "#943700",
+                        "surface-bright": "#f8f9ff",
+                        "on-secondary": "#ffffff",
+                        "inverse-on-surface": "#eaf1ff",
+                        "surface-container-low": "#eff4ff",
+                        "surface-container-highest": "#d3e4fe",
+                        "on-tertiary": "#ffffff",
+                        "surface-container": "#e5eeff",
+                        "secondary": "#4b41e1",
+                        "surface-variant": "#d3e4fe",
+                        "secondary-fixed": "#e2dfff",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "surface-container-high": "#dce9ff",
+                        "secondary-container": "#645efb",
+                        "outline": "#737686",
+                        "tertiary-container": "#bc4800",
+                        "surface": "#f8f9ff",
+                        "error-container": "#ffdad6",
+                        "on-surface-variant": "#434655",
+                        "secondary-fixed-dim": "#c3c0ff",
+                        "primary": "#004ac6",
+                        "on-primary-fixed": "#00174b",
+                        "inverse-surface": "#213145",
+                        "on-error-container": "#93000a",
+                        "surface-dim": "#cbdbf5",
+                        "on-secondary-fixed": "#0f0069",
+                        "on-surface": "#0b1c30",
+                        "on-primary-container": "#eeefff",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed-variant": "#3323cc",
+                        "background": "#f8f9ff",
+                        "outline-variant": "#c3c6d7",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "on-primary": "#ffffff",
+                        "on-secondary-container": "#fffbff",
+                        "on-tertiary-fixed-variant": "#7d2d00",
+                        "on-tertiary-fixed": "#360f00",
+                        "surface-tint": "#0053db",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-primary": "#b4c5ff",
+                        "on-tertiary-container": "#ffede6",
+                        "tertiary-fixed-dim": "#ffb596",
+                        "on-error": "#ffffff",
+                        "on-background": "#0b1c30",
+                        "primary-container": "#2563eb",
+                        "primary-fixed": "#dbe1ff",
+                        "tertiary-fixed": "#ffdbcd"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "lg": "24px",
+                        "xl": "32px",
+                        "md": "16px",
+                        "xs": "4px",
+                        "container-padding": "24px",
+                        "gutter": "16px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "display": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "500" }],
+                        "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "display": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Custom scrollbar for matrix */
+        .matrix-container::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        .matrix-container::-webkit-scrollbar-track {
+            background: theme('colors.surface-container-low');
+            border-radius: theme('borderRadius.DEFAULT');
+        }
+        .matrix-container::-webkit-scrollbar-thumb {
+            background: theme('colors.outline-variant');
+            border-radius: theme('borderRadius.DEFAULT');
+        }
+        .matrix-container::-webkit-scrollbar-thumb:hover {
+            background: theme('colors.outline');
+        }
+    </style>
+</head>
+<body class="bg-surface-dim font-body-md text-on-surface min-h-screen flex items-center justify-center p-md">
+<!-- Modal Backdrop overlay -->
+<div class="fixed inset-0 bg-inverse-surface/40 backdrop-blur-sm z-50 flex items-center justify-center p-md lg:p-xl">
+<!-- Modal Container -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] w-full max-w-5xl flex flex-col max-h-[921px] overflow-hidden">
+<!-- Modal Header -->
+<div class="flex justify-between items-center px-lg py-md border-b border-outline-variant bg-surface-container-lowest">
+<div>
+<h2 class="text-headline-md font-headline-md text-on-surface">Role Matrix Configuration</h2>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-xs">Manage access control and permissions across all hospital ICT roles.</p>
+</div>
+<div class="flex items-center gap-sm">
+<button class="p-sm text-on-surface-variant hover:bg-surface-container-low rounded-DEFAULT transition-colors">
+<span class="material-symbols-outlined" data-icon="fullscreen">fullscreen</span>
+</button>
+<button class="p-sm text-on-surface-variant hover:bg-surface-container-low hover:text-error rounded-DEFAULT transition-colors" onclick="closeModal()">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+</div>
+</div>
+<!-- Modal Body / Matrix Content -->
+<div class="flex-1 overflow-hidden flex flex-col bg-surface">
+<!-- Toolbar -->
+<div class="px-lg py-sm flex justify-between items-center bg-surface-container-lowest border-b border-outline-variant">
+<div class="flex gap-md items-center">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant" data-icon="search" style="font-size: 18px;">search</span>
+<input class="pl-8 pr-sm py-xs text-body-sm font-body-sm border border-outline-variant rounded-DEFAULT bg-surface-container-low focus:bg-surface-container-lowest focus:border-primary focus:ring-1 focus:ring-primary w-64 transition-colors" placeholder="Search permissions..." type="text"/>
+</div>
+<div class="h-6 w-px bg-outline-variant"></div>
+<div class="flex items-center gap-xs">
+<span class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Module:</span>
+<select class="text-body-sm font-body-sm border border-outline-variant rounded-DEFAULT bg-surface-container-low py-xs pl-sm pr-8 focus:border-primary focus:ring-1 focus:ring-primary">
+<option>All Modules</option>
+<option>Tickets</option>
+<option>Inventory</option>
+<option>Procurement</option>
+<option>Users</option>
+</select>
+</div>
+</div>
+<div class="flex gap-sm">
+<button class="text-label-md font-label-md px-md py-xs border border-outline-variant text-on-surface bg-surface-container-lowest hover:bg-surface-container-low rounded-DEFAULT transition-colors flex items-center gap-xs">
+<span class="material-symbols-outlined" data-icon="add" style="font-size: 16px;">add</span> Add Role
+                        </button>
+</div>
+</div>
+<!-- Scrollable Matrix -->
+<div class="flex-1 overflow-auto matrix-container relative">
+<table class="w-full text-left border-collapse min-w-[800px]">
+<thead class="sticky top-0 bg-surface-container-lowest z-10 shadow-[0_1px_0_theme('colors.outline-variant')]">
+<tr>
+<th class="p-md font-label-md text-label-md text-on-surface-variant border-b border-r border-outline-variant bg-surface-container-lowest sticky left-0 z-20 w-1/4">
+                                    Permissions \ Roles
+                                </th>
+<!-- Role Columns -->
+<th class="p-md text-center border-b border-outline-variant w-32 min-w-[120px]">
+<div class="flex flex-col items-center gap-xs">
+<span class="material-symbols-outlined text-tertiary-container" data-icon="admin_panel_settings">admin_panel_settings</span>
+<span class="font-label-md text-label-md text-on-surface">Super Admin</span>
+</div>
+</th>
+<th class="p-md text-center border-b border-outline-variant w-32 min-w-[120px]">
+<div class="flex flex-col items-center gap-xs">
+<span class="material-symbols-outlined text-primary" data-icon="manage_accounts">manage_accounts</span>
+<span class="font-label-md text-label-md text-on-surface">ICT Admin</span>
+</div>
+</th>
+<th class="p-md text-center border-b border-outline-variant w-32 min-w-[120px]">
+<div class="flex flex-col items-center gap-xs">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="support_agent">support_agent</span>
+<span class="font-label-md text-label-md text-on-surface">Technician</span>
+</div>
+</th>
+<th class="p-md text-center border-b border-outline-variant w-32 min-w-[120px]">
+<div class="flex flex-col items-center gap-xs">
+<span class="material-symbols-outlined text-secondary" data-icon="inventory_2">inventory_2</span>
+<span class="font-label-md text-label-md text-on-surface">Store Keeper</span>
+</div>
+</th>
+<th class="p-md text-center border-b border-outline-variant w-32 min-w-[120px]">
+<div class="flex flex-col items-center gap-xs">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="medical_services">medical_services</span>
+<span class="font-label-md text-label-md text-on-surface">BioMed Tech</span>
+</div>
+</th>
+<th class="p-md text-center border-b border-outline-variant w-32 min-w-[120px]">
+<div class="flex flex-col items-center gap-xs">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="person">person</span>
+<span class="font-label-md text-label-md text-on-surface">Basic User</span>
+</div>
+</th>
+</tr>
+</thead>
+<tbody class="bg-surface-container-lowest">
+<!-- Category: Ticket Management -->
+<tr class="bg-surface-container-low">
+<td class="px-md py-sm font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider sticky left-0 z-10" colspan="7">
+                                    Ticket Management
+                                </td>
+</tr>
+<tr class="hover:bg-surface-bright transition-colors group">
+<td class="px-md py-sm border-b border-r border-outline-variant sticky left-0 bg-surface-container-lowest group-hover:bg-surface-bright transition-colors z-10">
+<div class="font-body-sm text-body-sm text-on-surface">Create Ticket</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant mt-xs">Submit new support requests</div>
+</td>
+<td class="px-md py-sm border-b border-outline-variant text-center"><input checked="" class="text-primary border-outline-variant rounded-sm focus:ring-primary h-4 w-4 opacity-50 cursor-not-allowed" disabled="" type="checkbox"/></td>
+<td class="px-md py-sm border-b border-outline-variant text-center"><input checked="" class="text-primary border-outline-variant rounded-sm focus:ring-primary h-4 w-4" type="checkbox"/></td>
+<td class="px-md py-sm border-b border-outline-variant text-center"><input checked="" class="text-primary border-outline-variant rounded-sm focus:ring-primary h-4 w-4" type="checkbox"/></td>
+<td class="px-md py-sm border-b border-outline-variant text-center"><input checked="" class="text-primary border-outline-variant rounded-sm focus:ring-primary h-4 w-4" type="checkbox"/></td>
+<td class="px-md py-sm border-b border-outline-variant text-center"><input checked="" class="text-primary border-outline-variant rounded-sm focus:ring-primary h-4 w-4" type="checkbox"/></td>
+<td class="px-md py-sm border-b border-outline-variant text-center"><input checked="" class="text-primary border-outline-variant rounded-sm focus:ring-primary h-4 w-4" type="checkbox"/></td>
+</tr>
+<tr class="hover:bg-surface-bright transition-colors group">
+<td class="px-md py-sm border-b border-r border-outline-variant sticky left-0 bg-surface-container-lowest group-hover:bg-surface-bright transition-colors z-10">
+<div class="font-body-sm text-body-sm text-on-surface">Assign Tickets</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant mt-xs">Assign tickets to specific technicians</div>
+</td>
+<td class="px-md py-sm border-b border-outline-variant text-center"><input checked="" class="text-primary border-outline-variant rounded-sm focus:ring-primary h-4 w-4 opacity-50 cursor-not-allowed" disabled="" type="checkbox"/></td>
+<td class="px-md py-sm border-b border-outline-variant text-center"><input checked="" class="text-primary border-outline-variant rounded-sm focus:ring-primary h-4 w-4" type="checkbox"/></td>
+<td class="px-md py-sm border-b border-outline-variant text-center"><input class="text-primary border-outline-variant rounded-sm focus:ring-primary h-4 w-4" type="checkbox"/></td>
+<td class="px-md py-sm border-b border-outline-variant text-center"><input class="text-primary border-outline-variant rounded-sm focus:ring-primary h-4 w-4" type="checkbox"/></td>
+<td class="px-md py-sm border-b border-outline-variant text-center"><input class="text-primary border-outline-variant rounded-sm focus:ring-primary h-4 w-4" type="checkbox"/></td>
+<td class="px-md py-sm border-b border-outline-variant text-center"><input class="text-primary border-outline-variant rounded-sm focus:ring-primary h-4 w-4" type="checkbox"/></td>
+</tr>
+<!-- Category: Inventory & Procurement -->
+<tr class="bg-surface-container-low">
+<td class="px-md py-sm font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider sticky left-0 z-10" colspan="7">
+                                    Inventory &amp; Procurement
+                                </td>
+</tr>
+<tr class="hover:bg-surface-bright transition-colors group">
+<td class="px-md py-sm border-b border-r border-outline-variant sticky left-0 bg-surface-container-lowest group-hover:bg-surface-bright transition-colors z-10">
+<div class="font-body-sm text-body-sm text-on-surface">Manage Inventory</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant mt-xs">Add, edit, or remove hardware assets</div>
+</td>
+<td class="px-md py-sm border-b border-outline-variant text-center"><input checked="" class="text-primary border-outline-variant rounded-sm focus:ring-primary h-4 w-4 opacity-50 cursor-not-allowed" disabled="" type="checkbox"/></td>
+<td class="px-md py-sm border-b border-outline-variant text-center"><input checked="" class="text-primary border-outline-variant rounded-sm focus:ring-primary h-4 w-4" type="checkbox"/></td>
+<td class="px-md py-sm border-b border-outline-variant text-center"><input class="text-primary border-outline-variant rounded-sm focus:ring-primary h-4 w-4" type="checkbox"/></td>
+<td class="px-md py-sm border-b border-outline-variant text-center"><input checked="" class="text-primary border-outline-variant rounded-sm focus:ring-primary h-4 w-4" type="checkbox"/></td>
+<td class="px-md py-sm border-b border-outline-variant text-center"><input class="text-primary border-outline-variant rounded-sm focus:ring-primary h-4 w-4" type="checkbox"/></td>
+<td class="px-md py-sm border-b border-outline-variant text-center"><input class="text-primary border-outline-variant rounded-sm focus:ring-primary h-4 w-4" type="checkbox"/></td>
+</tr>
+<tr class="hover:bg-surface-bright transition-colors group">
+<td class="px-md py-sm border-b border-r border-outline-variant sticky left-0 bg-surface-container-lowest group-hover:bg-surface-bright transition-colors z-10">
+<div class="font-body-sm text-body-sm text-on-surface">Approve Procurement</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant mt-xs">Approve purchase requests for new gear</div>
+</td>
+<td class="px-md py-sm border-b border-outline-variant text-center"><input checked="" class="text-primary border-outline-variant rounded-sm focus:ring-primary h-4 w-4 opacity-50 cursor-not-allowed" disabled="" type="checkbox"/></td>
+<td class="px-md py-sm border-b border-outline-variant text-center"><input checked="" class="text-primary border-outline-variant rounded-sm focus:ring-primary h-4 w-4" type="checkbox"/></td>
+<td class="px-md py-sm border-b border-outline-variant text-center"><input class="text-primary border-outline-variant rounded-sm focus:ring-primary h-4 w-4" type="checkbox"/></td>
+<td class="px-md py-sm border-b border-outline-variant text-center"><input class="text-primary border-outline-variant rounded-sm focus:ring-primary h-4 w-4" type="checkbox"/></td>
+<td class="px-md py-sm border-b border-outline-variant text-center"><input class="text-primary border-outline-variant rounded-sm focus:ring-primary h-4 w-4" type="checkbox"/></td>
+<td class="px-md py-sm border-b border-outline-variant text-center"><input class="text-primary border-outline-variant rounded-sm focus:ring-primary h-4 w-4 opacity-50 cursor-not-allowed" disabled="" type="checkbox"/></td>
+</tr>
+<!-- Category: System Administration -->
+<tr class="bg-surface-container-low">
+<td class="px-md py-sm font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider sticky left-0 z-10" colspan="7">
+                                    System Administration
+                                </td>
+</tr>
+<tr class="hover:bg-surface-bright transition-colors group">
+<td class="px-md py-sm border-b border-r border-outline-variant sticky left-0 bg-surface-container-lowest group-hover:bg-surface-bright transition-colors z-10">
+<div class="font-body-sm text-body-sm text-on-surface">Manage Users</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant mt-xs">Create accounts, assign roles, reset passwords</div>
+</td>
+<td class="px-md py-sm border-b border-outline-variant text-center"><input checked="" class="text-primary border-outline-variant rounded-sm focus:ring-primary h-4 w-4 opacity-50 cursor-not-allowed" disabled="" type="checkbox"/></td>
+<td class="px-md py-sm border-b border-outline-variant text-center"><input checked="" class="text-primary border-outline-variant rounded-sm focus:ring-primary h-4 w-4" type="checkbox"/></td>
+<td class="px-md py-sm border-b border-outline-variant text-center"><input class="text-primary border-outline-variant rounded-sm focus:ring-primary h-4 w-4" type="checkbox"/></td>
+<td class="px-md py-sm border-b border-outline-variant text-center"><input class="text-primary border-outline-variant rounded-sm focus:ring-primary h-4 w-4" type="checkbox"/></td>
+<td class="px-md py-sm border-b border-outline-variant text-center"><input class="text-primary border-outline-variant rounded-sm focus:ring-primary h-4 w-4" type="checkbox"/></td>
+<td class="px-md py-sm border-b border-outline-variant text-center"><input class="text-primary border-outline-variant rounded-sm focus:ring-primary h-4 w-4 opacity-50 cursor-not-allowed" disabled="" type="checkbox"/></td>
+</tr>
+<tr class="hover:bg-surface-bright transition-colors group">
+<td class="px-md py-sm border-b border-r border-outline-variant sticky left-0 bg-surface-container-lowest group-hover:bg-surface-bright transition-colors z-10">
+<div class="font-body-sm text-body-sm text-on-surface">View Audit Logs</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant mt-xs">Access system-wide security and activity logs</div>
+</td>
+<td class="px-md py-sm border-b border-outline-variant text-center"><input checked="" class="text-primary border-outline-variant rounded-sm focus:ring-primary h-4 w-4 opacity-50 cursor-not-allowed" disabled="" type="checkbox"/></td>
+<td class="px-md py-sm border-b border-outline-variant text-center"><input checked="" class="text-primary border-outline-variant rounded-sm focus:ring-primary h-4 w-4" type="checkbox"/></td>
+<td class="px-md py-sm border-b border-outline-variant text-center"><input class="text-primary border-outline-variant rounded-sm focus:ring-primary h-4 w-4" type="checkbox"/></td>
+<td class="px-md py-sm border-b border-outline-variant text-center"><input class="text-primary border-outline-variant rounded-sm focus:ring-primary h-4 w-4" type="checkbox"/></td>
+<td class="px-md py-sm border-b border-outline-variant text-center"><input class="text-primary border-outline-variant rounded-sm focus:ring-primary h-4 w-4" type="checkbox"/></td>
+<td class="px-md py-sm border-b border-outline-variant text-center"><input class="text-primary border-outline-variant rounded-sm focus:ring-primary h-4 w-4 opacity-50 cursor-not-allowed" disabled="" type="checkbox"/></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Modal Footer -->
+<div class="px-lg py-md border-t border-outline-variant bg-surface-container-lowest flex justify-between items-center">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-outline" data-icon="info" style="font-size: 18px;">info</span>
+<span class="text-body-sm font-body-sm text-on-surface-variant">Changes are autosaved. Super Admin permissions cannot be modified.</span>
+</div>
+<div class="flex gap-md">
+<button class="px-lg py-sm text-label-md font-label-md border border-outline-variant text-on-surface rounded-DEFAULT hover:bg-surface-container-low transition-colors">
+                        Revert Changes
+                    </button>
+<button class="px-lg py-sm text-label-md font-label-md bg-primary text-on-primary rounded-DEFAULT hover:bg-primary-container transition-colors shadow-sm">
+                        Save &amp; Apply Matrix
+                    </button>
+</div>
+</div>
+</div>
+</div>
+</body></html>
