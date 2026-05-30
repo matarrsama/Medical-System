@@ -172,13 +172,15 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useUIStore } from '@/stores/ui'
+import { useAuthStore } from '@/stores/auth'
 import { db } from '@/lib/firebase'
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore'
 import { suspendUser, deleteUser } from '@/services/api'
 
 const ui = useUIStore()
+const authStore = useAuthStore()
 const searchQuery = ref('')
 const filterRole = ref('')
 const filterDepartment = ref('')
@@ -187,19 +189,26 @@ const filterStatus = ref('')
 const users = ref([])
 const loading = ref(true)
 let unsub = null
+let started = false
 
 onMounted(() => {
-  unsub = onSnapshot(
-    query(collection(db, 'users'), orderBy('created', 'desc')),
-    (snapshot) => {
-      users.value = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }))
-      loading.value = false
-    },
-    (err) => {
-      console.error('Firestore users listener error:', err)
-      loading.value = false
+  const unwatch = watch(() => authStore.loading, (isLoading) => {
+    if (!isLoading && !started) {
+      started = true
+      unsub = onSnapshot(
+        query(collection(db, 'users'), orderBy('created', 'desc')),
+        (snapshot) => {
+          users.value = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }))
+          loading.value = false
+        },
+        (err) => {
+          console.error('Firestore users listener error:', err)
+          loading.value = false
+        }
+      )
+      unwatch()
     }
-  )
+  }, { immediate: true })
   document.addEventListener('click', onDocClick)
 })
 
