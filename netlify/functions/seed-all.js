@@ -81,26 +81,30 @@ const SEED = {
   ]
 }
 
+const toId = (doc) => doc.id || doc.slug || doc.name?.toLowerCase().replace(/\s+/g, '-') || crypto.randomUUID()
+
 export const handler = async () => {
   const results = {}
 
-  for (const [collection, docs] of Object.entries(SEED)) {
-    results[collection] = { created: 0, skipped: 0, errors: [] }
-    for (const doc of docs) {
-      const docId = doc.id || doc.slug || doc.name?.toLowerCase().replace(/\s+/g, '-') || crypto.randomUUID()
+  const ops = Object.entries(SEED).flatMap(([coll, docs]) => {
+    results[coll] ??= { created: 0, skipped: 0, errors: [] }
+    return docs.map(async (doc) => {
+      const docId = toId(doc)
       try {
-        const existing = await db.collection(collection).doc(docId).get()
+        const existing = await db.collection(coll).doc(docId).get()
         if (existing.exists) {
-          results[collection].skipped++
+          results[coll].skipped++
         } else {
-          await db.collection(collection).doc(docId).set(doc)
-          results[collection].created++
+          await db.collection(coll).doc(docId).set(doc)
+          results[coll].created++
         }
       } catch (err) {
-        results[collection].errors.push(`${doc.id || doc.name}: ${err.message}`)
+        results[coll].errors.push(`${doc.id || doc.name}: ${err.message}`)
       }
-    }
-  }
+    })
+  })
+
+  await Promise.all(ops)
 
   return {
     statusCode: 200,
