@@ -29,9 +29,12 @@ service cloud.firestore {
     function minLevel(area, min) { return isAuth() && level(area) >= min }
 
     // ── Users ─────────────────────────────────────
+    // Every role has at least View access to Users per the Role Matrix,
+    // so any authenticated user can read the users collection.
     match /users/{userId} {
-      allow read: if isAuth() && (request.auth.uid == userId || minLevel('users', 1))
-      allow create, update: if isAuth() && (request.auth.uid == userId || minLevel('users', 3))
+      allow read: if isAuth()
+      allow create: if isAuth() && minLevel('users', 3)
+      allow update: if isAuth() && (request.auth.uid == userId || minLevel('users', 3))
       allow delete: if isAuth() && minLevel('users', 4)
     }
 
