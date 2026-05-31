@@ -8,7 +8,10 @@
     </div>
     <div class="flex-1 overflow-y-auto px-6 py-5 space-y-6">
       <div class="flex items-center gap-5">
-        <div class="w-16 h-16 rounded-full bg-primary flex items-center justify-center text-on-primary text-headline-md font-bold shrink-0">{{ user.initials }}</div>
+        <div class="w-16 h-16 rounded-full overflow-hidden bg-primary flex items-center justify-center text-on-primary text-headline-md font-bold shrink-0 border-2 border-outline-variant">
+          <img v-if="user.avatar" class="w-full h-full object-cover" :src="user.avatar" alt="User avatar" />
+          <span v-else>{{ user.initials }}</span>
+        </div>
         <div class="min-w-0">
           <h2 class="text-headline-sm font-headline-md text-on-surface truncate">{{ user.name }}</h2>
           <p class="text-body-sm text-on-surface-variant">{{ user.email }}</p>

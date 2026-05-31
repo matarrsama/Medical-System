@@ -46,7 +46,7 @@
           <div class="relative">
             <select v-model="form.department" class="w-full appearance-none bg-surface-container-highest border-none rounded-xl px-4 py-3.5 text-body-sm text-on-surface focus:ring-1 focus:ring-primary transition-all">
               <option disabled value="">Select Department</option>
-              <option v-for="dept in departments" :key="dept" :value="dept">{{ dept }}</option>
+              <option v-for="dept in deptStore.items" :key="dept.id" :value="dept.name">{{ dept.name }}</option>
             </select>
             <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-outline">keyboard_arrow_down</span>
           </div>
@@ -102,20 +102,20 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import { useUIStore } from '@/stores/ui'
+import { useDepartmentsStore } from '@/stores/departments'
 import { updateUser } from '@/services/api'
 import { labelToId, idToLabel } from '@/data/roles'
-import { db } from '@/lib/firebase'
-import { collection, onSnapshot } from 'firebase/firestore'
+import { useAuditLog } from '@/composables/useAuditLog'
 
 const ui = useUIStore()
+const { logActivity } = useAuditLog()
 const emit = defineEmits(['close'])
 const fileInput = ref(null)
 const empIdTouched = ref(false)
 const saving = ref(false)
-const departments = ref([])
-let unsubDepts = null
+const deptStore = useDepartmentsStore()
 
 const user = computed(() => ui.modalData || {})
 
@@ -221,6 +221,7 @@ async function save() {
       status: form.status,
       avatar: form.avatar
     })
+    await logActivity({ action: 'Update', resource: `User ${form.name}`, details: `Updated profile: ${form.title}, ${form.department}, role: ${form.role}` })
     Object.assign(user.value, {
       name: form.name,
       initials: form.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2),
@@ -242,13 +243,4 @@ async function save() {
   }
 }
 
-onMounted(() => {
-  unsubDepts = onSnapshot(collection(db, 'departments'), (snap) => {
-    departments.value = snap.docs.map(d => d.data().name)
-  })
-})
-
-onUnmounted(() => {
-  if (unsubDepts) unsubDepts()
-})
 </script>

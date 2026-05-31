@@ -4,21 +4,21 @@ import { db } from '@/lib/firebase'
 import { collection, onSnapshot } from 'firebase/firestore'
 import { loadCache, saveCache } from './cache'
 
-const CACHE_KEY = 'inventory'
+const CACHE_KEY = 'purchaseOrders'
 
-export const useInventoryStore = defineStore('inventory', () => {
-  const assets = ref(loadCache(CACHE_KEY) || [])
+export const usePurchaseOrdersStore = defineStore('purchaseOrders', () => {
+  const orders = ref(loadCache(CACHE_KEY) || [])
   let unsub = null
 
   function startListening() {
     if (unsub) return
-    unsub = onSnapshot(collection(db, 'inventory'), (snap) => {
-      assets.value = snap.docs.map(doc => ({
+    unsub = onSnapshot(collection(db, 'purchaseOrders'), (snap) => {
+      orders.value = snap.docs.map(doc => ({
         id: doc.id,
-        assetTag: doc.data().assetTag || doc.id,
+        poNumber: doc.data().poNumber || doc.id,
         ...doc.data()
       }))
-      saveCache(CACHE_KEY, assets.value)
+      saveCache(CACHE_KEY, orders.value)
     }, () => {})
   }
 
@@ -31,5 +31,5 @@ export const useInventoryStore = defineStore('inventory', () => {
 
   startListening()
 
-  return { assets, startListening, stopListening }
+  return { orders, startListening, stopListening }
 })

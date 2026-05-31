@@ -112,7 +112,10 @@
             <tr v-for="user in filteredUsers" :key="user.id" class="hover:bg-surface-container-lowest transition-colors cursor-pointer border-b border-outline-variant/30 last:border-0" @click="ui.openModal('UserDetail', user)">
               <td class="p-3 pl-4">
                 <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary text-label-md font-bold">{{ user.initials }}</div>
+                  <div class="w-8 h-8 rounded-full overflow-hidden bg-primary flex items-center justify-center text-on-primary text-label-md font-bold border border-outline-variant shrink-0">
+                    <img v-if="user.avatar" class="w-full h-full object-cover" :src="user.avatar" alt="User avatar" />
+                    <span v-else>{{ user.initials }}</span>
+                  </div>
                   <div>
                     <div class="font-medium text-on-surface">{{ user.name }}</div>
                     <div class="text-label-sm text-on-surface-variant">{{ user.email }}</div>
@@ -170,22 +173,36 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { useRoute } from 'vue-router'
 import { useUIStore } from '@/stores/ui'
 import { db } from '@/lib/firebase'
 import { onAuthStateChanged } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore'
 import { suspendUser, deleteUser } from '@/services/api'
+import { useFirestoreCache } from '@/composables/useFirestoreCache'
+import { useAuditLog } from '@/composables/useAuditLog'
 
+const route = useRoute()
 const ui = useUIStore()
-const searchQuery = ref('')
+const { logActivity } = useAuditLog()
+const searchQuery = ref(route.query.q || '')
+console.log('[UsersView] searchQuery initialized to:', searchQuery.value)
+
+watch(() => route.query.q, (q) => {
+  console.log('[UsersView] route.query.q changed to:', q)
+  searchQuery.value = q || ''
+})
 const filterRole = ref('')
 const filterDepartment = ref('')
 const openMenu = ref(null)
 const filterStatus = ref('')
 const users = ref([])
 const loading = ref(true)
+const cache = useFirestoreCache()
+const cached = cache.load('users')
+if (cached) { users.value = cached; loading.value = false }
 const suspending = ref(false)
 const deleting = ref(false)
 let unsub = null
@@ -205,6 +222,7 @@ onMounted(() => {
           console.log('[UsersView] mapped users:', JSON.stringify(mapped.map(u => ({ id: u.id, name: u.name, role: u.role }))))
           users.value = mapped
           loading.value = false
+          cache.save('users', mapped)
         },
         (err) => {
           console.error('[UsersView] Firestore snapshot error:', err.code, err.message)
@@ -298,6 +316,7 @@ async function suspendUserHandler(user) {
   suspending.value = true
   try {
     await suspendUser(user.uid, 'Suspended')
+    await logActivity({ action: 'Update', resource: `User ${user.name}`, details: `Suspended user account` })
     ui.showToast(`${user.name} has been suspended`, 'success')
   } catch (err) {
     ui.showToast(err.message, 'error')
@@ -306,19 +325,9 @@ async function suspendUserHandler(user) {
   }
 }
 
-async function deleteUserHandler(user) {
+function deleteUserHandler(user) {
   openMenu.value = null
-  if (!confirm(`Are you sure you want to delete ${user.name}?`)) return
-  if (deleting.value) return
-  deleting.value = true
-  try {
-    await deleteUser(user.uid)
-    ui.showToast(`${user.name} has been deleted`, 'success')
-  } catch (err) {
-    ui.showToast(err.message, 'error')
-  } finally {
-    deleting.value = false
-  }
+  ui.openModal('DeleteConfirm', user)
 }
 
 function onDocClick() {

@@ -63,10 +63,19 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { db } from '@/lib/firebase'
 import { collection, onSnapshot } from 'firebase/firestore'
+import { useFirestoreCache } from '@/composables/useFirestoreCache'
 
+const cache = useFirestoreCache()
 const rawTenants = ref([])
 const rawUsers = ref([])
 const rawTickets = ref([])
+
+const cachedTenants = cache.load('superadmin_tenants')
+const cachedUsers = cache.load('superadmin_users')
+const cachedTickets = cache.load('superadmin_tickets')
+if (cachedTenants) rawTenants.value = cachedTenants
+if (cachedUsers) rawUsers.value = cachedUsers
+if (cachedTickets) rawTickets.value = cachedTickets
 
 const systemHealth = ref([
   { label: 'Server CPU', percent: 67, color: 'bg-green-500' },
@@ -80,18 +89,24 @@ const unsubscribers = []
 
 onMounted(() => {
   const unsubTenants = onSnapshot(collection(db, 'tenants'), (snapshot) => {
-    rawTenants.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
-  })
+    const mapped = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+    rawTenants.value = mapped
+    cache.save('superadmin_tenants', mapped)
+  }, () => {})
   unsubscribers.push(unsubTenants)
 
   const unsubUsers = onSnapshot(collection(db, 'users'), (snapshot) => {
-    rawUsers.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
-  })
+    const mapped = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+    rawUsers.value = mapped
+    cache.save('superadmin_users', mapped)
+  }, () => {})
   unsubscribers.push(unsubUsers)
 
   const unsubTickets = onSnapshot(collection(db, 'tickets'), (snapshot) => {
-    rawTickets.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
-  })
+    const mapped = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+    rawTickets.value = mapped
+    cache.save('superadmin_tickets', mapped)
+  }, () => {})
   unsubscribers.push(unsubTickets)
 })
 

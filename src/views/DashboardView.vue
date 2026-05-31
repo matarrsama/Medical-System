@@ -189,21 +189,36 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { db } from '@/lib/firebase'
 import { collection, onSnapshot, query, orderBy, where } from 'firebase/firestore'
+import { useFirestoreCache } from '@/composables/useFirestoreCache'
 
+const cache = useFirestoreCache()
 const allTickets = ref([])
 const allUsers = ref([])
+const cachedTickets = cache.load('dashboard_tickets')
+const cachedUsers = cache.load('dashboard_users')
+if (cachedTickets) allTickets.value = cachedTickets
+if (cachedUsers) allUsers.value = cachedUsers
+
 let unsubTickets = null
 let unsubUsers = null
 
 onMounted(() => {
   unsubTickets = onSnapshot(
     query(collection(db, 'tickets'), orderBy('created', 'desc')),
-    (snap) => { allTickets.value = snap.docs.map(d => ({ ...d.data(), id: d.id })) },
+    (snap) => {
+      const mapped = snap.docs.map(d => ({ ...d.data(), id: d.id }))
+      allTickets.value = mapped
+      cache.save('dashboard_tickets', mapped)
+    },
     () => {}
   )
   unsubUsers = onSnapshot(
     query(collection(db, 'users'), where('role', 'in', ['ICT Officer', 'Sys Administrator'])),
-    (snap) => { allUsers.value = snap.docs.map(d => ({ ...d.data(), id: d.id })) },
+    (snap) => {
+      const mapped = snap.docs.map(d => ({ ...d.data(), id: d.id }))
+      allUsers.value = mapped
+      cache.save('dashboard_users', mapped)
+    },
     () => {}
   )
 })

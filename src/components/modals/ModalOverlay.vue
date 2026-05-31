@@ -31,14 +31,29 @@ const modals = {
   RoleMatrix: defineAsyncComponent(() => import('./RoleMatrixModal.vue')),
   ProvisionUser: defineAsyncComponent(() => import('./ProvisionUserModal.vue')),
   EditUser: defineAsyncComponent(() => import('./EditUserModal.vue')),
-  ResetPassword: defineAsyncComponent(() => import('./ResetPasswordModal.vue'))
+  ResetPassword: defineAsyncComponent(() => import('./ResetPasswordModal.vue')),
+  TicketDetail: defineAsyncComponent(() => import('./TicketDetailModal.vue')),
+  InventoryDetail: defineAsyncComponent(() => import('./InventoryDetailModal.vue')),
+  PurchaseOrderDetail: defineAsyncComponent(() => import('./PurchaseOrderDetailModal.vue')),
+  RequestDetail: defineAsyncComponent(() => import('./RequestDetailModal.vue')),
+  ScheduleMaintenance: defineAsyncComponent(() => import('./ScheduleMaintenanceModal.vue')),
+  MaintenanceDetail: defineAsyncComponent(() => import('./MaintenanceDetailModal.vue')),
+  NewEquipment: defineAsyncComponent(() => import('./NewEquipmentModal.vue')),
+  EquipmentDetail: defineAsyncComponent(() => import('./EquipmentDetailModal.vue')),
+  DepartmentDetail: defineAsyncComponent(() => import('./DepartmentDetailModal.vue')),
+  AddReport: defineAsyncComponent(() => import('./AddReportModal.vue')),
+  ReportDetail: defineAsyncComponent(() => import('./ReportDetailModal.vue')),
+  ExportReports: defineAsyncComponent(() => import('./ExportReportsModal.vue')),
+  DeleteConfirm: defineAsyncComponent(() => import('./DeleteConfirmModal.vue'))
 }
 
 const currentModal = computed(() => modals[ui.activeModal] || null)
 
 const wrapperClass = computed(() => {
+  if (ui.modalExpanded) return 'max-w-6xl w-[95vw] h-[95vh] max-h-[95vh]'
   if (ui.activeModal === 'ProvisionUser') return 'max-w-4xl h-[90vh] max-h-[90vh]'
   if (ui.activeModal === 'ResetPassword') return 'max-w-md'
+  if (ui.activeModal === 'DeleteConfirm') return 'max-w-md'
   return 'max-w-3xl h-[90vh] max-h-[90vh]'
 })
 </script>

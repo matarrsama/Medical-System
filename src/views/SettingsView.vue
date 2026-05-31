@@ -14,9 +14,15 @@
     <template v-else>
       <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg shadow-sm mb-lg">
         <div class="flex items-start gap-5">
-          <div class="w-16 h-16 rounded-full overflow-hidden bg-surface-container-highest flex-shrink-0 border-2 border-outline-variant">
-            <img v-if="profile.avatar" class="w-full h-full object-cover" :src="profile.avatar" alt="Profile" />
-            <div v-else class="w-full h-full flex items-center justify-center text-headline-md font-headline-md text-on-surface-variant">{{ profile.initials }}</div>
+          <div class="relative group">
+            <div class="w-16 h-16 rounded-full overflow-hidden bg-surface-container-highest flex-shrink-0 border-2 border-outline-variant cursor-pointer" @click="triggerAvatarInput">
+              <img v-if="profile.avatar" class="w-full h-full object-cover" :src="profile.avatar" alt="Profile" />
+              <div v-else class="w-full h-full flex items-center justify-center text-headline-md font-headline-md text-on-surface-variant">{{ profile.initials }}</div>
+              <div class="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer" @click="triggerAvatarInput">
+                <span class="material-symbols-outlined text-white text-[18px]">photo_camera</span>
+              </div>
+            </div>
+            <input ref="avatarInput" type="file" accept="image/*" class="hidden" @change="onAvatarChange" />
           </div>
           <div class="flex-1 min-w-0">
             <h3 class="text-headline-sm font-headline-md text-on-surface">{{ profile.name }}</h3>
@@ -137,17 +143,22 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, watch, onMounted, onUnmounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import { useAuditLog } from '@/composables/useAuditLog'
 import { useUIStore } from '@/stores/ui'
+import { useFirestoreCache } from '@/composables/useFirestoreCache'
 import { db } from '@/lib/firebase'
 import { doc, onSnapshot, updateDoc } from 'firebase/firestore'
 
 const auth = useAuthStore()
 const ui = useUIStore()
+const { logActivity } = useAuditLog()
+const cache = useFirestoreCache()
 
 const loading = ref(true)
 const saving = ref(false)
+const avatarInput = ref(null)
 const profile = reactive({
   name: '', initials: '', employeeId: '', email: '', title: '', department: '',
   role: '', status: '', mfa: 'push', avatar: ''
@@ -163,44 +174,111 @@ const prefs = reactive({
 const saved = ref(null)
 let unsub = null
 
-onMounted(() => {
-  if (!auth.user?.uid) {
-    loading.value = false
+function triggerAvatarInput() {
+  avatarInput.value?.click()
+}
+
+function onAvatarChange(e) {
+  const file = e.target.files?.[0]
+  if (!file) return
+  if (file.size > 2 * 1024 * 1024) {
+    ui.showToast('Image must be under 2MB', 'error')
     return
   }
+  const reader = new FileReader()
+  reader.onload = (ev) => {
+    profile.avatar = ev.target.result
+  }
+  reader.readAsDataURL(file)
+  e.target.value = ''
+}
 
-  unsub = onSnapshot(doc(db, 'users', auth.user.uid), (snap) => {
-    if (snap.exists()) {
-      const data = snap.data()
-      Object.assign(profile, {
-        name: data.name || '',
-        initials: data.initials || '',
-        employeeId: data.employeeId || '',
-        email: data.email || '',
-        title: data.title || '',
-        department: data.department || '',
-        role: data.role || '',
-        status: data.status || '',
-        mfa: data.mfa || 'push',
-        avatar: data.avatar || ''
-      })
-      const p = data.preferences || {}
-      const defaults = {
-        emailNotifications: true,
-        smsNotifications: false,
-        dailySummary: true,
-        mfaMethod: data.mfa || 'push',
-        language: p.language || 'en',
-        timezone: p.timezone || 'America/New_York'
+let watchUnsub = null
+
+onMounted(() => {
+  watchUnsub = watch(
+    [() => auth.user?.uid, () => auth.loading],
+    ([uid, authLoading]) => {
+      if (uid) {
+        // Try to load cached data for this user immediately
+        const cachedData = cache.load('settings_' + uid)
+        if (cachedData) {
+          Object.assign(profile, {
+            name: cachedData.name || '',
+            initials: cachedData.initials || '',
+            employeeId: cachedData.employeeId || '',
+            email: cachedData.email || '',
+            title: cachedData.title || '',
+            department: cachedData.department || '',
+            role: cachedData.role || '',
+            status: cachedData.status || '',
+            mfa: cachedData.mfa || 'push',
+            avatar: cachedData.avatar || ''
+          })
+          const p = cachedData.preferences || {}
+          const defaults = {
+            emailNotifications: p.emailNotifications !== false,
+            smsNotifications: !!p.smsNotifications,
+            dailySummary: p.dailySummary !== false,
+            mfaMethod: cachedData.mfa || 'push',
+            language: p.language || 'en',
+            timezone: p.timezone || 'America/New_York'
+          }
+          Object.assign(prefs, defaults)
+          saved.value = { ...defaults }
+          loading.value = false // Bypasses visual flash or loader spinner
+        }
+
+        if (unsub) return // already subscribed
+        if (!cachedData) {
+          loading.value = true
+        }
+
+        unsub = onSnapshot(doc(db, 'users', uid), (snap) => {
+          if (snap.exists()) {
+            const data = snap.data()
+            // Save updated state in the cache for offline-first speed on next visit
+            cache.save('settings_' + uid, data)
+
+            Object.assign(profile, {
+              name: data.name || '',
+              initials: data.initials || '',
+              employeeId: data.employeeId || '',
+              email: data.email || '',
+              title: data.title || '',
+              department: data.department || '',
+              role: data.role || '',
+              status: data.status || '',
+              mfa: data.mfa || 'push',
+              avatar: data.avatar || ''
+            })
+            const p = data.preferences || {}
+            const defaults = {
+              emailNotifications: p.emailNotifications !== false,
+              smsNotifications: !!p.smsNotifications,
+              dailySummary: p.dailySummary !== false,
+              mfaMethod: data.mfa || 'push',
+              language: p.language || 'en',
+              timezone: p.timezone || 'America/New_York'
+            }
+            Object.assign(prefs, defaults)
+            saved.value = { ...defaults }
+          }
+          loading.value = false
+        }, (err) => {
+          console.error('Error fetching settings:', err)
+          loading.value = false
+        })
+      } else if (!authLoading) {
+        loading.value = false
       }
-      Object.assign(prefs, defaults)
-      saved.value = { ...defaults }
-    }
-    loading.value = false
-  })
+    },
+    { immediate: true }
+  )
 })
 
 onUnmounted(() => {
+  if (watchUnsub) watchUnsub()
   if (unsub) unsub()
 })
 
@@ -222,8 +300,9 @@ async function saveAll() {
   if (!auth.user?.uid || saving.value) return
   saving.value = true
   try {
-    await updateDoc(doc(db, 'users', auth.user.uid), {
+    const updateData = {
       mfa: prefs.mfaMethod,
+      avatar: profile.avatar,
       preferences: {
         emailNotifications: prefs.emailNotifications,
         smsNotifications: prefs.smsNotifications,
@@ -231,7 +310,9 @@ async function saveAll() {
         language: prefs.language,
         timezone: prefs.timezone
       }
-    })
+    }
+    await updateDoc(doc(db, 'users', auth.user.uid), updateData)
+    await logActivity({ action: 'Update', resource: 'User Settings', details: `Updated account and notification preferences` })
     saved.value = { ...prefs }
     ui.showToast('Settings saved', 'success')
   } catch (err) {

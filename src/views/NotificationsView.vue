@@ -31,15 +31,21 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { db } from '@/lib/firebase'
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore'
+import { useFirestoreCache } from '@/composables/useFirestoreCache'
 
 const notifications = ref([])
+const cache = useFirestoreCache()
+const cached = cache.load('notifications')
+if (cached) notifications.value = cached
 let unsubscribe = null
 
 onMounted(() => {
   const q = query(collection(db, 'notifications'), orderBy('timestamp', 'desc'))
   unsubscribe = onSnapshot(q, (snapshot) => {
-    notifications.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
-  })
+    const mapped = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+    notifications.value = mapped
+    cache.save('notifications', mapped)
+  }, () => {})
 })
 
 onUnmounted(() => {

@@ -36,10 +36,6 @@
       </router-link>
     </nav>
     <div class="p-md border-t border-outline-variant mt-auto flex flex-col gap-sm">
-      <button class="w-full bg-surface-container-highest text-primary border border-outline-variant hover:bg-surface-variant transition-colors text-label-md font-label-md py-2 rounded-lg flex justify-center items-center gap-2">
-        <span class="material-symbols-outlined text-[18px]">download</span>
-        Generate Report
-      </button>
       <button @click="handleLogout" :disabled="signingOut" class="w-full text-outline border border-outline-variant hover:bg-error-container hover:text-on-error-container transition-colors text-label-md font-label-md py-2 rounded-lg flex justify-center items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed">
         <span v-if="signingOut" class="material-symbols-outlined animate-spin text-[18px]">sync</span>
         <span v-else class="material-symbols-outlined text-[18px]">logout</span>
@@ -50,7 +46,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useSettings } from '@/composables/useSettings'
@@ -82,12 +78,23 @@ const navItems = [
   { to: '/biomedical', icon: 'medical_services', label: 'Biomedical' }
 ]
 
-const bottomNavItems = [
-  { to: '/departments', icon: 'domain', label: 'Departments' },
-  { to: '/reports', icon: 'analytics', label: 'Reports' },
-  { to: '/users', icon: 'group', label: 'Users' },
-  { to: '/audit-logs', icon: 'history_edu', label: 'Audit Logs' },
-  { to: '/admin', icon: 'admin_panel_settings', label: 'Admin' },
-  { to: '/settings', icon: 'settings', label: 'Settings' }
-]
+const bottomNavItems = computed(() => {
+  const items = [
+    { to: '/departments', icon: 'domain', label: 'Departments' },
+    { to: '/reports', icon: 'analytics', label: 'Reports' },
+    { to: '/settings', icon: 'settings', label: 'Settings' }
+  ]
+  if (auth.canAccessAdmin) {
+    items.splice(2, 0, { to: '/admin', icon: 'admin_panel_settings', label: 'Admin' })
+  }
+  if (auth.canManageUsers) {
+    const idx = auth.canAccessAdmin ? 3 : 2
+    items.splice(idx, 0, { to: '/users', icon: 'group', label: 'Users' })
+  }
+  if (auth.canAccessAuditLogs) {
+    const len = items.length
+    items.splice(len, 0, { to: '/audit-logs', icon: 'history_edu', label: 'Audit Logs' })
+  }
+  return items
+})
 </script>

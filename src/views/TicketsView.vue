@@ -39,7 +39,8 @@
               <option value="">Category: All</option>
               <option>Network</option>
               <option>Hardware</option>
-              <option>Software (EMR)</option>
+              <option>Software</option>
+              <option>Access</option>
             </select>
           </div>
           <div class="relative hidden sm:block">
@@ -62,6 +63,10 @@
           </div>
         </div>
         <div class="flex items-center gap-2">
+          <button v-if="selectedIds.size > 0" @click="deleteSelected" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-label-sm font-label-sm text-on-error bg-error transition-colors shadow-sm">
+            <span class="material-symbols-outlined" style="font-size: 16px;">delete</span>
+            Delete ({{ selectedIds.size }})
+          </button>
           <button class="text-label-sm font-label-sm text-on-surface-variant hover:text-on-surface px-2 py-1 rounded transition-colors flex items-center gap-1">
             <span class="material-symbols-outlined" style="font-size: 16px;">filter_list</span> More
           </button>
@@ -72,9 +77,9 @@
           <thead>
             <tr class="bg-surface-container-low text-on-surface-variant text-label-sm font-label-sm uppercase tracking-wider">
               <th class="p-3 pl-4 border-b border-outline-variant font-medium w-10">
-                <input type="checkbox" class="rounded border-outline-variant text-primary focus:ring-primary" />
+                <input type="checkbox" :checked="allSelected" @change="toggleSelectAll" class="rounded border-outline-variant text-primary focus:ring-primary" />
               </th>
-              <th class="p-3 border-b border-outline-variant font-medium">Ticket ID</th>
+              <th class="p-3 border-b border-outline-variant font-medium cursor-pointer select-none" @click="toggleSort">Ticket ID <span class="material-symbols-outlined align-middle" style="font-size: 14px;">{{ sortDir === 'asc' ? 'arrow_upward' : 'arrow_downward' }}</span></th>
               <th class="p-3 border-b border-outline-variant font-medium">Title</th>
               <th class="p-3 border-b border-outline-variant font-medium hidden md:table-cell">Priority</th>
               <th class="p-3 border-b border-outline-variant font-medium hidden md:table-cell">Status</th>
@@ -84,11 +89,11 @@
             </tr>
           </thead>
           <tbody class="text-body-sm font-body-sm text-on-surface">
-            <tr v-for="ticket in filteredTickets" :key="ticket.id" class="hover:bg-surface-container-lowest transition-colors group cursor-pointer border-b border-outline-variant/30 last:border-0" @click="ui.openModal('NewTicket')">
+            <tr v-for="ticket in filteredTickets" :key="ticket.id" class="hover:bg-surface-container-lowest transition-colors group cursor-pointer border-b border-outline-variant/30 last:border-0" @click="openTicketDetail(ticket)">
               <td class="p-3 pl-4" @click.stop>
-                <input type="checkbox" class="rounded border-outline-variant text-primary focus:ring-primary" />
+                <input type="checkbox" :checked="selectedIds.has(ticket.id)" @change="toggleSelect(ticket.id)" class="rounded border-outline-variant text-primary focus:ring-primary" />
               </td>
-              <td class="p-3 text-primary font-medium">{{ ticket.id }}</td>
+              <td class="p-3 text-primary font-medium">{{ ticket.ticketId || ticket.id }}</td>
               <td class="p-3 font-medium">{{ ticket.title }}</td>
               <td class="p-3 hidden md:table-cell">
                 <span :class="priorityClass(ticket.priority)" class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-label-sm font-label-sm">
@@ -100,11 +105,30 @@
                 <span :class="statusClass(ticket.status)" class="px-2 py-0.5 rounded text-label-sm font-label-sm">{{ ticket.status }}</span>
               </td>
               <td class="p-3 hidden lg:table-cell text-on-surface-variant">{{ ticket.assignee }}</td>
-              <td class="p-3 hidden lg:table-cell text-on-surface-variant">{{ ticket.created }}</td>
-              <td class="p-3 pr-4" @click.stop>
-                <button class="p-1 rounded hover:bg-surface-container text-on-surface-variant opacity-0 group-hover:opacity-100 transition-all">
+              <td class="p-3 hidden lg:table-cell text-on-surface-variant">{{ formatDate(ticket.created) }}</td>
+              <td class="p-3 pr-4 relative" @click.stop>
+                <button @click.stop="toggleDropdown(ticket.id, $event)" class="p-1 rounded hover:bg-surface-container text-on-surface-variant opacity-0 group-hover:opacity-100 transition-all">
                   <span class="material-symbols-outlined" style="font-size: 18px;">more_vert</span>
                 </button>
+                <div v-if="openDropdownId === ticket.id" class="ticket-dropdown absolute right-4 z-50 w-44 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-lg py-1" :class="dropdownUp ? 'bottom-full mb-1' : 'top-full mt-1'">
+                  <button @click.stop="openTicketDetail(ticket)" class="flex items-center gap-2.5 w-full px-4 py-2.5 text-label-sm font-label-sm text-on-surface text-left">
+                    <span class="material-symbols-outlined text-[16px] text-outline">info</span>
+                    View Details
+                  </button>
+                  <button @click.stop="openTicketEdit(ticket)" class="flex items-center gap-2.5 w-full px-4 py-2.5 text-label-sm font-label-sm text-on-surface text-left">
+                    <span class="material-symbols-outlined text-[16px] text-outline">edit</span>
+                    Edit
+                  </button>
+                  <button @click.stop="openTicketAssign(ticket)" class="flex items-center gap-2.5 w-full px-4 py-2.5 text-label-sm font-label-sm text-on-surface text-left">
+                    <span class="material-symbols-outlined text-[16px] text-outline">person_add</span>
+                    Assign
+                  </button>
+                  <div class="border-t border-outline-variant my-1"></div>
+                  <button @click.stop="deleteTicket(ticket)" class="flex items-center gap-2.5 w-full px-4 py-2.5 text-label-sm font-label-sm text-error text-left">
+                    <span class="material-symbols-outlined text-[16px]">delete</span>
+                    Delete
+                  </button>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -125,36 +149,130 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { useRoute } from 'vue-router'
 import { useTicketsStore } from '@/stores/tickets'
 import { useUIStore } from '@/stores/ui'
-
+const route = useRoute()
 const ticketsStore = useTicketsStore()
 const ui = useUIStore()
-const searchQuery = ref('')
+const searchQuery = ref(route.query.q || '')
+console.log('[TicketsView] searchQuery initialized to:', searchQuery.value)
+
+watch(() => route.query.q, (q) => {
+  console.log('[TicketsView] route.query.q changed to:', q)
+  searchQuery.value = q || ''
+})
+
+const selectedIds = ref(new Set())
+const openDropdownId = ref(null)
+const dropdownUp = ref(false)
+
+const allSelected = computed(() => filteredTickets.value.length > 0 && filteredTickets.value.every(t => selectedIds.value.has(t.id)))
+
+function toggleSelect(id) {
+  const s = new Set(selectedIds.value)
+  if (s.has(id)) s.delete(id); else s.add(id)
+  selectedIds.value = s
+}
+
+function toggleSelectAll() {
+  if (allSelected.value) {
+    selectedIds.value = new Set()
+  } else {
+    selectedIds.value = new Set(filteredTickets.value.map(t => t.id))
+  }
+}
+
+function deleteSelected() {
+  const tickets = filteredTickets.value.filter(t => selectedIds.value.has(t.id))
+  selectedIds.value = new Set()
+  ui.openModal('DeleteConfirm', tickets)
+}
+
+function toggleDropdown(id, e) {
+  if (openDropdownId.value === id) {
+    openDropdownId.value = null
+    return
+  }
+  openDropdownId.value = id
+  const btn = e.currentTarget
+  const rect = btn.getBoundingClientRect()
+  const spaceBelow = window.innerHeight - rect.bottom
+  const spaceAbove = rect.top
+  dropdownUp.value = spaceBelow < 200 && spaceAbove > 200
+}
+
+function onDocClick(e) {
+  if (!e.target.closest('.ticket-dropdown')) {
+    openDropdownId.value = null
+  }
+}
+
+onMounted(() => document.addEventListener('click', onDocClick))
+onUnmounted(() => document.removeEventListener('click', onDocClick))
+
+function openTicketDetail(ticket) {
+  openDropdownId.value = null
+  ui.openModal('TicketDetail', { ticket, startEdit: false })
+}
+
+function openTicketEdit(ticket) {
+  openDropdownId.value = null
+  ui.openModal('TicketDetail', { ticket, startEdit: true })
+}
+
+function openTicketAssign(ticket) {
+  openDropdownId.value = null
+  ui.openModal('TicketDetail', { ticket, startEdit: true })
+}
+
+function deleteTicket(ticket) {
+  openDropdownId.value = null
+  ui.openModal('DeleteConfirm', ticket)
+}
+
 const filterCategory = ref('')
 const filterPriority = ref('')
 const filterStatus = ref('')
+const sortDir = ref('asc')
+
+function toggleSort() {
+  sortDir.value = sortDir.value === 'asc' ? 'desc' : 'asc'
+}
 
 const filteredTickets = computed(() => {
-  return ticketsStore.tickets.filter(t => {
-    if (searchQuery.value && !t.id.toLowerCase().includes(searchQuery.value.toLowerCase()) && !t.title.toLowerCase().includes(searchQuery.value.toLowerCase())) return false
-    if (filterPriority.value && t.priority !== filterPriority.value.toLowerCase()) return false
+  const items = ticketsStore.tickets.filter(t => {
+    const q = searchQuery.value.toLowerCase()
+    if (q && !(t.ticketId || t.id).toLowerCase().includes(q) && !(t.title || '').toLowerCase().includes(q)) return false
+    if (filterCategory.value && t.category !== filterCategory.value) return false
+    if (filterPriority.value && t.priority?.toLowerCase() !== filterPriority.value.toLowerCase()) return false
     if (filterStatus.value && t.status !== filterStatus.value) return false
     return true
   })
+  return [...items].sort((a, b) => {
+    const idA = (a.ticketId || a.id || '').toLowerCase()
+    const idB = (b.ticketId || b.id || '').toLowerCase()
+    return sortDir.value === 'asc' ? idA.localeCompare(idB) : idB.localeCompare(idA)
+  })
 })
+
+function formatDate(v) {
+  if (!v) return ''
+  if (v?.toDate) return v.toDate().toLocaleDateString()
+  return String(v)
+}
 
 function priorityClass(p) {
   const map = { critical: 'bg-error-container/40 text-on-error-container', high: 'bg-tertiary-container/20 text-tertiary', medium: 'bg-surface-container-highest text-on-surface-variant', low: 'bg-surface-container text-on-surface-variant' }
-  return map[p] || ''
+  return map[p?.toLowerCase()] || ''
 }
 function priorityDot(p) {
   const map = { critical: 'bg-error', high: 'bg-tertiary', medium: 'bg-primary', low: 'bg-outline' }
-  return map[p] || ''
+  return map[p?.toLowerCase()] || ''
 }
 function statusClass(s) {
-  const map = { 'Investigating': 'bg-error-container/40 text-on-error-container', 'Assigned': 'bg-surface-container-highest text-on-surface-variant', 'Pending Vendor': 'bg-tertiary-container/20 text-tertiary', 'Resolved': 'bg-green-100 text-green-800' }
+  const map = { 'Open': 'bg-surface-container-highest text-on-surface-variant', 'In Progress': 'bg-primary-container/40 text-on-primary-container', 'Assigned': 'bg-surface-container-highest text-on-surface-variant', 'Resolved': 'bg-green-100 text-green-800', 'Closed': 'bg-outline/20 text-on-surface-variant' }
   return map[s] || ''
 }
 </script>

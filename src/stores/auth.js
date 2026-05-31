@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { auth } from '@/lib/firebase'
+import { auth, db } from '@/lib/firebase'
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth'
+import { doc, onSnapshot } from 'firebase/firestore'
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref(null)
@@ -9,9 +10,13 @@ export const useAuthStore = defineStore('auth', () => {
   const loading = ref(true)
 
   const isAuthenticated = computed(() => user.value !== null)
-  const canAccessAdmin = computed(() => role.value === 'Sys Administrator' || role.value === 'IT Administrator')
+  const canAccessAdmin = computed(() => role.value === 'Sys Administrator')
+  const canAccessAuditLogs = computed(() => ['Sys Administrator', 'ICT Officer', 'Hospital Admin'].includes(role.value))
+  const canManageUsers = computed(() => canAccessAuditLogs.value)
+  const isSuperAdmin = computed(() => role.value === 'Sys Administrator')
 
   let unsubscribe = null
+  let unsubUserDoc = null
 
   function init() {
     unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
@@ -23,11 +28,32 @@ export const useAuthStore = defineStore('auth', () => {
           uid: firebaseUser.uid,
           email: firebaseUser.email,
           displayName: firebaseUser.displayName,
-          role: role.value
+          role: role.value,
+          avatar: '',
+          initials: ''
         }
+
+        if (unsubUserDoc) unsubUserDoc()
+        unsubUserDoc = onSnapshot(doc(db, 'users', firebaseUser.uid), (snap) => {
+          if (snap.exists()) {
+            const data = snap.data()
+            user.value = {
+              ...user.value,
+              displayName: data.name || user.value.displayName,
+              avatar: data.avatar || '',
+              initials: data.initials || ''
+            }
+          }
+        }, (err) => {
+          console.error('Error listening to user document:', err)
+        })
       } else {
         user.value = null
         role.value = null
+        if (unsubUserDoc) {
+          unsubUserDoc()
+          unsubUserDoc = null
+        }
       }
       loading.value = false
     })
@@ -35,6 +61,10 @@ export const useAuthStore = defineStore('auth', () => {
 
   function cleanup() {
     if (unsubscribe) unsubscribe()
+    if (unsubUserDoc) {
+      unsubUserDoc()
+      unsubUserDoc = null
+    }
   }
 
   async function login(email, password) {
@@ -45,7 +75,9 @@ export const useAuthStore = defineStore('auth', () => {
       uid: cred.user.uid,
       email: cred.user.email,
       displayName: cred.user.displayName,
-      role: role.value
+      role: role.value,
+      avatar: '',
+      initials: ''
     }
   }
 
@@ -53,7 +85,11 @@ export const useAuthStore = defineStore('auth', () => {
     await signOut(auth)
     user.value = null
     role.value = null
+    if (unsubUserDoc) {
+      unsubUserDoc()
+      unsubUserDoc = null
+    }
   }
 
-  return { user, role, loading, isAuthenticated, canAccessAdmin, init, cleanup, login, logout }
+  return { user, role, loading, isAuthenticated, canAccessAdmin, canAccessAuditLogs, canManageUsers, isSuperAdmin, init, cleanup, login, logout }
 })

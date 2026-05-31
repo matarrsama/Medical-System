@@ -6,6 +6,7 @@ export const useUIStore = defineStore('ui', () => {
   const toasts = ref([])
   const activeModal = ref(null)
   const modalData = ref(null)
+  const modalExpanded = ref(false)
 
   function toggleTheme() {
     isDark.value = !isDark.value
@@ -23,12 +24,18 @@ export const useUIStore = defineStore('ui', () => {
   function openModal(name, data = null) {
     modalData.value = data
     activeModal.value = name
+    modalExpanded.value = false
   }
 
   function closeModal() {
     activeModal.value = null
     modalData.value = null
+    modalExpanded.value = false
   }
 
-  return { isDark, toasts, activeModal, modalData, toggleTheme, showToast, openModal, closeModal }
+  function toggleModalExpanded() {
+    modalExpanded.value = !modalExpanded.value
+  }
+
+  return { isDark, toasts, activeModal, modalData, modalExpanded, toggleTheme, showToast, openModal, closeModal, toggleModalExpanded }
 })

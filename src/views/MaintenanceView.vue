@@ -2,39 +2,118 @@
   <div>
     <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-lg">
       <div>
+        <div class="flex items-center space-x-2 text-label-md font-label-md text-on-surface-variant mb-1">
+          <span>Operations</span>
+          <span class="material-symbols-outlined" style="font-size: 14px;">chevron_right</span>
+          <span class="text-primary font-bold">Maintenance</span>
+        </div>
         <h2 class="text-display font-display text-on-surface">Maintenance Schedule</h2>
         <p class="text-body-md font-body-md text-on-surface-variant mt-1">Plan and track preventive maintenance for hospital equipment.</p>
       </div>
+      <button v-if="canSchedule" @click="ui.openModal('ScheduleMaintenance')" class="bg-primary text-on-primary text-label-md font-label-md px-4 py-2 rounded-lg hover:bg-primary-container transition-colors shadow-sm flex items-center gap-2">
+        <span class="material-symbols-outlined text-[18px]">add</span>
+        Schedule Maintenance
+      </button>
     </div>
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-gutter mb-lg">
-      <div v-for="stat in stats" :key="stat.label" class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md">
-        <div class="text-label-md font-label-md text-on-surface-variant">{{ stat.label }}</div>
-        <div class="text-display font-display text-on-surface mt-1">{{ stat.value }}</div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-4 gap-gutter mb-lg">
+      <div v-for="stat in stats" :key="stat.label" class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex items-center gap-3">
+        <div class="w-10 h-10 rounded-lg flex items-center justify-center" :class="stat.bg">
+          <span class="material-symbols-outlined text-[20px]" :class="stat.iconClass">{{ stat.icon }}</span>
+        </div>
+        <div>
+          <div class="text-label-sm font-label-sm text-on-surface-variant">{{ stat.label }}</div>
+          <div class="text-headline-md font-headline-md text-on-surface mt-0.5">{{ stat.value }}</div>
+        </div>
       </div>
     </div>
-    <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden">
-      <div class="p-4 border-b border-outline-variant">
-        <h3 class="text-headline-sm font-headline-md text-on-surface">Scheduled Tasks</h3>
+
+    <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden flex flex-col flex-1 min-h-[500px]">
+      <div class="border-b border-outline-variant p-4 bg-surface-container-lowest flex flex-wrap gap-3 items-center justify-between">
+        <div class="flex flex-wrap gap-3 items-center flex-1">
+          <div class="relative w-full sm:w-64">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" style="font-size: 18px;">search</span>
+            <input v-model="searchQuery" class="w-full bg-surface-container pl-9 pr-3 py-1.5 rounded border border-outline-variant text-body-sm font-body-sm placeholder:text-on-surface-variant focus:ring-1 focus:ring-primary focus:border-primary focus:bg-surface-container-lowest transition-colors" placeholder="Filter by equipment or ID..." type="text" />
+          </div>
+          <div class="relative hidden sm:block">
+            <select v-model="filterStatus" class="appearance-none bg-surface-container border border-outline-variant rounded pl-3 pr-8 py-1.5 text-body-sm font-body-sm text-on-surface focus:ring-1 focus:ring-primary focus:border-primary focus:bg-surface-container-lowest transition-colors cursor-pointer">
+              <option value="">Status: All</option>
+              <option>Scheduled</option>
+              <option>In Progress</option>
+              <option>Completed</option>
+            </select>
+          </div>
+          <div class="relative hidden sm:block">
+            <select v-model="filterType" class="appearance-none bg-surface-container border border-outline-variant rounded pl-3 pr-8 py-1.5 text-body-sm font-body-sm text-on-surface focus:ring-1 focus:ring-primary focus:border-primary focus:bg-surface-container-lowest transition-colors cursor-pointer">
+              <option value="">Type: All</option>
+              <option>Preventive</option>
+              <option>Corrective</option>
+              <option>Inspection</option>
+              <option>Calibration</option>
+            </select>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button v-if="selectedIds.size > 0" @click="deleteSelected" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-label-sm font-label-sm text-on-error bg-error transition-colors shadow-sm">
+            <span class="material-symbols-outlined" style="font-size: 16px;">delete</span>
+            Delete ({{ selectedIds.size }})
+          </button>
+        </div>
       </div>
-      <div class="overflow-x-auto">
+
+      <div class="overflow-x-auto flex-1">
         <table class="w-full text-left border-collapse">
           <thead>
             <tr class="bg-surface-container-low text-on-surface-variant text-label-sm font-label-sm uppercase tracking-wider">
-              <th class="p-3 pl-4 border-b border-outline-variant font-medium">Equipment</th>
-              <th class="p-3 border-b border-outline-variant font-medium">Type</th>
-              <th class="p-3 border-b border-outline-variant font-medium hidden md:table-cell">Location</th>
-              <th class="p-3 border-b border-outline-variant font-medium">Scheduled Date</th>
+              <th class="p-3 pl-4 border-b border-outline-variant font-medium w-10">
+                <input type="checkbox" :checked="allSelected" @change="toggleSelectAll" class="rounded border-outline-variant text-primary focus:ring-primary" />
+              </th>
+              <th class="p-3 border-b border-outline-variant font-medium cursor-pointer select-none" @click="toggleSort">ID <span class="material-symbols-outlined align-middle" style="font-size: 14px;">{{ sortDir === 'asc' ? 'arrow_upward' : 'arrow_downward' }}</span></th>
+              <th class="p-3 border-b border-outline-variant font-medium">Equipment</th>
+              <th class="p-3 border-b border-outline-variant font-medium hidden md:table-cell">Type</th>
+              <th class="p-3 border-b border-outline-variant font-medium hidden md:table-cell">Department</th>
+              <th class="p-3 border-b border-outline-variant font-medium hidden sm:table-cell">Scheduled Date</th>
               <th class="p-3 border-b border-outline-variant font-medium">Status</th>
+              <th class="p-3 pr-4 border-b border-outline-variant font-medium w-10"></th>
             </tr>
           </thead>
-          <tbody class="text-body-sm text-on-surface">
-            <tr v-for="task in tasks" :key="task.id" class="hover:bg-surface-container-lowest cursor-pointer border-b border-outline-variant/30 last:border-0">
-              <td class="p-3 pl-4 font-medium">{{ task.equipment }}</td>
-              <td class="p-3 text-on-surface-variant">{{ task.type }}</td>
-              <td class="p-3 hidden md:table-cell text-on-surface-variant">{{ task.location }}</td>
-              <td class="p-3">{{ task.date }}</td>
+          <tbody class="text-body-sm font-body-sm text-on-surface">
+            <tr v-for="task in filteredTasks" :key="task.id" class="hover:bg-surface-container-lowest transition-colors group cursor-pointer border-b border-outline-variant/30 last:border-0" @click="openDetail(task)">
+              <td class="p-3 pl-4" @click.stop>
+                <input type="checkbox" :checked="selectedIds.has(task.id)" @change="toggleSelect(task.id)" class="rounded border-outline-variant text-primary focus:ring-primary" />
+              </td>
+              <td class="p-3 text-primary font-medium font-mono">{{ task.maintenanceId || task.id }}</td>
+              <td class="p-3 font-medium">{{ task.equipment }}</td>
+              <td class="p-3 hidden md:table-cell text-on-surface-variant">
+                <span :class="typeClass(task.type)" class="px-2 py-0.5 rounded text-label-sm font-label-sm">{{ task.type }}</span>
+              </td>
+              <td class="p-3 hidden md:table-cell text-on-surface-variant">{{ task.department }}</td>
+              <td class="p-3 hidden sm:table-cell text-on-surface-variant">{{ task.scheduledDate || '—' }}</td>
               <td class="p-3">
-                <span :class="statusClass(task.status)" class="px-2 py-0.5 rounded text-label-sm font-label-sm">{{ task.status }}</span>
+                <span :class="statusClass(task.status)" class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-label-sm font-label-sm">
+                  <span class="w-1.5 h-1.5 rounded-full" :class="statusDot(task.status)"></span>
+                  {{ task.status }}
+                </span>
+              </td>
+              <td class="p-3 pr-4 relative" @click.stop>
+                <button @click.stop="toggleDropdown(task.id, $event)" class="p-1 rounded hover:bg-surface-container text-on-surface-variant opacity-0 group-hover:opacity-100 transition-all">
+                  <span class="material-symbols-outlined" style="font-size: 18px;">more_vert</span>
+                </button>
+                <div v-if="openDropdownId === task.id" class="maintenance-dropdown absolute right-4 z-50 w-44 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-lg py-1" :class="dropdownUp ? 'bottom-full mb-2' : 'top-full mt-2'">
+                  <button @click.stop="openDetail(task)" class="flex items-center gap-2.5 w-full px-4 py-2.5 text-label-sm font-label-sm text-on-surface text-left">
+                    <span class="material-symbols-outlined text-[16px] text-outline">info</span>
+                    View Details
+                  </button>
+                  <button @click.stop="openEdit(task)" class="flex items-center gap-2.5 w-full px-4 py-2.5 text-label-sm font-label-sm text-on-surface text-left">
+                    <span class="material-symbols-outlined text-[16px] text-outline">edit</span>
+                    Edit
+                  </button>
+                  <div class="border-t border-outline-variant my-1"></div>
+                  <button @click.stop="deleteTask(task)" class="flex items-center gap-2.5 w-full px-4 py-2.5 text-label-sm font-label-sm text-error text-left">
+                    <span class="material-symbols-outlined text-[16px]">delete</span>
+                    Delete
+                  </button>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -46,41 +125,151 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { db } from '@/lib/firebase'
-import { collection, onSnapshot, query } from 'firebase/firestore'
 import { useUIStore } from '@/stores/ui'
+import { useAuthStore } from '@/stores/auth'
+import { useMaintenanceStore } from '@/stores/maintenance'
+import { db, auth } from '@/lib/firebase'
+import { doc, getDoc } from 'firebase/firestore'
 
-const uiStore = useUIStore()
-const tasks = ref([])
-let unsubscribe = null
+const ui = useUIStore()
+const authStore = useAuthStore()
+const maintenanceStore = useMaintenanceStore()
 
-const stats = computed(() => {
-  const total = tasks.value.length
-  const scheduled = tasks.value.filter(t => t.status === 'Scheduled').length
-  const inProgress = tasks.value.filter(t => t.status === 'In Progress').length
-  const completed = tasks.value.filter(t => t.status === 'Completed').length
-  const overdue = tasks.value.filter(t => t.status === 'Overdue').length
-  return [
-    { label: 'Scheduled', value: scheduled },
-    { label: 'In Progress', value: inProgress },
-    { label: 'Completed', value: completed },
-    { label: 'Overdue', value: overdue }
-  ]
+const canSchedule = computed(() =>
+  ['Sys Administrator', 'Hospital Admin', 'ICT Officer'].includes(authStore.role)
+)
+
+const userDept = ref('')
+
+const userTasks = computed(() => {
+  if (canSchedule.value) return maintenanceStore.tasks
+  return maintenanceStore.tasks.filter(t => t.department === userDept.value)
 })
 
-function statusClass(s) {
-  const map = { Scheduled: 'bg-blue-100 text-blue-800', 'In Progress': 'bg-amber-100 text-amber-800', Completed: 'bg-green-100 text-green-800', Overdue: 'bg-error-container/40 text-on-error-container' }
-  return map[s] || ''
+const searchQuery = ref('')
+const filterStatus = ref('')
+const filterType = ref('')
+const sortDir = ref('asc')
+
+function toggleSort() {
+  sortDir.value = sortDir.value === 'asc' ? 'desc' : 'asc'
 }
 
-onMounted(() => {
-  const q = query(collection(db, 'maintenanceTasks'))
-  unsubscribe = onSnapshot(q, (snapshot) => {
-    tasks.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+const filteredTasks = computed(() => {
+  const items = userTasks.value.filter(t => {
+    const q = searchQuery.value.toLowerCase()
+    if (q && !(t.maintenanceId || t.id).toLowerCase().includes(q) && !(t.equipment || '').toLowerCase().includes(q)) return false
+    if (filterStatus.value && t.status !== filterStatus.value) return false
+    if (filterType.value && t.type !== filterType.value) return false
+    return true
+  })
+  return [...items].sort((a, b) => {
+    const idA = (a.maintenanceId || a.id || '').toLowerCase()
+    const idB = (b.maintenanceId || b.id || '').toLowerCase()
+    return sortDir.value === 'asc' ? idA.localeCompare(idB) : idB.localeCompare(idA)
   })
 })
 
-onUnmounted(() => {
-  if (unsubscribe) unsubscribe()
+const stats = computed(() => {
+  const all = userTasks.value
+  const scheduled = all.filter(t => t.status === 'Scheduled').length
+  const inProgress = all.filter(t => t.status === 'In Progress').length
+  const completed = all.filter(t => t.status === 'Completed').length
+  const overdue = all.filter(t => t.status === 'Overdue').length
+  return [
+    { label: 'Scheduled', value: scheduled, icon: 'event', bg: 'bg-blue-100 dark:bg-blue-900/30', iconClass: 'text-blue-600 dark:text-blue-400' },
+    { label: 'In Progress', value: inProgress, icon: 'sync', bg: 'bg-amber-100 dark:bg-amber-900/30', iconClass: 'text-amber-600 dark:text-amber-400' },
+    { label: 'Completed', value: completed, icon: 'check_circle', bg: 'bg-green-100 dark:bg-green-900/30', iconClass: 'text-green-600 dark:text-green-400' },
+    { label: 'Overdue', value: overdue, icon: 'warning', bg: 'bg-red-100 dark:bg-red-900/30', iconClass: 'text-red-600 dark:text-red-400' }
+  ]
 })
+
+const selectedIds = ref(new Set())
+const openDropdownId = ref(null)
+const dropdownUp = ref(false)
+
+const allSelected = computed(() => filteredTasks.value.length > 0 && filteredTasks.value.every(t => selectedIds.value.has(t.id)))
+
+function toggleSelect(id) {
+  const s = new Set(selectedIds.value)
+  if (s.has(id)) s.delete(id); else s.add(id)
+  selectedIds.value = s
+}
+
+function toggleSelectAll() {
+  if (allSelected.value) {
+    selectedIds.value = new Set()
+  } else {
+    selectedIds.value = new Set(filteredTasks.value.map(t => t.id))
+  }
+}
+
+function toggleDropdown(id, e) {
+  if (openDropdownId.value === id) {
+    openDropdownId.value = null
+    return
+  }
+  openDropdownId.value = id
+  const btn = e.currentTarget
+  const rect = btn.getBoundingClientRect()
+  const spaceBelow = window.innerHeight - rect.bottom
+  const spaceAbove = rect.top
+  dropdownUp.value = spaceBelow < 200 && spaceAbove > 200
+}
+
+function onDocClick(e) {
+  if (!e.target.closest('.maintenance-dropdown')) {
+    openDropdownId.value = null
+  }
+}
+
+onMounted(async () => {
+  document.addEventListener('click', onDocClick)
+  const uid = auth.currentUser?.uid
+  if (uid) {
+    try {
+      const userSnap = await getDoc(doc(db, 'users', uid))
+      if (userSnap.exists()) {
+        userDept.value = userSnap.data().department || ''
+      }
+    } catch {}
+  }
+})
+onUnmounted(() => document.removeEventListener('click', onDocClick))
+
+function openDetail(task) {
+  openDropdownId.value = null
+  ui.openModal('MaintenanceDetail', { task, startEdit: false })
+}
+
+function openEdit(task) {
+  openDropdownId.value = null
+  ui.openModal('MaintenanceDetail', { task, startEdit: true })
+}
+
+function deleteTask(task) {
+  openDropdownId.value = null
+  ui.openModal('DeleteConfirm', task)
+}
+
+function deleteSelected() {
+  const items = filteredTasks.value.filter(t => selectedIds.value.has(t.id))
+  selectedIds.value = new Set()
+  ui.openModal('DeleteConfirm', items)
+}
+
+function typeClass(t) {
+  const map = { Preventive: 'bg-surface-container-highest text-on-surface-variant', Corrective: 'bg-tertiary-container/20 text-tertiary', Inspection: 'bg-primary-container/30 text-primary', Calibration: 'bg-surface-container text-on-surface-variant' }
+  return map[t] || ''
+}
+
+function statusClass(s) {
+  const map = { Scheduled: 'bg-blue-100 text-blue-800', 'In Progress': 'bg-amber-100 text-amber-800', Completed: 'bg-green-100 text-green-800', Overdue: 'bg-red-100 text-red-800' }
+  return map[s] || ''
+}
+
+function statusDot(s) {
+  const map = { Scheduled: 'bg-blue-600', 'In Progress': 'bg-amber-500', Completed: 'bg-green-600', Overdue: 'bg-red-600' }
+  return map[s] || ''
+}
 </script>

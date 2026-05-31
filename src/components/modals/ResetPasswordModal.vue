@@ -40,9 +40,11 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useUIStore } from '@/stores/ui'
+import { useAuditLog } from '@/composables/useAuditLog'
 import { resetPassword } from '@/services/api'
 
 const ui = useUIStore()
+const { logActivity } = useAuditLog()
 const user = computed(() => ui.modalData || {})
 const tempPassword = ref('Loading...')
 const loading = ref(true)
@@ -50,6 +52,7 @@ const loading = ref(true)
 onMounted(async () => {
   try {
     const result = await resetPassword(user.value.uid)
+    await logActivity({ action: 'Update', resource: `User ${user.value.name || user.value.uid}`, details: `Password reset` })
     tempPassword.value = result.tempPassword
   } catch (err) {
     ui.showToast(err.message, 'error')

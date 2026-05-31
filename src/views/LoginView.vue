@@ -76,6 +76,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useUIStore } from '@/stores/ui'
 import { useToast } from '@/composables/useToast'
 import { useSettings } from '@/composables/useSettings'
+import { useAuditLog } from '@/composables/useAuditLog'
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth'
 import { auth as firebaseAuth } from '@/lib/firebase'
 
@@ -84,6 +85,7 @@ const auth = useAuthStore()
 const ui = useUIStore()
 const toast = useToast()
 const { hospitalName } = useSettings()
+const { logActivity } = useAuditLog()
 
 const email = ref('')
 const password = ref('')
@@ -93,6 +95,7 @@ async function handleLogin() {
   loggingIn.value = true
   try {
     await auth.login(email.value, password.value)
+    await logActivity({ action: 'Login', resource: 'System', details: `Successful login from ${email.value}` })
     toast.success('Authentication Successful! Logging in...')
     setTimeout(() => router.push('/dashboard'), 1000)
   } catch (err) {
@@ -107,6 +110,7 @@ async function handleSSO() {
   try {
     const provider = new GoogleAuthProvider()
     await signInWithPopup(firebaseAuth, provider)
+    await logActivity({ action: 'Login', resource: 'System', details: `Successful SSO login` })
     toast.success('SSO Authorized. Logging in...')
     setTimeout(() => router.push('/dashboard'), 1000)
   } catch (err) {

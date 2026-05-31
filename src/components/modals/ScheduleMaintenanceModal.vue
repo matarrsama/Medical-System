@@ -2,10 +2,10 @@
   <div class="flex flex-col h-full">
     <div class="flex items-center justify-between px-6 py-4 border-b border-outline-variant shrink-0">
       <div class="flex items-center gap-3">
-        <span class="material-symbols-outlined text-primary text-[22px]">inventory_2</span>
+        <span class="material-symbols-outlined text-primary text-[22px]">build</span>
         <div>
-          <h3 class="text-headline-md font-headline-md text-on-surface">Add Inventory Asset</h3>
-          <p class="text-body-sm text-on-surface-variant mt-0.5">Register a new ICT asset in the system</p>
+          <h3 class="text-headline-md font-headline-md text-on-surface">Schedule Maintenance</h3>
+          <p class="text-body-sm text-on-surface-variant mt-0.5">Plan preventive or corrective maintenance for equipment</p>
         </div>
       </div>
       <button @click="$emit('close')" class="p-1.5 rounded-lg hover:bg-surface-container text-on-surface-variant transition-colors">
@@ -17,20 +17,20 @@
       <div class="flex items-center gap-3 p-4 rounded-xl bg-surface-container-low border border-outline-variant/50">
         <span class="material-symbols-outlined text-primary text-[20px]">tag</span>
         <div>
-          <span class="text-label-sm text-outline font-medium">Asset Tag</span>
-          <p class="text-body-md text-on-surface font-mono font-medium mt-0.5">{{ assetTag || 'Generating…' }}</p>
+          <span class="text-label-sm text-outline font-medium">Maintenance ID</span>
+          <p class="text-body-md text-on-surface font-mono font-medium mt-0.5">{{ maintenanceId || 'Generating…' }}</p>
         </div>
       </div>
 
       <div class="grid grid-cols-2 gap-4">
         <div>
-          <label class="text-label-md font-label-md text-on-surface">Asset Name</label>
-          <input v-model="form.name" class="w-full mt-1 px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary" required />
+          <label class="text-label-md font-label-md text-on-surface">Equipment <span class="text-error">*</span></label>
+          <input v-model="form.equipment" class="w-full mt-1 px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary" required />
         </div>
         <div>
-          <label class="text-label-md font-label-md text-on-surface">Category</label>
-          <select v-model="form.category" class="w-full mt-1 px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary">
-            <option>Desktop</option><option>Network</option><option>Printer</option><option>Server</option><option>Mobile</option>
+          <label class="text-label-md font-label-md text-on-surface">Type</label>
+          <select v-model="form.type" class="w-full mt-1 px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary">
+            <option>Preventive</option><option>Corrective</option><option>Inspection</option><option>Calibration</option>
           </select>
         </div>
       </div>
@@ -49,14 +49,25 @@
         <div>
           <label class="text-label-md font-label-md text-on-surface">Status</label>
           <select v-model="form.status" class="w-full mt-1 px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary">
-            <option>Active</option><option>Maintenance</option><option>Retired</option>
+            <option>Scheduled</option><option>In Progress</option><option>Completed</option>
           </select>
         </div>
       </div>
 
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="text-label-md font-label-md text-on-surface">Location</label>
+          <input v-model="form.location" class="w-full mt-1 px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary" placeholder="e.g. Room 205, Building B" />
+        </div>
+        <div>
+          <label class="text-label-md font-label-md text-on-surface">Scheduled Date</label>
+          <input v-model="form.scheduledDate" type="date" class="w-full mt-1 px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary" />
+        </div>
+      </div>
+
       <div>
-        <label class="text-label-md font-label-md text-on-surface">Location</label>
-        <input v-model="form.location" class="w-full mt-1 px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary" placeholder="e.g. Room 101, Building A" />
+        <label class="text-label-md font-label-md text-on-surface">Description</label>
+        <textarea v-model="form.description" rows="3" class="w-full mt-1 px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary resize-none"></textarea>
       </div>
     </form>
 
@@ -67,7 +78,7 @@
       <button @click="submit" :disabled="saving" class="flex items-center gap-2 px-6 py-2.5 rounded-lg text-label-md font-label-md text-on-primary bg-primary hover:bg-primary-container transition-all shadow-sm disabled:opacity-40 disabled:cursor-not-allowed">
         <span v-if="saving" class="material-symbols-outlined animate-spin text-[18px]">sync</span>
         <span v-else class="material-symbols-outlined text-[18px]">add</span>
-        Add Asset
+        Schedule Maintenance
       </button>
     </div>
   </div>
@@ -93,30 +104,32 @@ const canChooseDepartment = computed(() =>
 )
 
 const form = reactive({
-  name: '', category: 'Desktop', department: '', status: 'Active', location: ''
+  equipment: '', type: 'Preventive', department: '', status: 'Scheduled', location: '', scheduledDate: '', description: ''
 })
 
 async function submit() {
-  if (!form.name.trim()) return
+  if (!form.equipment.trim()) return
   saving.value = true
   try {
-    await addDoc(collection(db, 'inventory'), {
-      assetTag: assetTag.value,
-      name: form.name,
-      category: form.category,
-      department: form.department,
+    await addDoc(collection(db, 'maintenanceTasks'), {
+      maintenanceId: maintenanceId.value,
+      equipment: form.equipment,
+      type: form.type,
+      department: form.department || userDept.value,
       status: form.status,
       location: form.location || null,
+      scheduledDate: form.scheduledDate || null,
+      description: form.description || null,
       createdBy: auth.currentUser?.uid || null,
       createdByName: auth.currentUser?.displayName || null,
       created: serverTimestamp()
     })
-    await logActivity({ action: 'Create', resource: `Asset ${assetTag.value}`, details: `Added "${form.name}" in ${form.category}` })
-    toast.success(`Asset ${assetTag.value} added successfully!`)
+    await logActivity({ action: 'Create', resource: `Maintenance ${maintenanceId.value}`, details: `Scheduled for ${form.equipment}` })
+    toast.success(`Maintenance ${maintenanceId.value} scheduled successfully!`)
     emit('close')
   } catch (err) {
-    console.error('[AddInventoryModal] error adding asset:', err)
-    toast.error(err.code === 'permission-denied' ? 'You do not have permission to add assets.' : 'Failed to add asset.')
+    console.error('[ScheduleMaintenanceModal] error creating maintenance task:', err)
+    toast.error(err.code === 'permission-denied' ? 'You do not have permission to schedule maintenance.' : 'Failed to schedule maintenance.')
   } finally {
     saving.value = false
   }
@@ -124,10 +137,11 @@ async function submit() {
 
 onMounted(async () => {
   try {
-    assetTag.value = await nextVal('assetTag', { prefix: 'AST-', pad: 4, starting: 1 })
+    const year = new Date().getFullYear()
+    maintenanceId.value = await nextVal(`maintenanceId_${year}`, { prefix: `MNT-${year}-`, pad: 3, starting: 1 })
   } catch (err) {
-    console.warn('[AddInventoryModal] counter unavailable, using client-side ID:', err)
-    assetTag.value = `AST-${Date.now().toString(36).slice(-4).toUpperCase()}${Math.random().toString(36).slice(2, 4).toUpperCase()}`
+    console.warn('[ScheduleMaintenanceModal] counter unavailable, using client-side ID:', err)
+    maintenanceId.value = `MNT-${new Date().getFullYear()}-${Date.now().toString(36).slice(-3).toUpperCase()}${Math.random().toString(36).slice(2, 4).toUpperCase()}`
   }
   const uid = auth.currentUser?.uid
   if (uid) {

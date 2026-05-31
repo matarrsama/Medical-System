@@ -48,10 +48,12 @@
 import { ref, reactive, onMounted } from 'vue'
 import { useUIStore } from '@/stores/ui'
 import { useSettings } from '@/composables/useSettings'
+import { useAuditLog } from '@/composables/useAuditLog'
 import { doc, getDoc } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 
 const ui = useUIStore()
+const { logActivity } = useAuditLog()
 const saving = ref(false)
 const { saveSettings } = useSettings()
 
@@ -88,7 +90,7 @@ function buildSections(overrides = {}) {
         item('timeZone', 'Time Zone', 'System-wide time zone for all logs and schedules', 'select', { options: ['America/New_York', 'America/Chicago', 'America/Denver', 'America/Los_Angeles', 'Europe/London', 'Europe/Berlin', 'Asia/Dubai', 'Asia/Tokyo', 'UTC'] }),
         item('language', 'Language', 'Default interface language', 'select', { options: ['English (US)', 'English (UK)', 'French', 'Spanish', 'Arabic'] }),
         item('dateFormat', 'Date Format', 'How dates are displayed throughout the system', 'select', { options: ['MM/DD/YYYY', 'DD/MM/YYYY', 'YYYY-MM-DD'] }),
-        item('currency', 'Currency', 'Default currency for financial modules', 'select', { options: ['USD ($)', 'EUR (€)', 'GBP (£)', 'KES (KSh)'] })
+        item('currency', 'Currency', 'Default currency for financial modules', 'select', { options: ['USD ($)', 'EUR (€)', 'GBP (£)', 'KES (KSh)', 'GMD (D)'] })
       ]
     },
     {
@@ -151,6 +153,7 @@ async function save() {
   const vals = flatten()
   try {
     await saveSettings(vals)
+    await logActivity({ action: 'Update', resource: 'System Settings', details: `Updated system configuration` })
     ui.showToast('Settings saved successfully', 'success')
   } catch (err) {
     ui.showToast(`Save failed: ${err.message}`, 'error')

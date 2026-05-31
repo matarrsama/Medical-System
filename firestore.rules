@@ -2,6 +2,46 @@ rules_version = '2'
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // ── Equipment (Biomedical) ────────────────────
+    match /equipment/{itemId} {
+      allow read: if isAuth()
+      allow create: if isAuth() && minLevel('inventory', 2)
+      allow update, delete: if isAuth() && minLevel('inventory', 3)
+    }
+
+    // ── Maintenance Tasks ──────────────────────────
+    match /maintenanceTasks/{taskId} {
+      allow read: if isAuth()
+      allow create: if isAuth() && minLevel('inventory', 2)
+      allow update, delete: if isAuth() && minLevel('inventory', 3)
+    }
+
+    // ── Purchase Orders ────────────────────────────
+    match /purchaseOrders/{poId} {
+      allow read: if isAuth()
+      allow create: if isAuth() && minLevel('inventory', 2)
+      allow update, delete: if isAuth() && minLevel('inventory', 3)
+    }
+
+    // ── Vendors ────────────────────────────────────
+    match /vendors/{vendorId} {
+      allow read: if isAuth()
+      allow create: if isAuth() && minLevel('inventory', 2)
+      allow update, delete: if isAuth() && minLevel('inventory', 3)
+    }
+
+    // ── Notifications ─────────────────────────────
+    match /notifications/{notificationId} {
+      allow read: if isAuth()
+      allow create: if isAuth()
+      allow update, delete: if isAuth() && minLevel('users', 4)
+    }
+
+    // ── Tenants (Super Admin) ─────────────────────
+    match /tenants/{tenantId} {
+      allow read, write: if isAuth() && role() == 'Sys Administrator'
+    }
+
     // ── Helpers ───────────────────────────────────
     function isAuth() { return request.auth != null }
 
@@ -83,6 +123,11 @@ service cloud.firestore {
     match /auditLogs/{logId} {
       allow read: if isAuth() && level('settings') >= 3
       allow write: if isAuth() && minLevel('users', 4)
+    }
+
+    // ── ID Counters ───────────────────────────────
+    match /counters/{counterName} {
+      allow read, write: if isAuth()
     }
   }
 }

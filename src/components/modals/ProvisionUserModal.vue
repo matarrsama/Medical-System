@@ -98,6 +98,7 @@
 <script setup>
 import { ref, reactive, computed } from 'vue'
 import { useToast } from '@/composables/useToast'
+import { useAuditLog } from '@/composables/useAuditLog'
 import { createUser } from '@/services/api'
 import { idToLabel } from '@/data/roles'
 import StepPersonalDetails from '@/components/provision/StepPersonalDetails.vue'
@@ -106,6 +107,7 @@ import StepSecurityCredentials from '@/components/provision/StepSecurityCredenti
 
 const emit = defineEmits(['close'])
 const toast = useToast()
+const { logActivity } = useAuditLog()
 const currentStep = ref(1)
 const saving = ref(false)
 
@@ -167,6 +169,7 @@ async function submit() {
       mfa: wizardData.credentials.mfa,
       avatar: wizardData.avatar
     })
+    await logActivity({ action: 'Create', resource: `User ${wizardData.fullName}`, details: `Provisioned with role ${wizardData.role}` })
     toast.success(`User "${wizardData.fullName}" provisioned successfully!`)
     emit('close')
   } catch (err) {
