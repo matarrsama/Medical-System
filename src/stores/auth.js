@@ -2,18 +2,24 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { auth, db } from '@/lib/firebase'
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth'
-import { doc, onSnapshot } from 'firebase/firestore'
+import { doc, onSnapshot, updateDoc, collection, query, where, getDocs } from 'firebase/firestore'
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref(null)
   const role = ref(null)
   const loading = ref(true)
+  const mustChangePassword = ref(false)
+  const mustChangeChecked = ref(false)
+  const departmentHeadOf = ref(null)
 
   const isAuthenticated = computed(() => user.value !== null)
   const canAccessAdmin = computed(() => role.value === 'Sys Administrator')
-  const canAccessAuditLogs = computed(() => ['Sys Administrator', 'ICT Officer', 'Hospital Admin'].includes(role.value))
-  const canManageUsers = computed(() => canAccessAuditLogs.value)
+  const canAccessAuditLogs = computed(() => role.value === 'Sys Administrator')
+  const canManageUsers = computed(() => ['Sys Administrator', 'Hospital Admin', 'ICT Officer'].includes(role.value))
   const isSuperAdmin = computed(() => role.value === 'Sys Administrator')
+  const canViewAllTickets = computed(() => ['Sys Administrator', 'Hospital Admin', 'ICT Officer'].includes(role.value))
+  const canManageDepartments = computed(() => ['Sys Administrator', 'Hospital Admin', 'ICT Officer'].includes(role.value))
+  const canViewUsers = computed(() => ['Sys Administrator', 'Hospital Admin', 'ICT Officer'].includes(role.value) || !!departmentHeadOf.value)
 
   let unsubscribe = null
   let unsubUserDoc = null
@@ -30,7 +36,8 @@ export const useAuthStore = defineStore('auth', () => {
           displayName: firebaseUser.displayName,
           role: role.value,
           avatar: '',
-          initials: ''
+          initials: '',
+          department: ''
         }
 
         if (unsubUserDoc) unsubUserDoc()
@@ -41,15 +48,30 @@ export const useAuthStore = defineStore('auth', () => {
               ...user.value,
               displayName: data.name || user.value.displayName,
               avatar: data.avatar || '',
-              initials: data.initials || ''
+              initials: data.initials || '',
+              department: data.department || ''
             }
+            mustChangePassword.value = data.mustChangePassword === true
+            mustChangeChecked.value = true
           }
         }, (err) => {
           console.error('Error listening to user document:', err)
         })
+
+        updateDoc(doc(db, 'users', firebaseUser.uid), {
+          lastActive: new Date().toISOString()
+        }).catch(() => {})
+
+        try {
+          const deptSnap = await getDocs(query(collection(db, 'departments'), where('headId', '==', firebaseUser.uid)))
+          departmentHeadOf.value = deptSnap.empty ? null : deptSnap.docs[0].data().name
+        } catch { departmentHeadOf.value = null }
       } else {
         user.value = null
         role.value = null
+        mustChangePassword.value = false
+        mustChangeChecked.value = false
+        departmentHeadOf.value = null
         if (unsubUserDoc) {
           unsubUserDoc()
           unsubUserDoc = null
@@ -77,19 +99,31 @@ export const useAuthStore = defineStore('auth', () => {
       displayName: cred.user.displayName,
       role: role.value,
       avatar: '',
-      initials: ''
+      initials: '',
+      department: ''
     }
+
+    updateDoc(doc(db, 'users', cred.user.uid), {
+      lastActive: new Date().toISOString()
+    }).catch(() => {})
+  }
+
+  function clearMustChange() {
+    mustChangePassword.value = false
   }
 
   async function logout() {
     await signOut(auth)
     user.value = null
     role.value = null
+    mustChangePassword.value = false
+    mustChangeChecked.value = false
+    departmentHeadOf.value = null
     if (unsubUserDoc) {
       unsubUserDoc()
       unsubUserDoc = null
     }
   }
 
-  return { user, role, loading, isAuthenticated, canAccessAdmin, canAccessAuditLogs, canManageUsers, isSuperAdmin, init, cleanup, login, logout }
+  return { user, role, loading, isAuthenticated, canAccessAdmin, canAccessAuditLogs, canManageUsers, isSuperAdmin, canViewAllTickets, canManageDepartments, canViewUsers, mustChangePassword, mustChangeChecked, departmentHeadOf, init, cleanup, login, logout, clearMustChange }
 })

@@ -1,12 +1,23 @@
 <template>
-  <aside class="bg-surface-container dark:bg-surface-container-low border-r border-outline-variant dark:border-outline flex flex-col h-full fixed left-0 top-0 pt-16 z-20 overflow-y-auto w-64 shadow-[1px_0_4px_rgba(0,0,0,0.02)]">
-    <div class="p-lg flex items-center gap-sm border-b border-outline-variant/50">
-      <div class="w-10 h-10 rounded bg-primary flex items-center justify-center text-on-primary shrink-0">
-        <span class="material-symbols-outlined icon-fill">health_and_safety</span>
+  <aside
+    :class="[
+      'bg-surface-container dark:bg-surface-container-low border-r border-outline-variant dark:border-outline flex flex-col h-full fixed left-0 top-0 pt-16 z-20 overflow-y-auto w-64 shadow-[1px_0_4px_rgba(0,0,0,0.02)]',
+      'max-sm:transition-transform max-sm:duration-300 max-sm:ease-in-out',
+      ui.sidebarOpen ? 'max-sm:translate-x-0' : 'max-sm:-translate-x-full'
+    ]"
+  >
+    <div class="flex items-center justify-end px-sm pt-sm sm:hidden">
+      <button @click="ui.closeSidebar()" class="p-1 rounded-full hover:bg-surface-container-high transition-colors">
+        <span class="material-symbols-outlined text-[20px]">close</span>
+      </button>
+    </div>
+    <div class="flex flex-col items-center py-4 px-4 border-b border-outline-variant/30">
+      <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-surface-container-highest flex items-center justify-center bg-surface-container-high text-on-surface-variant font-bold text-title-md select-none mb-2">
+        <img v-if="auth.user?.avatar" class="w-full h-full object-cover" :src="auth.user?.avatar" alt="" />
+        <span v-else class="uppercase tracking-tighter">{{ auth.user?.initials || 'U' }}</span>
       </div>
-      <div class="overflow-hidden">
-        <h2 class="text-headline-sm font-headline-md font-black text-on-surface dark:text-inverse-on-surface truncate">{{ displayName }}</h2>
-      </div>
+      <span class="text-label-sm font-label-md text-on-surface truncate max-w-[180px] text-center">{{ auth.user?.displayName || 'User' }}</span>
+      <span class="text-label-xs text-on-surface-variant truncate max-w-[180px] text-center">{{ auth.role || '' }}</span>
     </div>
     <nav class="flex-1 py-md px-sm flex flex-col gap-xs overflow-y-auto">
       <router-link
@@ -43,17 +54,19 @@
       </button>
     </div>
   </aside>
+  <div v-if="ui.sidebarOpen" @click="ui.closeSidebar()" class="fixed inset-0 bg-black/50 z-10 sm:hidden"></div>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { useSettings } from '@/composables/useSettings'
+import { useUIStore } from '@/stores/ui'
 const $route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
-const { displayName } = useSettings()
+
+const ui = useUIStore()
 
 const signingOut = ref(false)
 
@@ -80,14 +93,16 @@ const navItems = [
 
 const bottomNavItems = computed(() => {
   const items = [
-    { to: '/departments', icon: 'domain', label: 'Departments' },
     { to: '/reports', icon: 'analytics', label: 'Reports' },
     { to: '/settings', icon: 'settings', label: 'Settings' }
   ]
+  if (auth.canManageDepartments) {
+    items.unshift({ to: '/departments', icon: 'domain', label: 'Departments' })
+  }
   if (auth.canAccessAdmin) {
     items.splice(2, 0, { to: '/admin', icon: 'admin_panel_settings', label: 'Admin' })
   }
-  if (auth.canManageUsers) {
+  if (auth.canViewUsers) {
     const idx = auth.canAccessAdmin ? 3 : 2
     items.splice(idx, 0, { to: '/users', icon: 'group', label: 'Users' })
   }

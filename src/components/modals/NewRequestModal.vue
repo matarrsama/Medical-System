@@ -30,14 +30,14 @@
 
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="text-label-md font-label-md text-on-surface mb-1.5 block">Type</label>
-            <select v-model="form.type" class="w-full px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary focus:border-primary transition-colors">
+            <label class="text-label-md font-label-md text-on-surface mb-1.5 block">Type <span class="text-error">*</span></label>
+            <select v-model="form.type" class="w-full px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary focus:border-primary transition-colors" required>
               <option>Equipment</option><option>Access</option><option>License</option><option>Service</option>
             </select>
           </div>
           <div>
-            <label class="text-label-md font-label-md text-on-surface mb-1.5 block">Priority</label>
-            <select v-model="form.priority" class="w-full px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary focus:border-primary transition-colors">
+            <label class="text-label-md font-label-md text-on-surface mb-1.5 block">Priority <span class="text-error">*</span></label>
+            <select v-model="form.priority" class="w-full px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary focus:border-primary transition-colors" required>
               <option>Low</option><option>Medium</option><option>High</option><option>Critical</option>
             </select>
           </div>
@@ -45,8 +45,8 @@
 
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="text-label-md font-label-md text-on-surface mb-1.5 block">Department</label>
-            <select v-model="form.department" class="w-full px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary focus:border-primary transition-colors">
+            <label class="text-label-md font-label-md text-on-surface mb-1.5 block">Department <span class="text-error">*</span></label>
+            <select v-model="form.department" class="w-full px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary focus:border-primary transition-colors" required>
               <option v-for="dept in deptStore.items" :key="dept.id" :value="dept.name">{{ dept.name }}</option>
             </select>
           </div>
@@ -93,15 +93,11 @@
 <script setup>
 import { reactive, ref, onMounted, onUnmounted } from 'vue'
 import { useToast } from '@/composables/useToast'
-import { useCounter } from '@/composables/useCounter'
+import { generateId } from '@/utils/generateId'
 import { useAuditLog } from '@/composables/useAuditLog'
-import { useDepartmentsStore } from '@/stores/departments'
-import { db, auth } from '@/lib/firebase'
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
 
 const emit = defineEmits(['close'])
 const toast = useToast()
-const { nextVal } = useCounter()
 const { logActivity } = useAuditLog()
 const saving = ref(false)
 const deptStore = useDepartmentsStore()
@@ -140,14 +136,9 @@ async function submit() {
   }
 }
 
-onMounted(async () => {
-  try {
-    const year = new Date().getFullYear()
-    requestId.value = await nextVal(`requestId_${year}`, { prefix: `REQ-${year}-`, pad: 3, starting: 1 })
-  } catch (err) {
-    console.warn('[NewRequestModal] counter unavailable, using client-side ID:', err)
-    requestId.value = `REQ-${new Date().getFullYear()}-${Date.now().toString(36).slice(-3).toUpperCase()}${Math.random().toString(36).slice(2, 4).toUpperCase()}`
-  }
+onMounted(() => {
+  const year = new Date().getFullYear()
+  requestId.value = generateId(`REQ-${year}-`, 6)
 })
 
 onUnmounted(() => {})

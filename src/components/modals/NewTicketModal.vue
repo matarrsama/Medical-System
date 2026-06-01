@@ -29,14 +29,14 @@
 
       <div class="grid grid-cols-2 gap-4">
         <div>
-          <label class="text-label-md font-label-md text-on-surface mb-1.5 block">Priority</label>
-          <select v-model="form.priority" class="w-full px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary focus:border-primary transition-colors">
+          <label class="text-label-md font-label-md text-on-surface mb-1.5 block">Priority <span class="text-error">*</span></label>
+          <select v-model="form.priority" class="w-full px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary focus:border-primary transition-colors" required>
             <option>Low</option><option>Medium</option><option>High</option><option>Critical</option>
           </select>
         </div>
         <div>
-          <label class="text-label-md font-label-md text-on-surface mb-1.5 block">Category</label>
-          <select v-model="form.category" class="w-full px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary focus:border-primary transition-colors">
+          <label class="text-label-md font-label-md text-on-surface mb-1.5 block">Category <span class="text-error">*</span></label>
+          <select v-model="form.category" class="w-full px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary focus:border-primary transition-colors" required>
             <option>Network</option><option>Hardware</option><option>Software</option><option>Access</option>
           </select>
         </div>
@@ -44,10 +44,14 @@
 
       <div class="grid grid-cols-2 gap-4">
         <div>
-          <label class="text-label-md font-label-md text-on-surface mb-1.5 block">Department</label>
-          <select v-model="form.department" class="w-full px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary focus:border-primary transition-colors">
+          <label class="text-label-md font-label-md text-on-surface mb-1.5 block">Department <span class="text-error">*</span></label>
+          <select v-if="canChooseDepartment" v-model="form.department" class="w-full px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary focus:border-primary transition-colors" required>
             <option v-for="dept in deptStore.items" :key="dept.id" :value="dept.name">{{ dept.name }}</option>
           </select>
+          <div v-else class="flex items-center gap-2 px-3 py-2.5 border border-outline-variant/50 rounded-lg bg-surface-container text-body-sm text-on-surface font-medium">
+            <span class="material-symbols-outlined text-[16px] text-outline">business</span>
+            {{ form.department }}
+          </div>
         </div>
         <div>
           <label class="text-label-md font-label-md text-on-surface mb-1.5 block">Assign to <span class="text-on-surface-variant text-label-sm">(optional)</span></label>
@@ -92,27 +96,42 @@
 </template>
 
 <script setup>
-import { reactive, ref, onMounted } from 'vue'
+import { reactive, ref, computed, onMounted } from 'vue'
 import { useToast } from '@/composables/useToast'
-import { useCounter } from '@/composables/useCounter'
+import { generateId } from '@/utils/generateId'
 import { useAuditLog } from '@/composables/useAuditLog'
 import { useDepartmentsStore } from '@/stores/departments'
 import { useUsersStore } from '@/stores/users'
+import { useAuthStore } from '@/stores/auth'
 import { db, auth } from '@/lib/firebase'
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
+import { collection, addDoc, serverTimestamp, getDoc, doc } from 'firebase/firestore'
 
 const emit = defineEmits(['close'])
 const toast = useToast()
-const { nextVal } = useCounter()
+const authStore = useAuthStore()
 const { logActivity } = useAuditLog()
 const saving = ref(false)
 const deptStore = useDepartmentsStore()
 const usersStore = useUsersStore()
 
+const canChooseDepartment = computed(() =>
+  ['Sys Administrator', 'Hospital Admin', 'ICT Officer'].includes(authStore.role)
+)
+
 const ticketId = ref('')
 
 const form = reactive({
-  title: '', priority: 'Medium', category: 'Network', description: '', department: 'ER', assignee: ''
+  title: '', priority: 'Medium', category: 'Network', description: '', department: '', assignee: ''
+})
+
+onMounted(async () => {
+  ticketId.value = generateId('INC-', 8)
+  if (!canChooseDepartment.value && authStore.user?.uid) {
+    const userSnap = await getDoc(doc(db, 'users', authStore.user.uid))
+    if (userSnap.exists()) {
+      form.department = userSnap.data().department || ''
+    }
+  }
 })
 
 async function submit() {
@@ -127,7 +146,7 @@ async function submit() {
       description: form.description,
       department: form.department,
       assignee: form.assignee,
-      status: 'Open',
+      status: form.assignee ? 'Assigned' : 'Open',
       createdBy: auth.currentUser?.uid || null,
       createdByName: auth.currentUser?.displayName || null,
       created: serverTimestamp()
@@ -143,12 +162,7 @@ async function submit() {
   }
 }
 
-onMounted(async () => {
-  try {
-    ticketId.value = await nextVal('ticketId', { prefix: 'INC-', pad: 4, starting: 9043 })
-  } catch (err) {
-    console.warn('[NewTicketModal] counter unavailable, using client-side ID:', err)
-    ticketId.value = `INC-${Date.now().toString(36).slice(-4).toUpperCase()}${Math.random().toString(36).slice(2, 4).toUpperCase()}`
-  }
+onMounted(() => {
+  ticketId.value = generateId('INC-', 8)
 })
 </script>

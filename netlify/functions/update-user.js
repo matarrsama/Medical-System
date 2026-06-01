@@ -1,6 +1,9 @@
-import { db, auth } from './_shared/admin.js'
+import { db, auth, corsHeaders } from './_shared/admin.js'
 
 export const handler = async (event) => {
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 200, headers: corsHeaders, body: '' }
+  }
   try {
     const data = JSON.parse(event.body)
     const { uid, email, displayName, employeeId, title, department, role, mfa, status, avatar } = data
@@ -23,8 +26,8 @@ export const handler = async (event) => {
 
     await db.collection('users').doc(uid).update(update)
 
-    return { statusCode: 200, body: JSON.stringify({ uid }) }
+    return { statusCode: 200, headers: corsHeaders, body: JSON.stringify({ uid }) }
   } catch (err) {
-    return { statusCode: 500, body: JSON.stringify({ error: err.message }) }
+    return { statusCode: 500, headers: corsHeaders, body: JSON.stringify({ error: err.message }) }
   }
 }

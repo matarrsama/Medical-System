@@ -133,7 +133,7 @@
                   {{ user.status }}
                 </span>
               </td>
-              <td class="p-3 hidden lg:table-cell text-on-surface-variant">{{ user.lastActive }}</td>
+              <td class="p-3 hidden lg:table-cell text-on-surface-variant">{{ timeAgo(user.lastActive) }}</td>
               <td class="p-3 pr-4 relative">
                 <button @click.stop="toggleMenu(user.id)" class="p-1 rounded hover:bg-surface-container text-on-surface-variant">
                   <span class="material-symbols-outlined" style="font-size: 18px;">more_vert</span>
@@ -143,25 +143,27 @@
                     <span class="material-symbols-outlined text-[16px] text-outline">visibility</span>
                     View Details
                   </button>
-                  <button @click="editUser(user)" class="w-full flex items-center gap-2.5 px-3.5 py-2 text-label-sm text-on-surface hover:bg-surface-container transition-colors text-left">
-                    <span class="material-symbols-outlined text-[16px] text-outline">edit</span>
-                    Edit User
-                  </button>
-                  <button @click="resetPassword(user)" class="w-full flex items-center gap-2.5 px-3.5 py-2 text-label-sm text-on-surface hover:bg-surface-container transition-colors text-left">
-                    <span class="material-symbols-outlined text-[16px] text-outline">key</span>
-                    Reset Password
-                  </button>
-                  <hr class="my-1 border-outline-variant/50" />
-                  <button @click="suspendUserHandler(user)" :disabled="suspending" class="w-full flex items-center gap-2.5 px-3.5 py-2 text-label-sm text-amber-700 hover:bg-amber-50 transition-colors text-left disabled:opacity-40 disabled:cursor-not-allowed">
-                    <span v-if="suspending" class="material-symbols-outlined animate-spin text-[16px]">sync</span>
-                    <span v-else class="material-symbols-outlined text-[16px]">pause_circle</span>
-                    Suspend User
-                  </button>
-                  <button @click="deleteUserHandler(user)" :disabled="deleting" class="w-full flex items-center gap-2.5 px-3.5 py-2 text-label-sm text-error hover:bg-error-container/20 transition-colors text-left disabled:opacity-40 disabled:cursor-not-allowed">
-                    <span v-if="deleting" class="material-symbols-outlined animate-spin text-[16px]">sync</span>
-                    <span v-else class="material-symbols-outlined text-[16px]">delete</span>
-                    Delete User
-                  </button>
+                  <template v-if="canManageAllUsers">
+                    <button @click="editUser(user)" class="w-full flex items-center gap-2.5 px-3.5 py-2 text-label-sm text-on-surface hover:bg-surface-container transition-colors text-left">
+                      <span class="material-symbols-outlined text-[16px] text-outline">edit</span>
+                      Edit User
+                    </button>
+                    <button @click="resetPassword(user)" class="w-full flex items-center gap-2.5 px-3.5 py-2 text-label-sm text-on-surface hover:bg-surface-container transition-colors text-left">
+                      <span class="material-symbols-outlined text-[16px] text-outline">key</span>
+                      Reset Password
+                    </button>
+                    <hr class="my-1 border-outline-variant/50" />
+                    <button @click="suspendUserHandler(user)" :disabled="suspending" class="w-full flex items-center gap-2.5 px-3.5 py-2 text-label-sm text-amber-700 hover:bg-amber-50 transition-colors text-left disabled:opacity-40 disabled:cursor-not-allowed">
+                      <span v-if="suspending" class="material-symbols-outlined animate-spin text-[16px]">sync</span>
+                      <span v-else class="material-symbols-outlined text-[16px]">pause_circle</span>
+                      Suspend User
+                    </button>
+                    <button @click="deleteUserHandler(user)" :disabled="deleting" class="w-full flex items-center gap-2.5 px-3.5 py-2 text-label-sm text-error hover:bg-error-container/20 transition-colors text-left disabled:opacity-40 disabled:cursor-not-allowed">
+                      <span v-if="deleting" class="material-symbols-outlined animate-spin text-[16px]">sync</span>
+                      <span v-else class="material-symbols-outlined text-[16px]">delete</span>
+                      Delete User
+                    </button>
+                  </template>
                 </div>
               </td>
             </tr>
@@ -177,15 +179,17 @@ import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useUIStore } from '@/stores/ui'
 import { db } from '@/lib/firebase'
-import { onAuthStateChanged } from 'firebase/auth'
-import { auth } from '@/lib/firebase'
-import { collection, onSnapshot, query, orderBy } from 'firebase/firestore'
+import { collection, onSnapshot, query, orderBy, where } from 'firebase/firestore'
 import { suspendUser, deleteUser } from '@/services/api'
 import { useFirestoreCache } from '@/composables/useFirestoreCache'
 import { useAuditLog } from '@/composables/useAuditLog'
+import { timeAgo } from '@/utils/timeAgo'
+
+import { useAuthStore } from '@/stores/auth'
 
 const route = useRoute()
 const ui = useUIStore()
+const authStore = useAuthStore()
 const { logActivity } = useAuditLog()
 const searchQuery = ref(route.query.q || '')
 console.log('[UsersView] searchQuery initialized to:', searchQuery.value)
@@ -206,39 +210,34 @@ if (cached) { users.value = cached; loading.value = false }
 const suspending = ref(false)
 const deleting = ref(false)
 let unsub = null
-let unsubAuth = null
 
 onMounted(() => {
-  console.log('[UsersView] mounted, waiting for auth...')
-  unsubAuth = onAuthStateChanged(auth, (user) => {
-    console.log('[UsersView] onAuthStateChanged:', user ? `uid=${user.uid} email=${user.email}` : 'NO USER')
-    if (user && !unsub) {
-      console.log('[UsersView] subscribing to Firestore users collection')
-      unsub = onSnapshot(
-        query(collection(db, 'users'), orderBy('created', 'desc')),
-        (snapshot) => {
-          console.log('[UsersView] Firestore snapshot received, docs count:', snapshot.docs.length)
-          const mapped = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }))
-          console.log('[UsersView] mapped users:', JSON.stringify(mapped.map(u => ({ id: u.id, name: u.name, role: u.role }))))
-          users.value = mapped
-          loading.value = false
-          cache.save('users', mapped)
-        },
-        (err) => {
-          console.error('[UsersView] Firestore snapshot error:', err.code, err.message)
-          loading.value = false
-        }
-      )
-    } else if (!user) {
-      console.log('[UsersView] no user, setting loading=false')
-      loading.value = false
-    }
-  })
   document.addEventListener('click', onDocClick)
 })
 
+watch(() => authStore.loading, (loading_) => {
+  if (!loading_) {
+    const constraints = [orderBy('created', 'desc')]
+    if (!authStore.canManageUsers && authStore.departmentHeadOf) {
+      constraints.push(where('department', '==', authStore.departmentHeadOf))
+    }
+    unsub = onSnapshot(
+      query(collection(db, 'users'), ...constraints),
+      (snapshot) => {
+        const mapped = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }))
+        users.value = mapped
+        loading.value = false
+        cache.save('users', mapped)
+      },
+      (err) => {
+        console.error('[UsersView] Firestore snapshot error:', err.code, err.message)
+        loading.value = false
+      }
+    )
+  }
+}, { immediate: true })
+
 onUnmounted(() => {
-  if (unsubAuth) unsubAuth()
   if (unsub) unsub()
   document.removeEventListener('click', onDocClick)
 })
@@ -253,6 +252,8 @@ const rolesCount = computed(() => {
   const roles = new Set(users.value.map(u => u.role).filter(Boolean))
   return roles.size
 })
+
+const canManageAllUsers = computed(() => ['Sys Administrator', 'Hospital Admin', 'ICT Officer'].includes(authStore.role))
 
 const filteredUsers = computed(() => {
   return users.value.filter(u => {

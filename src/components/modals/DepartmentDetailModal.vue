@@ -33,10 +33,13 @@
         <div>
           <span class="text-label-sm text-outline font-medium">Department Head</span>
           <template v-if="editing">
-            <input v-model="editForm.head" class="w-full mt-0.5 px-3 py-2 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary" />
+            <select v-model="editForm.headId" @change="onHeadChange" class="w-full mt-0.5 px-3 py-2 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary">
+              <option value="">— None —</option>
+              <option v-for="u in usersStore.items" :key="u.uid || u.id" :value="u.uid || u.id">{{ u.name || u.email || u.id }}</option>
+            </select>
           </template>
           <template v-else>
-            <p class="text-body-md text-on-surface font-medium mt-0.5">{{ dept.head || '—' }}</p>
+            <p class="text-body-md text-on-surface font-medium mt-0.5">{{ dept.headName || dept.head || '—' }}</p>
           </template>
         </div>
         <div>
@@ -92,6 +95,7 @@ import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import { useUIStore } from '@/stores/ui'
 import { useToast } from '@/composables/useToast'
 import { useAuditLog } from '@/composables/useAuditLog'
+import { useUsersStore } from '@/stores/users'
 import { db, auth } from '@/lib/firebase'
 import { doc, updateDoc, collection, onSnapshot } from 'firebase/firestore'
 import { getDeptColor } from '@/stores/departments'
@@ -99,6 +103,7 @@ import { getDeptColor } from '@/stores/departments'
 const ui = useUIStore()
 const toast = useToast()
 const { logActivity } = useAuditLog()
+const usersStore = useUsersStore()
 const modalData = computed(() => ui.modalData || {})
 const deptData = ref(modalData.value.department || modalData.value)
 const dept = computed(() => deptData.value)
@@ -109,13 +114,14 @@ let unsub = null
 const colorClass = computed(() => getDeptColor(dept.value.name))
 
 const editForm = reactive({
-  name: '', head: '', location: ''
+  name: '', headId: '', headName: '', location: ''
 })
 
 function startEdit() {
   Object.assign(editForm, {
     name: dept.value.name || '',
-    head: dept.value.head || '',
+    headId: dept.value.headId || '',
+    headName: dept.value.headName || '',
     location: dept.value.location || ''
   })
   editing.value = true
@@ -125,13 +131,20 @@ function cancelEdit() {
   editing.value = false
 }
 
+function onHeadChange() {
+  const user = usersStore.items.find(u => (u.uid || u.id) === editForm.headId)
+  editForm.headName = user ? (user.name || user.email || '') : ''
+}
+
 async function save() {
   if (!editForm.name.trim()) return
   saving.value = true
   try {
     await updateDoc(doc(db, 'departments', dept.value.id), {
       name: editForm.name,
-      head: editForm.head,
+      headId: editForm.headId || null,
+      headName: editForm.headName || null,
+      head: editForm.headName || null,
       location: editForm.location
     })
     await logActivity({ action: 'Update', resource: `Department ${editForm.name}`, details: `Updated department info` })

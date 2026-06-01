@@ -32,6 +32,11 @@
         </div>
       </div>
 
+      <div v-if="!editing && authStore.role === 'Hospital Admin'" class="flex items-center gap-2">
+        <span class="text-label-sm text-outline font-medium mr-1">Status:</span>
+        <button v-for="s in ['Pending', 'Approved', 'Rejected']" :key="s" @click="updateStatus(s)" :class="[s === request.status ? 'bg-primary text-on-primary shadow-sm' : 'bg-surface-container hover:bg-surface-container-higher text-on-surface-variant', 'px-3 py-1.5 rounded-lg text-label-sm font-label-sm transition-all']">{{ s }}</button>
+      </div>
+
       <div class="grid grid-cols-2 gap-x-6 gap-y-4 p-4 rounded-xl bg-surface-container-low">
         <div>
           <span class="text-label-sm text-outline font-medium">Request ID</span>
@@ -142,13 +147,15 @@
 <script setup>
 import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import { useUIStore } from '@/stores/ui'
+import { useAuthStore } from '@/stores/auth'
 import { useToast } from '@/composables/useToast'
 import { useDepartmentsStore } from '@/stores/departments'
 import { useAuditLog } from '@/composables/useAuditLog'
-import { db, auth } from '@/lib/firebase'
+import { db } from '@/lib/firebase'
 import { doc, updateDoc, onSnapshot } from 'firebase/firestore'
 
 const ui = useUIStore()
+const authStore = useAuthStore()
 const toast = useToast()
 const { logActivity } = useAuditLog()
 const modalData = computed(() => ui.modalData || {})
@@ -220,6 +227,21 @@ onMounted(() => {
 onUnmounted(() => {
   if (unsubRequest) unsubRequest()
 })
+
+async function updateStatus(status) {
+  if (status === request.value.status) return
+  saving.value = true
+  try {
+    await updateDoc(doc(db, 'requests', request.value.id), { status })
+    await logActivity({ action: 'Update', resource: `Request ${request.value.requestId || request.value.id}`, details: `Status changed to ${status}` })
+    toast.success(`Status updated to ${status}`)
+  } catch (err) {
+    console.error('[RequestDetailModal] error updating status:', err)
+    toast.error(err.code === 'permission-denied' ? 'You do not have permission to update requests.' : 'Failed to update status.')
+  } finally {
+    saving.value = false
+  }
+}
 
 function deleteRequest() {
   ui.closeModal()

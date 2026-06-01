@@ -10,21 +10,27 @@
         </div>
         <div class="space-y-5">
           <div>
-            <label class="block text-label-sm font-label-sm text-on-surface-variant uppercase tracking-widest mb-1 ml-1">Clinical Email Address</label>
+            <label class="block text-label-sm font-label-sm text-on-surface-variant uppercase tracking-widest mb-1 ml-1">Clinical Email Address <span class="text-error">*</span></label>
             <div class="relative">
               <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]">mail</span>
               <input
                 :value="modelValue.email"
                 @input="update('email', $event.target.value)"
-                class="w-full bg-surface-container-highest border-none rounded-xl py-3.5 pl-10 pr-4 text-body-sm text-on-surface focus:ring-1 focus:ring-primary"
+                class="w-full rounded-xl py-3.5 pl-10 pr-4 text-body-sm text-on-surface focus:ring-1 focus:ring-primary"
+                :class="emailError ? 'bg-error-container border-2 border-error' : 'bg-surface-container-highest border-none'"
                 type="email"
                 placeholder="a.thorne@hospital.clinic"
+                required
               />
             </div>
-            <p class="mt-1 text-[10px] text-outline ml-1">Automatically generated based on clinician registry.</p>
+            <p v-if="emailError" class="mt-1 text-[10px] text-error ml-1 flex items-center gap-1">
+              <span class="material-symbols-outlined text-[12px]">error</span>
+              Please enter a valid email address.
+            </p>
+            <p v-else class="mt-1 text-[10px] text-outline ml-1">Automatically generated based on clinician registry.</p>
           </div>
           <div>
-            <label class="block text-label-sm font-label-sm text-on-surface-variant uppercase tracking-widest mb-1 ml-1">Temporal Password</label>
+            <label class="block text-label-sm font-label-sm text-on-surface-variant uppercase tracking-widest mb-1 ml-1">Temporal Password <span class="text-error">*</span></label>
             <div class="relative">
               <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]">lock_open</span>
               <input
@@ -32,6 +38,7 @@
                 @input="update('password', $event.target.value)"
                 class="w-full bg-surface-container-highest border-none rounded-xl py-3.5 pl-10 pr-20 text-body-sm text-on-surface focus:ring-1 focus:ring-primary"
                 type="text"
+                required
               />
               <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
                 <button type="button" @click="generatePassword" class="w-9 h-9 rounded-lg bg-surface-container-low text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-all">
@@ -129,7 +136,7 @@
 import { computed } from 'vue'
 import { useToast } from '@/composables/useToast'
 
-const props = defineProps({ modelValue: { type: Object, required: true }, summary: { type: Object, default: () => ({ displayName: '—', title: '—', department: '—', employeeId: '—' }) } })
+const props = defineProps({ modelValue: { type: Object, required: true }, summary: { type: Object, default: () => ({ displayName: '—', title: '—', department: '—', employeeId: '—' }) }, emailError: { type: Boolean, default: false } })
 const emit = defineEmits(['update:modelValue'])
 
 const toast = useToast()

@@ -56,7 +56,7 @@
           </div>
           <div>
             <span class="text-label-sm text-outline font-medium">Last Active</span>
-            <p class="text-body-md text-on-surface font-medium mt-0.5">{{ user.lastActive }}</p>
+            <p class="text-body-md text-on-surface font-medium mt-0.5">{{ timeAgo(user.lastActive) }}</p>
           </div>
         </div>
       </div>
@@ -79,6 +79,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useUIStore } from '@/stores/ui'
+import { timeAgo } from '@/utils/timeAgo'
 
 const ui = useUIStore()
 const user = computed(() => ui.modalData || {})

@@ -43,6 +43,7 @@
         <StepPersonalDetails
           v-if="currentStep === 1"
           :model-value="wizardData"
+          :department-locked="departmentLocked"
           @update:model-value="Object.assign(wizardData, $event)"
         />
         <StepRoleAccess
@@ -53,6 +54,7 @@
           v-else-if="currentStep === 3"
           v-model="wizardData.credentials"
           :summary="summaryData"
+          :email-error="!emailValid && wizardData.credentials.email.length > 0"
         />
       </transition>
     </div>
@@ -96,18 +98,22 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { useToast } from '@/composables/useToast'
 import { useAuditLog } from '@/composables/useAuditLog'
+import { useAuthStore } from '@/stores/auth'
 import { createUser } from '@/services/api'
 import { idToLabel } from '@/data/roles'
+import { db } from '@/lib/firebase'
 import StepPersonalDetails from '@/components/provision/StepPersonalDetails.vue'
 import StepRoleAccess from '@/components/provision/StepRoleAccess.vue'
 import StepSecurityCredentials from '@/components/provision/StepSecurityCredentials.vue'
+import { doc, updateDoc, collection, query, where, getDocs } from 'firebase/firestore'
 
 const emit = defineEmits(['close'])
 const toast = useToast()
 const { logActivity } = useAuditLog()
+const authStore = useAuthStore()
 const currentStep = ref(1)
 const saving = ref(false)
 
@@ -117,6 +123,7 @@ const wizardData = reactive({
   employeeId: '',
   title: '',
   department: '',
+  makeDepartmentHead: false,
   role: '',
   credentials: {
     email: '',
@@ -125,7 +132,21 @@ const wizardData = reactive({
   }
 })
 
+const departmentLocked = computed(() =>
+  !!authStore.departmentHeadOf && !['Sys Administrator', 'Hospital Admin', 'ICT Officer'].includes(authStore.role)
+)
+
+onMounted(() => {
+  if (departmentLocked.value) {
+    wizardData.department = authStore.departmentHeadOf
+  }
+})
+
 const stepLabel = computed(() => ['Personal Details', 'Role & Access Level', 'Security Credentials'][currentStep.value - 1])
+
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+const emailValid = computed(() => emailRegex.test(wizardData.credentials.email))
 
 const canAdvance = computed(() => {
   if (currentStep.value === 1) {
@@ -135,7 +156,7 @@ const canAdvance = computed(() => {
   if (currentStep.value === 2) {
     return !!wizardData.role
   }
-  return true
+  return emailValid.value
 })
 
 const summaryData = computed(() => ({
@@ -158,7 +179,7 @@ async function submit() {
   if (saving.value) return
   saving.value = true
   try {
-    await createUser({
+    const result = await createUser({
       email: wizardData.credentials.email,
       password: wizardData.credentials.password,
       displayName: wizardData.fullName,
@@ -169,11 +190,24 @@ async function submit() {
       mfa: wizardData.credentials.mfa,
       avatar: wizardData.avatar
     })
+    if (wizardData.makeDepartmentHead && result.uid && wizardData.department) {
+      const snap = await getDocs(query(collection(db, 'departments'), where('name', '==', wizardData.department)))
+      if (!snap.empty) {
+        await updateDoc(doc(db, 'departments', snap.docs[0].id), {
+          headId: result.uid,
+          headName: wizardData.fullName
+        })
+      }
+    }
     await logActivity({ action: 'Create', resource: `User ${wizardData.fullName}`, details: `Provisioned with role ${wizardData.role}` })
     toast.success(`User "${wizardData.fullName}" provisioned successfully!`)
     emit('close')
   } catch (err) {
-    toast.error(err.message)
+    const msg = err.code === 'auth/email-already-exists' ? 'This email is already in use.'
+      : err.code === 'auth/invalid-email' ? 'Invalid email format.'
+      : err.code === 'auth/weak-password' ? 'Password is too weak.'
+      : err.message
+    toast.error(msg)
   } finally {
     saving.value = false
   }

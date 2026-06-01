@@ -10,21 +10,22 @@
         <h2 class="text-display font-display text-on-surface">Tickets</h2>
         <p class="text-body-md font-body-md text-on-surface-variant mt-1">Manage and resolve hospital ICT service requests and incidents.</p>
       </div>
-      <div class="flex items-center space-x-3">
-        <div class="flex bg-surface-container border border-outline-variant rounded-lg p-0.5">
-          <button class="bg-surface border border-outline shadow-sm text-on-surface p-1.5 rounded-md flex items-center justify-center">
-            <span class="material-symbols-outlined" style="font-size: 18px;">table_rows</span>
+        <div class="flex items-center space-x-3">
+          <button @click="ui.openModal('NewTicket')" class="bg-primary text-on-primary text-label-md font-label-md px-4 py-2 rounded-lg shadow-sm hover:bg-primary-container transition-colors flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[18px]">add</span>
+            New Ticket
           </button>
-          <button class="text-on-surface-variant hover:text-on-surface p-1.5 rounded-md flex items-center justify-center transition-colors">
-            <span class="material-symbols-outlined" style="font-size: 18px;">view_kanban</span>
-          </button>
-          <button class="text-on-surface-variant hover:text-on-surface p-1.5 rounded-md flex items-center justify-center transition-colors">
-            <span class="material-symbols-outlined" style="font-size: 18px;">calendar_month</span>
-          </button>
-        </div>
-        <button class="lg:hidden bg-primary text-on-primary text-label-md font-label-md px-4 py-2 rounded shadow-sm hover:bg-primary-container transition-colors items-center flex">
-          <span class="material-symbols-outlined mr-1" style="font-size: 16px;">add</span> New
-        </button>
+          <div class="flex bg-surface-container border border-outline-variant rounded-lg p-0.5">
+            <button @click="viewMode = 'table'" :class="viewMode === 'table' ? 'bg-surface border border-outline shadow-sm text-on-surface' : 'text-on-surface-variant hover:text-on-surface'" class="p-1.5 rounded-md flex items-center justify-center transition-colors">
+              <span class="material-symbols-outlined" style="font-size: 18px;">table_rows</span>
+            </button>
+            <button @click="viewMode = 'kanban'" :class="viewMode === 'kanban' ? 'bg-surface border border-outline shadow-sm text-on-surface' : 'text-on-surface-variant hover:text-on-surface'" class="p-1.5 rounded-md flex items-center justify-center transition-colors">
+              <span class="material-symbols-outlined" style="font-size: 18px;">view_kanban</span>
+            </button>
+            <button @click="viewMode = 'calendar'" :class="viewMode === 'calendar' ? 'bg-surface border border-outline shadow-sm text-on-surface' : 'text-on-surface-variant hover:text-on-surface'" class="p-1.5 rounded-md flex items-center justify-center transition-colors">
+              <span class="material-symbols-outlined" style="font-size: 18px;">calendar_month</span>
+            </button>
+          </div>
       </div>
     </div>
     <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden flex flex-col flex-1 min-h-[500px]">
@@ -67,12 +68,10 @@
             <span class="material-symbols-outlined" style="font-size: 16px;">delete</span>
             Delete ({{ selectedIds.size }})
           </button>
-          <button class="text-label-sm font-label-sm text-on-surface-variant hover:text-on-surface px-2 py-1 rounded transition-colors flex items-center gap-1">
-            <span class="material-symbols-outlined" style="font-size: 16px;">filter_list</span> More
-          </button>
+
         </div>
       </div>
-      <div class="overflow-x-auto flex-1">
+      <div v-if="viewMode === 'table'" class="overflow-x-auto flex-1">
         <table class="w-full text-left border-collapse">
           <thead>
             <tr class="bg-surface-container-low text-on-surface-variant text-label-sm font-label-sm uppercase tracking-wider">
@@ -134,6 +133,48 @@
           </tbody>
         </table>
       </div>
+      <div v-else-if="viewMode === 'kanban'" class="flex-1 overflow-x-auto p-4">
+        <div class="flex gap-4 h-full min-w-[700px]">
+          <div v-for="status in ['Open', 'Assigned', 'In Progress', 'Resolved', 'Closed']" :key="status" class="flex-1 min-w-[200px] bg-surface-container-low rounded-lg p-3">
+            <h3 class="text-label-sm font-label-sm uppercase tracking-wider text-on-surface-variant mb-3 pb-2 border-b border-outline-variant/30">{{ status }} ({{ ticketsByStatus[status]?.length || 0 }})</h3>
+            <div class="space-y-2">
+              <div v-for="ticket in ticketsByStatus[status] || []" :key="ticket.id" @click="openTicketDetail(ticket)" class="bg-surface-container-lowest rounded-lg p-3 border border-outline-variant cursor-pointer hover:shadow-sm transition-shadow">
+                <div class="text-label-sm font-label-sm text-primary mb-1">{{ ticket.ticketId || ticket.id }}</div>
+                <div class="text-body-sm font-body-sm text-on-surface mb-2 line-clamp-2">{{ ticket.title }}</div>
+                <div class="flex items-center gap-2">
+                  <span :class="priorityClass(ticket.priority)" class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-label-sm font-label-sm">
+                    <span class="w-1.5 h-1.5 rounded-full" :class="priorityDot(ticket.priority)"></span>
+                    {{ ticket.priority }}
+                  </span>
+                </div>
+                <div v-if="ticket.assignee" class="mt-2 text-label-sm font-label-sm text-on-surface-variant truncate">{{ ticket.assignee }}</div>
+              </div>
+              <div v-if="!(ticketsByStatus[status]?.length)" class="text-body-sm font-body-sm text-on-surface-variant text-center py-8">No tickets</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div v-else class="flex-1 p-4 overflow-y-auto">
+        <div class="flex items-center justify-between mb-4">
+          <button @click="prevMonth" class="p-1.5 rounded-lg hover:bg-surface-container text-on-surface-variant transition-colors">
+            <span class="material-symbols-outlined" style="font-size: 20px;">chevron_left</span>
+          </button>
+          <h2 class="text-title-sm font-title-sm text-on-surface">{{ monthLabel }}</h2>
+          <button @click="nextMonth" class="p-1.5 rounded-lg hover:bg-surface-container text-on-surface-variant transition-colors">
+            <span class="material-symbols-outlined" style="font-size: 20px;">chevron_right</span>
+          </button>
+        </div>
+        <div class="grid grid-cols-7 gap-px bg-outline-variant/20 rounded-lg overflow-hidden">
+          <div v-for="day in ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']" :key="day" class="bg-surface-container-lowest text-center text-label-sm font-label-sm text-on-surface-variant py-2">{{ day }}</div>
+          <div v-for="day in calendarDays" :key="day.date" class="bg-surface-container-lowest min-h-[90px] p-1.5" :class="day.isToday ? 'ring-2 ring-primary ring-inset' : ''">
+            <div class="text-label-sm font-label-sm mb-1" :class="day.isCurrentMonth ? 'text-on-surface' : 'text-on-surface-variant/40'">{{ day.day }}</div>
+            <div class="space-y-0.5">
+              <div v-for="ticket in day.tickets.slice(0, 3)" :key="ticket.id" @click="openTicketDetail(ticket)" class="text-label-sm font-label-sm truncate rounded px-1 py-0.5 cursor-pointer hover:opacity-80" :class="statusBg(ticket.status)">{{ ticket.ticketId || ticket.id }}</div>
+              <div v-if="day.tickets.length > 3" class="text-label-sm font-label-sm text-on-surface-variant px-1">{{ '+' + (day.tickets.length - 3) + ' more' }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="border-t border-outline-variant p-4 bg-surface-container-lowest flex flex-col sm:flex-row items-center justify-between gap-3">
         <div class="text-body-sm font-body-sm text-on-surface-variant">Showing {{ filteredTickets.length }} of {{ ticketsStore.tickets.length }} tickets</div>
         <div class="flex items-center gap-2">
@@ -153,9 +194,11 @@ import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useTicketsStore } from '@/stores/tickets'
 import { useUIStore } from '@/stores/ui'
+import { useAuthStore } from '@/stores/auth'
 const route = useRoute()
 const ticketsStore = useTicketsStore()
 const ui = useUIStore()
+const auth = useAuthStore()
 const searchQuery = ref(route.query.q || '')
 console.log('[TicketsView] searchQuery initialized to:', searchQuery.value)
 
@@ -209,8 +252,14 @@ function onDocClick(e) {
   }
 }
 
-onMounted(() => document.addEventListener('click', onDocClick))
-onUnmounted(() => document.removeEventListener('click', onDocClick))
+onMounted(() => {
+  document.addEventListener('click', onDocClick)
+  ticketsStore.startListening(auth.canViewAllTickets ? null : auth.user?.department)
+})
+onUnmounted(() => {
+  document.removeEventListener('click', onDocClick)
+  ticketsStore.stopListening()
+})
 
 function openTicketDetail(ticket) {
   openDropdownId.value = null
@@ -236,13 +285,78 @@ const filterCategory = ref('')
 const filterPriority = ref('')
 const filterStatus = ref('')
 const sortDir = ref('asc')
+const viewMode = ref('table')
+
+const ticketsByStatus = computed(() => {
+  const groups = {}
+  for (const s of ['Open', 'Assigned', 'In Progress', 'Resolved', 'Closed']) groups[s] = []
+  for (const t of filteredTickets.value) {
+    const status = t.status || 'Open'
+    if (groups[status]) groups[status].push(t)
+  }
+  return groups
+})
+
+const calendarMonth = ref(new Date())
+
+const monthLabel = computed(() =>
+  calendarMonth.value.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+)
+
+const ticketsByDate = computed(() => {
+  const map = {}
+  for (const t of filteredTickets.value) {
+    let dateStr
+    if (t.created?.toDate) dateStr = t.created.toDate().toISOString().slice(0, 10)
+    else if (t.created) dateStr = new Date(t.created).toISOString().slice(0, 10)
+    else continue
+    if (!map[dateStr]) map[dateStr] = []
+    map[dateStr].push(t)
+  }
+  return map
+})
+
+const calendarDays = computed(() => {
+  const year = calendarMonth.value.getFullYear()
+  const month = calendarMonth.value.getMonth()
+  const firstDay = new Date(year, month, 1)
+  const lastDay = new Date(year, month + 1, 0)
+  const startPad = firstDay.getDay()
+  const totalDays = lastDay.getDate()
+  const totalCells = Math.ceil((startPad + totalDays) / 7) * 7
+  const today = new Date().toISOString().slice(0, 10)
+  const days = []
+  for (let i = 0; i < totalCells; i++) {
+    const dayNum = i - startPad + 1
+    const date = new Date(year, month, dayNum)
+    const dateStr = date.toISOString().slice(0, 10)
+    days.push({
+      date: dateStr,
+      day: date.getDate(),
+      isCurrentMonth: dayNum >= 1 && dayNum <= totalDays,
+      isToday: dateStr === today,
+      tickets: ticketsByDate.value[dateStr] || []
+    })
+  }
+  return days
+})
+
+function prevMonth() { const d = new Date(calendarMonth.value); d.setMonth(d.getMonth() - 1); calendarMonth.value = d }
+function nextMonth() { const d = new Date(calendarMonth.value); d.setMonth(d.getMonth() + 1); calendarMonth.value = d }
+
+function statusBg(s) {
+  const map = { 'Open': 'bg-surface-container-highest text-on-surface-variant', 'Assigned': 'bg-surface-container-highest text-on-surface-variant', 'In Progress': 'bg-primary-container/40 text-on-primary-container', 'Resolved': 'bg-green-100 text-green-800', 'Closed': 'bg-outline/20 text-on-surface-variant' }
+  return map[s] || 'bg-surface-container-highest'
+}
 
 function toggleSort() {
   sortDir.value = sortDir.value === 'asc' ? 'desc' : 'asc'
 }
 
 const filteredTickets = computed(() => {
+  const userName = auth.user?.displayName
   const items = ticketsStore.tickets.filter(t => {
+    if (!auth.canViewAllTickets && auth.user?.department && t.department !== auth.user.department && t.assignee !== userName) return false
     const q = searchQuery.value.toLowerCase()
     if (q && !(t.ticketId || t.id).toLowerCase().includes(q) && !(t.title || '').toLowerCase().includes(q)) return false
     if (filterCategory.value && t.category !== filterCategory.value) return false
@@ -251,6 +365,9 @@ const filteredTickets = computed(() => {
     return true
   })
   return [...items].sort((a, b) => {
+    const aMine = a.assignee === userName ? 1 : 0
+    const bMine = b.assignee === userName ? 1 : 0
+    if (aMine !== bMine) return bMine - aMine
     const idA = (a.ticketId || a.id || '').toLowerCase()
     const idB = (b.ticketId || b.id || '').toLowerCase()
     return sortDir.value === 'asc' ? idA.localeCompare(idB) : idB.localeCompare(idA)

@@ -23,18 +23,18 @@
       </div>
 
       <div>
-        <label class="text-label-md font-label-md text-on-surface">Vendor</label>
-        <input v-model="form.vendor" class="w-full mt-1 px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary" required />
+        <label class="text-label-md font-label-md text-on-surface">Vendor <span class="text-error">*</span></label>
+          <input v-model="form.vendor" class="w-full mt-1 px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary" required />
       </div>
 
       <div class="grid grid-cols-2 gap-4">
         <div>
-          <label class="text-label-md font-label-md text-on-surface">Amount ({{ currencySymbol() }})</label>
-          <input v-model="form.amount" type="number" class="w-full mt-1 px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary" />
+          <label class="text-label-md font-label-md text-on-surface">Amount ({{ currencySymbol() }}) <span class="text-error">*</span></label>
+          <input v-model="form.amount" type="number" class="w-full mt-1 px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary" required />
         </div>
         <div>
-          <label class="text-label-md font-label-md text-on-surface">Department</label>
-          <select v-if="canChooseDepartment" v-model="form.department" class="w-full mt-1 px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary">
+          <label class="text-label-md font-label-md text-on-surface">Department <span class="text-error">*</span></label>
+          <select v-if="canChooseDepartment" v-model="form.department" class="w-full mt-1 px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary" required>
             <option v-for="dept in deptStore.items" :key="dept.id" :value="dept.name">{{ dept.name }}</option>
           </select>
           <div v-else class="flex items-center gap-2 mt-1 px-3 py-2.5 border border-outline-variant/50 rounded-lg bg-surface-container text-body-sm text-on-surface font-medium">
@@ -66,17 +66,16 @@
 <script setup>
 import { reactive, ref, computed, onMounted, onUnmounted } from 'vue'
 import { useToast } from '@/composables/useToast'
-import { useCounter } from '@/composables/useCounter'
+import { generateId } from '@/utils/generateId'
 import { useAuthStore } from '@/stores/auth'
-import { useAuditLog } from '@/composables/useAuditLog'
-import { useSettings } from '@/composables/useSettings'
 import { useDepartmentsStore } from '@/stores/departments'
+import { useSettings } from '@/composables/useSettings'
+import { useAuditLog } from '@/composables/useAuditLog'
 import { db, auth } from '@/lib/firebase'
-import { collection, addDoc, serverTimestamp, doc, getDoc } from 'firebase/firestore'
+import { addDoc, collection, serverTimestamp, getDoc, doc } from 'firebase/firestore'
 
 const emit = defineEmits(['close'])
 const toast = useToast()
-const { nextVal } = useCounter()
 const authStore = useAuthStore()
 const deptStore = useDepartmentsStore()
 const { logActivity } = useAuditLog()
@@ -117,13 +116,8 @@ async function submit() {
 }
 
 onMounted(async () => {
-  try {
-    const year = new Date().getFullYear()
-    poNumber.value = await nextVal(`poNumber_${year}`, { prefix: `PO-${year}-`, pad: 3, starting: 1 })
-  } catch (err) {
-    console.warn('[NewPurchaseOrderModal] counter unavailable, using client-side ID:', err)
-    poNumber.value = `PO-${new Date().getFullYear()}-${Date.now().toString(36).slice(-3).toUpperCase()}${Math.random().toString(36).slice(2, 4).toUpperCase()}`
-  }
+  const year = new Date().getFullYear()
+  poNumber.value = generateId(`PO-${year}-`, 6)
   const uid = auth.currentUser?.uid
   if (uid) {
     const userSnap = await getDoc(doc(db, 'users', uid))

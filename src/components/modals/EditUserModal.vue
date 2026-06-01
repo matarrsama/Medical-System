@@ -21,13 +21,13 @@
       </div>
       <div class="grid grid-cols-2 gap-4">
         <div class="group col-span-2">
-          <label class="block text-label-md font-label-md text-on-surface-variant mb-1 ml-1">Full Name</label>
-          <input v-model="form.name" @input="onNameInput" class="w-full bg-surface-container-highest border-none rounded-xl px-4 py-3.5 text-body-sm text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary transition-all" placeholder="e.g. Dr. Julian Vane" type="text" />
+          <label class="block text-label-md font-label-md text-on-surface-variant mb-1 ml-1">Full Name <span class="text-error">*</span></label>
+          <input v-model="form.name" @input="onNameInput" class="w-full bg-surface-container-highest border-none rounded-xl px-4 py-3.5 text-body-sm text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary transition-all" placeholder="e.g. Dr. Julian Vane" type="text" required />
         </div>
         <div class="group">
-          <label class="block text-label-md font-label-md text-on-surface-variant mb-1 ml-1">Employee ID</label>
+          <label class="block text-label-md font-label-md text-on-surface-variant mb-1 ml-1">Employee ID <span class="text-error">*</span></label>
           <div class="relative">
-            <input v-model="form.employeeId" @input="empIdTouched = true" class="w-full border rounded-xl px-4 py-3.5 pr-12 text-body-sm text-on-surface placeholder:text-outline/50 focus:ring-1 transition-all" :class="empIdTouched && !empIdValid && form.employeeId ? 'bg-error-container/20 border-error focus:ring-error' : 'bg-surface-container-highest border-none focus:ring-primary'" placeholder="BGH-XXX-XX" type="text" />
+            <input v-model="form.employeeId" @input="empIdTouched = true" class="w-full border rounded-xl px-4 py-3.5 pr-12 text-body-sm text-on-surface placeholder:text-outline/50 focus:ring-1 transition-all" :class="empIdTouched && !empIdValid && form.employeeId ? 'bg-error-container/20 border-error focus:ring-error' : 'bg-surface-container-highest border-none focus:ring-primary'" placeholder="BGH-XXX-XX" type="text" required />
             <button type="button" @click="generateId" class="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-lg bg-surface-container-low text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-all">
               <span class="material-symbols-outlined text-[18px]">auto_awesome</span>
             </button>
@@ -38,13 +38,13 @@
           </p>
         </div>
         <div class="group">
-          <label class="block text-label-md font-label-md text-on-surface-variant mb-1 ml-1">Professional Title</label>
-          <input v-model="form.title" @input="onTitleInput" class="w-full bg-surface-container-highest border-none rounded-xl px-4 py-3.5 text-body-sm text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary transition-all" placeholder="Senior Surgical Resident" type="text" />
+          <label class="block text-label-md font-label-md text-on-surface-variant mb-1 ml-1">Professional Title <span class="text-error">*</span></label>
+          <input v-model="form.title" @input="onTitleInput" class="w-full bg-surface-container-highest border-none rounded-xl px-4 py-3.5 text-body-sm text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary transition-all" placeholder="Senior Surgical Resident" type="text" required />
         </div>
         <div class="group">
-          <label class="block text-label-md font-label-md text-on-surface-variant mb-1 ml-1">Department</label>
+          <label class="block text-label-md font-label-md text-on-surface-variant mb-1 ml-1">Department <span class="text-error">*</span></label>
           <div class="relative">
-            <select v-model="form.department" class="w-full appearance-none bg-surface-container-highest border-none rounded-xl px-4 py-3.5 text-body-sm text-on-surface focus:ring-1 focus:ring-primary transition-all">
+            <select v-model="form.department" class="w-full appearance-none bg-surface-container-highest border-none rounded-xl px-4 py-3.5 text-body-sm text-on-surface focus:ring-1 focus:ring-primary transition-all" required>
               <option disabled value="">Select Department</option>
               <option v-for="dept in deptStore.items" :key="dept.id" :value="dept.name">{{ dept.name }}</option>
             </select>
@@ -52,13 +52,13 @@
           </div>
         </div>
         <div class="group">
-          <label class="block text-label-md font-label-md text-on-surface-variant mb-1 ml-1">Email</label>
-          <input v-model="form.email" class="w-full bg-surface-container-highest border-none rounded-xl px-4 py-3.5 text-body-sm text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary transition-all" placeholder="user@hospital.org" type="email" />
+          <label class="block text-label-md font-label-md text-on-surface-variant mb-1 ml-1">Email <span class="text-error">*</span></label>
+          <input v-model="form.email" class="w-full bg-surface-container-highest border-none rounded-xl px-4 py-3.5 text-body-sm text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary transition-all" placeholder="user@hospital.org" type="email" required />
         </div>
         <div class="group">
-          <label class="block text-label-md font-label-md text-on-surface-variant mb-1 ml-1">Status</label>
+          <label class="block text-label-md font-label-md text-on-surface-variant mb-1 ml-1">Status <span class="text-error">*</span></label>
           <div class="relative">
-            <select v-model="form.status" class="w-full appearance-none bg-surface-container-highest border-none rounded-xl px-4 py-3.5 text-body-sm text-on-surface focus:ring-1 focus:ring-primary transition-all">
+            <select v-model="form.status" class="w-full appearance-none bg-surface-container-highest border-none rounded-xl px-4 py-3.5 text-body-sm text-on-surface focus:ring-1 focus:ring-primary transition-all" required>
               <option>Active</option>
               <option>Inactive</option>
               <option>Suspended</option>
@@ -68,7 +68,7 @@
         </div>
       </div>
       <div>
-        <h4 class="text-label-md font-label-md text-on-surface-variant mb-3">Role & Access</h4>
+        <h4 class="text-label-md font-label-md text-on-surface-variant mb-3">Role & Access <span class="text-error">*</span></h4>
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
           <button v-for="role in roles" :key="role.id" @click="form.role = role.id" class="relative flex flex-col items-center p-4 rounded-xl bg-surface-container-lowest transition-all duration-200 text-center border-2" :class="form.role === role.id ? 'border-primary bg-primary-fixed/20 shadow-sm shadow-primary/10' : 'border-transparent hover:border-outline-variant shadow-sm'">
             <div class="w-10 h-10 rounded-lg flex items-center justify-center mb-2 transition-transform" :class="form.role === role.id ? 'bg-primary text-white' : 'bg-surface-container text-primary'">

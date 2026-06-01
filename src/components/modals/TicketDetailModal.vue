@@ -32,6 +32,11 @@
         </div>
       </div>
 
+      <div v-if="!editing" class="flex items-center gap-2">
+        <span class="text-label-sm text-outline font-medium mr-1">Status:</span>
+        <button v-for="s in ['Open', 'Assigned', 'In Progress', 'Resolved', 'Closed']" :key="s" @click="updateStatus(s)" :class="[s === ticket.status ? 'bg-primary text-on-primary shadow-sm' : 'bg-surface-container hover:bg-surface-container-higher text-on-surface-variant', 'px-3 py-1.5 rounded-lg text-label-sm font-label-sm transition-all']">{{ s }}</button>
+      </div>
+
       <div class="grid grid-cols-2 gap-x-6 gap-y-4 p-4 rounded-xl bg-surface-container-low">
         <div>
           <span class="text-label-sm text-outline font-medium">Ticket ID</span>
@@ -188,11 +193,12 @@ function cancelEdit() {
 async function save() {
   if (!editForm.title.trim()) return
   saving.value = true
+  const status = editForm.assignee ? 'Assigned' : editForm.status
   try {
     await updateDoc(doc(db, 'tickets', ticket.value.id), {
       title: editForm.title,
       priority: editForm.priority,
-      status: editForm.status,
+      status,
       category: editForm.category,
       department: editForm.department,
       assignee: editForm.assignee,
@@ -224,6 +230,21 @@ onMounted(() => {
 onUnmounted(() => {
   if (unsubTicket) unsubTicket()
 })
+
+async function updateStatus(status) {
+  if (status === ticket.value.status) return
+  saving.value = true
+  try {
+    await updateDoc(doc(db, 'tickets', ticket.value.id), { status })
+    await logActivity({ action: 'Update', resource: `Ticket ${ticket.value.ticketId || ticket.value.id}`, details: `Status changed to ${status}` })
+    toast.success(`Status updated to ${status}`)
+  } catch (err) {
+    console.error('[TicketDetailModal] error updating status:', err)
+    toast.error(err.code === 'permission-denied' ? 'You do not have permission to update tickets.' : 'Failed to update status.')
+  } finally {
+    saving.value = false
+  }
+}
 
 function deleteTicket() {
   ui.closeModal()

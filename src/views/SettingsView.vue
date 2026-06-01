@@ -54,6 +54,7 @@
             <span class="text-label-sm text-on-surface-variant">MFA: {{ profile.mfa === 'push' ? 'Push' : profile.mfa === 'sms' ? 'SMS' : 'App' }}</span>
           </div>
         </div>
+        <p class="text-label-sm text-on-surface-variant mt-4 pt-3 border-t border-outline-variant/30">Contact administrator to update these details.</p>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-gutter mb-lg">
@@ -127,12 +128,35 @@
                 <option value="UTC">UTC</option>
               </select>
             </div>
+            <hr class="border-outline-variant/50" />
+            <div>
+              <h4 class="text-label-md font-label-md text-on-surface mb-3">Change Password</h4>
+              <div class="space-y-3">
+                <div>
+                  <label class="block text-label-sm text-on-surface-variant mb-1" for="pw-current">Current Password <span class="text-error">*</span></label>
+                  <input id="pw-current" v-model="passwordForm.current" type="password" class="w-full px-3 py-2 rounded-lg border border-outline-variant bg-surface-container-low text-body-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary" placeholder="Enter current password" />
+                </div>
+                <div>
+                  <label class="block text-label-sm text-on-surface-variant mb-1" for="pw-new">New Password <span class="text-error">*</span></label>
+                  <input id="pw-new" v-model="passwordForm.newPassword" type="password" class="w-full px-3 py-2 rounded-lg border border-outline-variant bg-surface-container-low text-body-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary" placeholder="At least 8 characters" minlength="8" />
+                </div>
+                <div>
+                  <label class="block text-label-sm text-on-surface-variant mb-1" for="pw-confirm">Confirm New Password <span class="text-error">*</span></label>
+                  <input id="pw-confirm" v-model="passwordForm.confirm" type="password" class="w-full px-3 py-2 rounded-lg border border-outline-variant bg-surface-container-low text-body-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary" placeholder="Re-enter new password" minlength="8" />
+                </div>
+                <p v-if="passwordError" class="text-body-sm text-error">{{ passwordError }}</p>
+                <button @click="changePassword" :disabled="pwSubmitting" class="flex items-center gap-2 px-4 py-2 bg-primary text-on-primary text-label-sm font-label-sm rounded-lg hover:bg-primary-container transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+                  <span v-if="pwSubmitting" class="material-symbols-outlined animate-spin text-[16px]">sync</span>
+                  <span v-else class="material-symbols-outlined text-[16px]">key</span>
+                  {{ pwSubmitting ? 'Updating…' : 'Update Password' }}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
       <div class="flex justify-end gap-3">
-        <button @click="resetToSaved" class="px-4 py-2 border border-outline-variant rounded-lg text-label-md text-on-surface hover:bg-surface-container transition-colors">Reset</button>
         <button @click="saveAll" :disabled="saving" class="px-5 py-2 bg-primary text-on-primary rounded-lg text-label-md font-label-md hover:bg-primary-container transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
           <span v-if="saving" class="material-symbols-outlined animate-spin text-[18px]">sync</span>
           <span v-else>Save Settings</span>
@@ -148,8 +172,9 @@ import { useAuthStore } from '@/stores/auth'
 import { useAuditLog } from '@/composables/useAuditLog'
 import { useUIStore } from '@/stores/ui'
 import { useFirestoreCache } from '@/composables/useFirestoreCache'
-import { db } from '@/lib/firebase'
+import { db, auth as firebaseAuth } from '@/lib/firebase'
 import { doc, onSnapshot, updateDoc } from 'firebase/firestore'
+import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from 'firebase/auth'
 
 const auth = useAuthStore()
 const ui = useUIStore()
@@ -159,6 +184,9 @@ const cache = useFirestoreCache()
 const loading = ref(true)
 const saving = ref(false)
 const avatarInput = ref(null)
+const passwordForm = reactive({ current: '', newPassword: '', confirm: '' })
+const passwordError = ref('')
+const pwSubmitting = ref(false)
 const profile = reactive({
   name: '', initials: '', employeeId: '', email: '', title: '', department: '',
   role: '', status: '', mfa: 'push', avatar: ''
@@ -319,6 +347,41 @@ async function saveAll() {
     ui.showToast(`Save failed: ${err.message}`, 'error')
   } finally {
     saving.value = false
+  }
+}
+
+async function changePassword() {
+  passwordError.value = ''
+  if (!passwordForm.current) { passwordError.value = 'Current password is required'; return }
+  if (passwordForm.newPassword.length < 8) { passwordError.value = 'New password must be at least 8 characters'; return }
+  if (passwordForm.newPassword !== passwordForm.confirm) { passwordError.value = 'Passwords do not match'; return }
+
+  pwSubmitting.value = true
+  try {
+    const credential = EmailAuthProvider.credential(firebaseAuth.currentUser.email, passwordForm.current)
+    await reauthenticateWithCredential(firebaseAuth.currentUser, credential)
+    await updatePassword(firebaseAuth.currentUser, passwordForm.newPassword)
+    await logActivity({ action: 'Update', resource: 'Password', details: 'Changed own password' })
+    ui.showToast('Password updated successfully', 'success')
+    passwordForm.current = ''
+    passwordForm.newPassword = ''
+    passwordForm.confirm = ''
+  } catch (err) {
+    if (err.code === 'auth/wrong-password') {
+      passwordError.value = 'Current password is incorrect'
+      ui.showToast('Current password is incorrect', 'error')
+    } else if (err.code === 'auth/weak-password') {
+      passwordError.value = 'Password is too weak. Use at least 8 characters with a mix of letters and numbers'
+      ui.showToast('Password is too weak', 'error')
+    } else if (err.code === 'auth/requires-recent-login') {
+      passwordError.value = 'Please log out and log back in before changing your password'
+      ui.showToast('Session expired — please log out and back in', 'error')
+    } else {
+      passwordError.value = err.message
+      ui.showToast(err.message, 'error')
+    }
+  } finally {
+    pwSubmitting.value = false
   }
 }
 </script>

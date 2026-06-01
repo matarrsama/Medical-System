@@ -1,19 +1,52 @@
 {
   "name": "hospital-itsm-app",
   "version": "1.0.0",
-  "description": "Hospital ICT Service Management Web Application",
+  "description": "Medical Records System Web Application",
+  "main": "dist-electron/main.js",
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:electron": "vite --mode electron",
     "build": "vite build",
-    "preview": "vite preview"
+    "build:electron": "vite build --mode electron",
+    "preview": "vite preview",
+    "electron:dev": "vite --mode electron",
+    "electron:build": "vite build --mode electron && electron-builder",
+    "electron:preview": "vite preview"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.7",
     "autoprefixer": "^10.5.0",
+    "electron": "^42.3.0",
+    "electron-builder": "^26.8.1",
     "postcss": "^8.5.15",
     "tailwindcss": "^3.4.19",
-    "vite": "^5.2.11"
+    "vite": "^5.2.11",
+    "vite-plugin-electron": "^1.0.0",
+    "vite-plugin-electron-renderer": "^1.0.0"
+  },
+  "build": {
+    "appId": "com.hospital.itsm",
+    "productName": "Medical Records System",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "public/icon.png"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "public/icon.png"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "public/icon.png"
+    }
   },
   "dependencies": {
     "firebase": "^12.14.0",

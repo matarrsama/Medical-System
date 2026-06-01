@@ -29,6 +29,11 @@
         </div>
       </div>
 
+      <div v-if="!editing && canChangeStatus" class="flex items-center gap-2">
+        <span class="text-label-sm text-outline font-medium mr-1">Status:</span>
+        <button v-for="s in ['Active', 'Maintenance', 'Retired']" :key="s" @click="updateStatus(s)" :class="[s === asset.status ? 'bg-primary text-on-primary shadow-sm' : 'bg-surface-container hover:bg-surface-container-higher text-on-surface-variant', 'px-3 py-1.5 rounded-lg text-label-sm font-label-sm transition-all']">{{ s }}</button>
+      </div>
+
       <div class="grid grid-cols-2 gap-x-6 gap-y-4 p-4 rounded-xl bg-surface-container-low">
         <div>
           <span class="text-label-sm text-outline font-medium">Asset Tag</span>
@@ -118,6 +123,7 @@
 <script setup>
 import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import { useUIStore } from '@/stores/ui'
+import { useAuthStore } from '@/stores/auth'
 import { useToast } from '@/composables/useToast'
 import { useDepartmentsStore } from '@/stores/departments'
 import { useAuditLog } from '@/composables/useAuditLog'
@@ -127,6 +133,7 @@ import { doc, updateDoc, onSnapshot } from 'firebase/firestore'
 const ui = useUIStore()
 const toast = useToast()
 const { logActivity } = useAuditLog()
+const authStore = useAuthStore()
 const modalData = computed(() => ui.modalData || {})
 const assetData = ref(modalData.value.asset || modalData.value)
 const asset = computed(() => assetData.value)
@@ -134,6 +141,11 @@ const editing = ref(modalData.value.startEdit === true)
 const saving = ref(false)
 const deptStore = useDepartmentsStore()
 let unsubAsset = null
+
+const canChangeStatus = computed(() =>
+  ['Sys Administrator', 'Hospital Admin', 'ICT Officer'].includes(authStore.role) ||
+  (!!authStore.departmentHeadOf && authStore.departmentHeadOf === asset.value.department)
+)
 
 const editForm = reactive({
   name: '', category: '', status: '', department: '', location: ''
@@ -192,6 +204,21 @@ onMounted(() => {
 onUnmounted(() => {
   if (unsubAsset) unsubAsset()
 })
+
+async function updateStatus(status) {
+  if (status === asset.value.status) return
+  saving.value = true
+  try {
+    await updateDoc(doc(db, 'inventory', asset.value.id), { status })
+    await logActivity({ action: 'Update', resource: `Asset ${asset.value.assetTag || asset.value.id}`, details: `Status changed to ${status}` })
+    toast.success(`Status updated to ${status}`)
+  } catch (err) {
+    console.error('[InventoryDetailModal] error updating status:', err)
+    toast.error(err.code === 'permission-denied' ? 'You do not have permission to update assets.' : 'Failed to update status.')
+  } finally {
+    saving.value = false
+  }
+}
 
 function deleteAsset() {
   ui.closeModal()

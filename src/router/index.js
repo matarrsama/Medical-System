@@ -1,9 +1,11 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
+import { watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import LoginView from '@/views/LoginView.vue'
 
 const routes = [
   { path: '/', redirect: '/login' },
-  { path: '/login', name: 'Login', component: () => import('@/views/LoginView.vue') },
+  { path: '/login', name: 'Login', component: LoginView },
   { path: '/dashboard', name: 'Dashboard', component: () => import('@/views/DashboardView.vue') },
   { path: '/super-admin-dashboard', name: 'SuperAdminDashboard', component: () => import('@/views/SuperAdminDashboard.vue') },
   { path: '/tickets', name: 'Tickets', component: () => import('@/views/TicketsView.vue') },
@@ -14,12 +16,12 @@ const routes = [
   { path: '/maintenance', name: 'Maintenance', component: () => import('@/views/MaintenanceView.vue') },
   { path: '/procurement', name: 'Procurement', component: () => import('@/views/ProcurementView.vue') },
   { path: '/biomedical', name: 'Biomedical', component: () => import('@/views/BiomedicalView.vue') },
-  { path: '/departments', name: 'Departments', component: () => import('@/views/DepartmentsView.vue') },
+  { path: '/departments', name: 'Departments', component: () => import('@/views/DepartmentsView.vue'), meta: { requireRole: 'canManageDepartments' } },
   { path: '/reports', name: 'Reports', component: () => import('@/views/ReportsView.vue') },
-  { path: '/users', name: 'Users', component: () => import('@/views/UsersView.vue'), beforeEnter: (to, from, next) => { const auth = useAuthStore(); auth.canManageUsers ? next() : next('/access-denied') } },
+  { path: '/users', name: 'Users', component: () => import('@/views/UsersView.vue'), meta: { requireRole: 'canViewUsers' } },
   { path: '/notifications', name: 'Notifications', component: () => import('@/views/NotificationsView.vue') },
-  { path: '/audit-logs', name: 'AuditLogs', component: () => import('@/views/AuditLogsView.vue'), beforeEnter: (to, from, next) => { const auth = useAuthStore(); auth.canAccessAuditLogs ? next() : next('/access-denied') } },
-  { path: '/admin', name: 'AdminSettings', component: () => import('@/views/AdminSettingsView.vue'), beforeEnter: (to, from, next) => { const auth = useAuthStore(); auth.canAccessAdmin ? next() : next('/access-denied') } },
+  { path: '/audit-logs', name: 'AuditLogs', component: () => import('@/views/AuditLogsView.vue'), meta: { requireRole: 'canAccessAuditLogs' } },
+  { path: '/admin', name: 'AdminSettings', component: () => import('@/views/AdminSettingsView.vue'), meta: { requireRole: 'canAccessAdmin' } },
   { path: '/settings', name: 'Settings', component: () => import('@/views/SettingsView.vue') },
   { path: '/404', name: 'NotFound', component: () => import('@/views/NotFoundView.vue') },
   { path: '/500', name: 'ServerError', component: () => import('@/views/ServerErrorView.vue') },
@@ -31,6 +33,29 @@ const routes = [
 const router = createRouter({
   history: createWebHashHistory(),
   routes
+})
+
+const publicRoutes = ['Login', 'NotFound', 'ServerError', 'AccessDenied', 'Offline']
+
+router.beforeEach(async (to, from, next) => {
+  const auth = useAuthStore()
+
+  if (auth.loading) {
+    await new Promise((resolve) => {
+      const unwatch = watch(() => auth.loading, (val) => {
+        if (!val) { unwatch(); resolve() }
+      }, { immediate: true })
+    })
+  }
+
+  if (publicRoutes.includes(to.name)) return next()
+
+  if (!auth.isAuthenticated) return next('/login')
+
+  const required = to.meta?.requireRole
+  if (required && !auth[required]) return next('/access-denied')
+
+  next()
 })
 
 export default router

@@ -21,11 +21,24 @@
       <div class="grid grid-cols-2 gap-4">
         <div>
           <label class="text-label-md font-label-md text-on-surface">Department Head</label>
-          <input v-model="form.head" class="w-full mt-1 px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary" />
+          <select v-model="form.headId" @change="onHeadChange" class="w-full mt-1 px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary">
+            <option value="">— None —</option>
+            <option v-for="u in usersStore.items" :key="u.uid || u.id" :value="u.uid || u.id">{{ u.name || u.email || u.id }}</option>
+          </select>
         </div>
         <div>
           <label class="text-label-md font-label-md text-on-surface">Location</label>
           <input v-model="form.location" class="w-full mt-1 px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary" />
+        </div>
+      </div>
+      <div>
+        <label class="text-label-md font-label-md text-on-surface mb-2 block">Department Members</label>
+        <div class="max-h-40 overflow-y-auto border border-outline-variant rounded-lg p-2 space-y-1">
+          <label v-for="u in usersStore.items" :key="u.uid || u.id" class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-surface-container cursor-pointer text-label-sm font-label-sm text-on-surface">
+            <input type="checkbox" :value="u.uid || u.id" :checked="selectedMembers.has(u.uid || u.id)" @change="toggleMember(u.uid || u.id)" class="rounded border-outline-variant text-primary focus:ring-primary" />
+            {{ u.name || u.email || u.id }}
+          </label>
+          <div v-if="!usersStore.items.length" class="text-body-sm text-on-surface-variant text-center py-4">No users available</div>
         </div>
       </div>
     </form>
@@ -47,15 +60,29 @@
 import { reactive, ref } from 'vue'
 import { useToast } from '@/composables/useToast'
 import { useAuditLog } from '@/composables/useAuditLog'
+import { useUsersStore } from '@/stores/users'
 import { db, auth } from '@/lib/firebase'
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
+import { collection, addDoc, doc, updateDoc, serverTimestamp } from 'firebase/firestore'
 
 const emit = defineEmits(['close'])
 const toast = useToast()
 const { logActivity } = useAuditLog()
+const usersStore = useUsersStore()
 
-const form = reactive({ name: '', head: '', location: '' })
+const form = reactive({ name: '', headId: '', headName: '', location: '' })
 const saving = ref(false)
+const selectedMembers = ref(new Set())
+
+function toggleMember(id) {
+  const s = new Set(selectedMembers.value)
+  if (s.has(id)) s.delete(id); else s.add(id)
+  selectedMembers.value = s
+}
+
+function onHeadChange() {
+  const user = usersStore.items.find(u => (u.uid || u.id) === form.headId)
+  form.headName = user ? (user.name || user.email || '') : ''
+}
 
 async function submit() {
   if (!form.name.trim()) return
@@ -63,13 +90,19 @@ async function submit() {
   try {
     await addDoc(collection(db, 'departments'), {
       name: form.name,
-      head: form.head || null,
+      headId: form.headId || null,
+      headName: form.headName || null,
+      head: form.headName || null,
       location: form.location || null,
       createdBy: auth.currentUser?.uid || null,
       createdByName: auth.currentUser?.displayName || null,
       created: serverTimestamp()
     })
-    await logActivity({ action: 'Create', resource: `Department ${form.name}`, details: `Head: ${form.head || '—'}, Location: ${form.location || '—'}` })
+    const updates = [...selectedMembers.value].map(uid =>
+      updateDoc(doc(db, 'users', uid), { department: form.name }).catch(() => {})
+    )
+    await Promise.all(updates)
+    await logActivity({ action: 'Create', resource: `Department ${form.name}`, details: `Head: ${form.headName || '—'}, Location: ${form.location || '—'}` })
     toast.success('Department added successfully!')
     emit('close')
   } catch (err) {

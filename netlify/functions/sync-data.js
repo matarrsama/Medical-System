@@ -1,6 +1,9 @@
-import { db, auth } from './_shared/admin.js'
+import { db, auth, corsHeaders } from './_shared/admin.js'
 
 export const handler = async (event) => {
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 200, headers: corsHeaders, body: '' }
+  }
   try {
     const { users } = JSON.parse(event.body)
 
@@ -39,8 +42,8 @@ export const handler = async (event) => {
       }
     }
 
-    return { statusCode: 200, body: JSON.stringify(results) }
+    return { statusCode: 200, headers: corsHeaders, body: JSON.stringify(results) }
   } catch (err) {
-    return { statusCode: 500, body: JSON.stringify({ error: err.message }) }
+    return { statusCode: 500, headers: corsHeaders, body: JSON.stringify({ error: err.message }) }
   }
 }

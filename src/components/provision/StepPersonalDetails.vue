@@ -19,17 +19,18 @@
       </div>
     </div>
     <div class="group">
-      <label class="block text-label-md font-label-md text-on-surface-variant mb-1 ml-1">Full Name</label>
+      <label class="block text-label-md font-label-md text-on-surface-variant mb-1 ml-1">Full Name <span class="text-error">*</span></label>
         <input
           :value="modelValue.fullName"
           @input="onNameInput"
           class="w-full bg-surface-container-highest border-none rounded-xl px-4 py-3.5 text-body-sm text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary transition-all"
           placeholder="e.g. Dr. Julian Vane"
           type="text"
+          required
         />
     </div>
     <div class="group">
-      <label class="block text-label-md font-label-md text-on-surface-variant mb-1 ml-1">Employee ID</label>
+      <label class="block text-label-md font-label-md text-on-surface-variant mb-1 ml-1">Employee ID <span class="text-error">*</span></label>
       <div class="relative">
         <input
           :value="modelValue.employeeId"
@@ -38,6 +39,7 @@
           :class="empIdTouched && !empIdValid && modelValue.employeeId ? 'bg-error-container/20 border-error focus:ring-error' : 'bg-surface-container-highest border-none focus:ring-primary'"
           placeholder="BGH-XXX-XX"
           type="text"
+          required
         />
         <button type="button" @click="generateId" class="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-lg bg-surface-container-low text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-all">
           <span class="material-symbols-outlined text-[18px]">auto_awesome</span>
@@ -51,28 +53,36 @@
     </div>
     <div class="grid grid-cols-2 gap-4">
       <div class="group">
-        <label class="block text-label-md font-label-md text-on-surface-variant mb-1 ml-1">Professional Title</label>
+        <label class="block text-label-md font-label-md text-on-surface-variant mb-1 ml-1">Professional Title <span class="text-error">*</span></label>
         <input
           :value="modelValue.title"
           @input="onTitleInput"
           class="w-full bg-surface-container-highest border-none rounded-xl px-4 py-3.5 text-body-sm text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary transition-all"
           placeholder="Senior Surgical Resident"
           type="text"
+          required
         />
       </div>
       <div class="group">
-        <label class="block text-label-md font-label-md text-on-surface-variant mb-1 ml-1">Department</label>
+        <label class="block text-label-md font-label-md text-on-surface-variant mb-1 ml-1">Department <span class="text-error">*</span></label>
         <div class="relative">
           <select
             :value="modelValue.department"
-            @change="update('department', $event.target.value)"
+            @change="onDeptChange($event.target.value)"
             class="w-full appearance-none bg-surface-container-highest border-none rounded-xl px-4 py-3.5 text-body-sm text-on-surface focus:ring-1 focus:ring-primary transition-all"
+            :disabled="departmentLocked"
+            required
           >
             <option disabled value="">Select Department</option>
-            <option v-for="dept in departments" :key="dept" :value="dept">{{ dept }}</option>
+            <option v-for="dept in departments" :key="dept.name" :value="dept.name">{{ dept.name }}</option>
           </select>
           <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-outline">keyboard_arrow_down</span>
         </div>
+        <label v-if="modelValue.department" class="flex items-center gap-2 mt-2 px-1 cursor-pointer" :class="deptHasHead ? 'opacity-40 cursor-not-allowed' : ''">
+          <input type="checkbox" :checked="modelValue.makeDepartmentHead" @change="update('makeDepartmentHead', $event.target.checked)" :disabled="deptHasHead" class="rounded border-outline-variant text-primary focus:ring-primary" />
+          <span class="text-label-sm font-label-sm text-on-surface">Make department head</span>
+          <span v-if="deptHasHead" class="text-label-xs text-on-surface-variant">(already assigned)</span>
+        </label>
       </div>
     </div>
   </div>
@@ -83,7 +93,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { db } from '@/lib/firebase'
 import { collection, onSnapshot } from 'firebase/firestore'
 
-const props = defineProps({ modelValue: { type: Object, required: true } })
+const props = defineProps({ modelValue: { type: Object, required: true }, departmentLocked: { type: Boolean, default: false } })
 const emit = defineEmits(['update:modelValue'])
 const fileInput = ref(null)
 const empIdTouched = ref(false)
@@ -91,6 +101,20 @@ const departments = ref([])
 let unsubDepts = null
 
 const empIdValid = computed(() => /^BGH-[A-Z0-9]{3}-[A-Z0-9]{2}$/i.test(props.modelValue.employeeId))
+
+const deptHasHead = computed(() => {
+  if (!props.modelValue.department) return true
+  const dept = departments.value.find(d => d.name === props.modelValue.department)
+  return !!dept?.headId
+})
+
+function onDeptChange(value) {
+  const updatePayload = { department: value }
+  if (value !== props.modelValue.department) {
+    updatePayload.makeDepartmentHead = false
+  }
+  emit('update:modelValue', { ...props.modelValue, ...updatePayload })
+}
 
 function randChar() {
   const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -144,7 +168,7 @@ function update(field, value) {
 
 onMounted(() => {
   unsubDepts = onSnapshot(collection(db, 'departments'), (snap) => {
-    departments.value = snap.docs.map(d => d.data().name)
+    departments.value = snap.docs.map(d => ({ name: d.data().name, headId: d.data().headId || null }))
   })
 })
 

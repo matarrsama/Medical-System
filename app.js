@@ -1,4 +1,4 @@
-// Router and Interactive Manager for Hospital ICT Service Management App
+// Router and Interactive Manager for Medical Records System App
 
 const routes = {
     '': 'login.html',

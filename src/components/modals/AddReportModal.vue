@@ -24,7 +24,7 @@
       </div>
       <div class="grid grid-cols-2 gap-4">
         <div>
-          <label class="text-label-md font-label-md text-on-surface">Report Type</label>
+          <label class="text-label-md font-label-md text-on-surface">Report Type <span class="text-error">*</span></label>
           <select v-model="form.type" class="w-full mt-1 px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary">
             <option>Tickets</option>
             <option>Inventory</option>
@@ -35,7 +35,7 @@
           </select>
         </div>
         <div>
-          <label class="text-label-md font-label-md text-on-surface">Status</label>
+          <label class="text-label-md font-label-md text-on-surface">Status <span class="text-error">*</span></label>
           <select v-model="form.status" class="w-full mt-1 px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary">
             <option>Active</option>
             <option>Draft</option>
@@ -74,14 +74,11 @@
 <script setup>
 import { reactive, ref, onMounted } from 'vue'
 import { useToast } from '@/composables/useToast'
-import { useCounter } from '@/composables/useCounter'
+import { generateId } from '@/utils/generateId'
 import { useAuditLog } from '@/composables/useAuditLog'
-import { db, auth } from '@/lib/firebase'
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
 
 const emit = defineEmits(['close'])
 const toast = useToast()
-const { nextVal } = useCounter()
 const { logActivity } = useAuditLog()
 const saving = ref(false)
 const reportId = ref('')
@@ -90,14 +87,9 @@ const form = reactive({
   title: '', description: '', type: 'Tickets', status: 'Active', icon: 'summarize'
 })
 
-onMounted(async () => {
-  try {
-    const year = new Date().getFullYear()
-    reportId.value = await nextVal(`reportId_${year}`, { prefix: `RPT-${year}-`, pad: 3, starting: 1 })
-  } catch (err) {
-    console.warn('[AddReportModal] counter unavailable, using client-side ID:', err)
-    reportId.value = `RPT-${new Date().getFullYear()}-${Date.now().toString(36).slice(-3).toUpperCase()}${Math.random().toString(36).slice(2, 4).toUpperCase()}`
-  }
+onMounted(() => {
+  const year = new Date().getFullYear()
+  reportId.value = generateId(`RPT-${year}-`, 6)
 })
 
 async function submit() {

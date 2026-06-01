@@ -115,11 +115,13 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useUIStore } from '@/stores/ui'
+import { useAuthStore } from '@/stores/auth'
 import { db } from '@/lib/firebase'
-import { collection, onSnapshot } from 'firebase/firestore'
+import { collection, query, where, onSnapshot } from 'firebase/firestore'
 import { useFirestoreCache } from '@/composables/useFirestoreCache'
 
 const ui = useUIStore()
+const auth = useAuthStore()
 const activeTab = ref('pending')
 
 const allRequests = ref([])
@@ -129,7 +131,11 @@ if (cached) allRequests.value = cached
 let unsubscribe = null
 
 onMounted(() => {
-  unsubscribe = onSnapshot(collection(db, 'requests'), (snapshot) => {
+  const canViewAll = auth.role && ['Sys Administrator', 'Hospital Admin', 'ICT Officer'].includes(auth.role)
+  const q = canViewAll
+    ? collection(db, 'requests')
+    : query(collection(db, 'requests'), where('department', '==', auth.user?.department || ''))
+  unsubscribe = onSnapshot(q, (snapshot) => {
     const mapped = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
     allRequests.value = mapped
     cache.save('requests', mapped)
@@ -145,7 +151,8 @@ onUnmounted(() => {
 const tabs = computed(() => [
   { key: 'pending', label: 'Pending', count: allRequests.value.filter(r => r.status === 'Pending' || r.status === 'Open').length },
   { key: 'approved', label: 'Approved', count: allRequests.value.filter(r => r.status === 'Approved').length },
-  { key: 'rejected', label: 'Rejected', count: allRequests.value.filter(r => r.status === 'Rejected').length }
+  { key: 'rejected', label: 'Rejected', count: allRequests.value.filter(r => r.status === 'Rejected').length },
+  { key: 'all', label: 'All', count: allRequests.value.length }
 ])
 
 const searchQuery = ref('')

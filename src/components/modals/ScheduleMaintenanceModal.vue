@@ -28,8 +28,8 @@
           <input v-model="form.equipment" class="w-full mt-1 px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary" required />
         </div>
         <div>
-          <label class="text-label-md font-label-md text-on-surface">Type</label>
-          <select v-model="form.type" class="w-full mt-1 px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary">
+          <label class="text-label-md font-label-md text-on-surface">Type <span class="text-error">*</span></label>
+          <select v-model="form.type" class="w-full mt-1 px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary" required>
             <option>Preventive</option><option>Corrective</option><option>Inspection</option><option>Calibration</option>
           </select>
         </div>
@@ -37,8 +37,8 @@
 
       <div class="grid grid-cols-2 gap-4">
         <div>
-          <label class="text-label-md font-label-md text-on-surface">Department</label>
-          <select v-if="canChooseDepartment" v-model="form.department" class="w-full mt-1 px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary">
+          <label class="text-label-md font-label-md text-on-surface">Department <span class="text-error">*</span></label>
+          <select v-if="canChooseDepartment" v-model="form.department" class="w-full mt-1 px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary" required>
             <option v-for="dept in deptStore.items" :key="dept.id" :value="dept.name">{{ dept.name }}</option>
           </select>
           <div v-else class="flex items-center gap-2 mt-1 px-3 py-2.5 border border-outline-variant/50 rounded-lg bg-surface-container text-body-sm text-on-surface font-medium">
@@ -47,7 +47,7 @@
           </div>
         </div>
         <div>
-          <label class="text-label-md font-label-md text-on-surface">Status</label>
+          <label class="text-label-md font-label-md text-on-surface">Status <span class="text-error">*</span></label>
           <select v-model="form.status" class="w-full mt-1 px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary">
             <option>Scheduled</option><option>In Progress</option><option>Completed</option>
           </select>
@@ -87,16 +87,12 @@
 <script setup>
 import { reactive, ref, computed, onMounted, onUnmounted } from 'vue'
 import { useToast } from '@/composables/useToast'
-import { useCounter } from '@/composables/useCounter'
+import { generateId } from '@/utils/generateId'
 import { useAuthStore } from '@/stores/auth'
 import { useAuditLog } from '@/composables/useAuditLog'
-import { useDepartmentsStore } from '@/stores/departments'
-import { db, auth } from '@/lib/firebase'
-import { collection, addDoc, serverTimestamp, doc, getDoc } from 'firebase/firestore'
 
 const emit = defineEmits(['close'])
 const toast = useToast()
-const { nextVal } = useCounter()
 const authStore = useAuthStore()
 const { logActivity } = useAuditLog()
 const canChooseDepartment = computed(() =>
@@ -136,13 +132,8 @@ async function submit() {
 }
 
 onMounted(async () => {
-  try {
-    const year = new Date().getFullYear()
-    maintenanceId.value = await nextVal(`maintenanceId_${year}`, { prefix: `MNT-${year}-`, pad: 3, starting: 1 })
-  } catch (err) {
-    console.warn('[ScheduleMaintenanceModal] counter unavailable, using client-side ID:', err)
-    maintenanceId.value = `MNT-${new Date().getFullYear()}-${Date.now().toString(36).slice(-3).toUpperCase()}${Math.random().toString(36).slice(2, 4).toUpperCase()}`
-  }
+  const year = new Date().getFullYear()
+  maintenanceId.value = generateId(`MNT-${year}-`, 6)
   const uid = auth.currentUser?.uid
   if (uid) {
     const userSnap = await getDoc(doc(db, 'users', uid))

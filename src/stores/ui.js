@@ -7,6 +7,9 @@ export const useUIStore = defineStore('ui', () => {
   const activeModal = ref(null)
   const modalData = ref(null)
   const modalExpanded = ref(false)
+  const sidebarOpen = ref(false)
+  const searchOpen = ref(false)
+  const isOnline = ref(navigator.onLine)
 
   function toggleTheme() {
     isDark.value = !isDark.value
@@ -37,5 +40,17 @@ export const useUIStore = defineStore('ui', () => {
     modalExpanded.value = !modalExpanded.value
   }
 
-  return { isDark, toasts, activeModal, modalData, modalExpanded, toggleTheme, showToast, openModal, closeModal, toggleModalExpanded }
+  function toggleSidebar() {
+    sidebarOpen.value = !sidebarOpen.value
+  }
+
+  function closeSidebar() {
+    sidebarOpen.value = false
+  }
+
+  function toggleSearch() {
+    searchOpen.value = !searchOpen.value
+  }
+
+  return { isDark, toasts, activeModal, modalData, modalExpanded, sidebarOpen, searchOpen, isOnline, toggleTheme, showToast, openModal, closeModal, toggleModalExpanded, toggleSidebar, closeSidebar, toggleSearch }
 })

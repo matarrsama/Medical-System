@@ -126,7 +126,7 @@ export function useGlobalSearch() {
           type: 'department',
           icon: 'domain',
           label: d.name,
-          subtitle: `${d.head ? 'Head: ' + d.head : ''}`,
+          subtitle: `${(d.headName || d.head) ? 'Head: ' + (d.headName || d.head) : ''}`,
           route: '/departments'
         })
       }

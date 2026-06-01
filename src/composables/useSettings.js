@@ -3,7 +3,7 @@ import { db } from '@/lib/firebase'
 import { doc, onSnapshot, setDoc } from 'firebase/firestore'
 
 const DEFAULT_SETTINGS = {
-  hospitalName: 'Hospital ICT Service Management',
+  hospitalName: 'Medical Records System',
   displayName: 'ICT Admin Console',
   timeZone: 'America/New_York',
   language: 'English (US)',

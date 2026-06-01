@@ -109,7 +109,7 @@ service cloud.firestore {
     // ── Departments ──────────────────────────────
     match /departments/{deptId} {
       allow read: if isAuth()
-      allow write: if isAuth() && minLevel('users', 4)
+      allow write: if isAuth() && minLevel('users', 3)
     }
 
     // ── Requests ─────────────────────────────────
@@ -122,7 +122,8 @@ service cloud.firestore {
     // ── Audit Logs ────────────────────────────────
     match /auditLogs/{logId} {
       allow read: if isAuth() && level('settings') >= 3
-      allow write: if isAuth() && minLevel('users', 4)
+      allow create: if isAuth()
+      allow update, delete: if isAuth() && level('settings') >= 3
     }
 
     // ── ID Counters ───────────────────────────────

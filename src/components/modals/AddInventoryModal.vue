@@ -24,12 +24,12 @@
 
       <div class="grid grid-cols-2 gap-4">
         <div>
-          <label class="text-label-md font-label-md text-on-surface">Asset Name</label>
+          <label class="text-label-md font-label-md text-on-surface">Asset Name <span class="text-error">*</span></label>
           <input v-model="form.name" class="w-full mt-1 px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary" required />
         </div>
         <div>
-          <label class="text-label-md font-label-md text-on-surface">Category</label>
-          <select v-model="form.category" class="w-full mt-1 px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary">
+          <label class="text-label-md font-label-md text-on-surface">Category <span class="text-error">*</span></label>
+          <select v-model="form.category" class="w-full mt-1 px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary" required>
             <option>Desktop</option><option>Network</option><option>Printer</option><option>Server</option><option>Mobile</option>
           </select>
         </div>
@@ -37,8 +37,8 @@
 
       <div class="grid grid-cols-2 gap-4">
         <div>
-          <label class="text-label-md font-label-md text-on-surface">Department</label>
-          <select v-if="canChooseDepartment" v-model="form.department" class="w-full mt-1 px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary">
+          <label class="text-label-md font-label-md text-on-surface">Department <span class="text-error">*</span></label>
+          <select v-if="canChooseDepartment" v-model="form.department" class="w-full mt-1 px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary" required>
             <option v-for="dept in deptStore.items" :key="dept.id" :value="dept.name">{{ dept.name }}</option>
           </select>
           <div v-else class="flex items-center gap-2 mt-1 px-3 py-2.5 border border-outline-variant/50 rounded-lg bg-surface-container text-body-sm text-on-surface font-medium">
@@ -48,7 +48,7 @@
         </div>
         <div>
           <label class="text-label-md font-label-md text-on-surface">Status</label>
-          <select v-model="form.status" class="w-full mt-1 px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary">
+          <select v-model="form.status" class="w-full mt-1 px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary" required>
             <option>Active</option><option>Maintenance</option><option>Retired</option>
           </select>
         </div>
@@ -76,22 +76,21 @@
 <script setup>
 import { reactive, ref, computed, onMounted, onUnmounted } from 'vue'
 import { useToast } from '@/composables/useToast'
-import { useCounter } from '@/composables/useCounter'
+import { generateId } from '@/utils/generateId'
 import { useAuthStore } from '@/stores/auth'
 import { useAuditLog } from '@/composables/useAuditLog'
-import { useDepartmentsStore } from '@/stores/departments'
-import { db, auth } from '@/lib/firebase'
-import { collection, addDoc, serverTimestamp, doc, getDoc } from 'firebase/firestore'
 
 const emit = defineEmits(['close'])
 const toast = useToast()
-const { nextVal } = useCounter()
 const authStore = useAuthStore()
 const { logActivity } = useAuditLog()
+const saving = ref(false)
+const userDept = ref('')
 const canChooseDepartment = computed(() =>
   ['Sys Administrator', 'Hospital Admin', 'ICT Officer'].includes(authStore.role)
 )
 
+const assetTag = ref('')
 const form = reactive({
   name: '', category: 'Desktop', department: '', status: 'Active', location: ''
 })
@@ -123,12 +122,7 @@ async function submit() {
 }
 
 onMounted(async () => {
-  try {
-    assetTag.value = await nextVal('assetTag', { prefix: 'AST-', pad: 4, starting: 1 })
-  } catch (err) {
-    console.warn('[AddInventoryModal] counter unavailable, using client-side ID:', err)
-    assetTag.value = `AST-${Date.now().toString(36).slice(-4).toUpperCase()}${Math.random().toString(36).slice(2, 4).toUpperCase()}`
-  }
+  assetTag.value = generateId('AST-', 8)
   const uid = auth.currentUser?.uid
   if (uid) {
     const userSnap = await getDoc(doc(db, 'users', uid))

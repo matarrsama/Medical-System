@@ -44,7 +44,9 @@ const modals = {
   AddReport: defineAsyncComponent(() => import('./AddReportModal.vue')),
   ReportDetail: defineAsyncComponent(() => import('./ReportDetailModal.vue')),
   ExportReports: defineAsyncComponent(() => import('./ExportReportsModal.vue')),
-  DeleteConfirm: defineAsyncComponent(() => import('./DeleteConfirmModal.vue'))
+  DeleteConfirm: defineAsyncComponent(() => import('./DeleteConfirmModal.vue')),
+  ChangePassword: defineAsyncComponent(() => import('./ChangePasswordModal.vue')),
+  Help: defineAsyncComponent(() => import('./HelpModal.vue'))
 }
 
 const currentModal = computed(() => modals[ui.activeModal] || null)

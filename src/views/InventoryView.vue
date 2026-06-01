@@ -10,7 +10,7 @@
         <h2 class="text-display font-display text-on-surface">Inventory &amp; Assets</h2>
         <p class="text-body-md font-body-md text-on-surface-variant mt-1">Track and manage hospital ICT assets and equipment.</p>
       </div>
-      <button @click="ui.openModal('AddInventory')" class="bg-primary text-on-primary text-label-md font-label-md px-4 py-2 rounded-lg hover:bg-primary-container transition-colors shadow-sm flex items-center gap-2">
+      <button v-if="canAddInventory" @click="ui.openModal('AddInventory')" class="bg-primary text-on-primary text-label-md font-label-md px-4 py-2 rounded-lg hover:bg-primary-container transition-colors shadow-sm flex items-center gap-2">
         <span class="material-symbols-outlined text-[18px]">add</span>
         Add Inventory
       </button>
@@ -42,7 +42,7 @@
           </div>
         </div>
         <div class="flex items-center gap-2">
-          <button v-if="selectedIds.size > 0" @click="deleteSelected" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-label-sm font-label-sm text-on-error bg-error transition-colors shadow-sm">
+          <button v-if="canManageInventory && selectedIds.size > 0" @click="deleteSelected" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-label-sm font-label-sm text-on-error bg-error transition-colors shadow-sm">
             <span class="material-symbols-outlined" style="font-size: 16px;">delete</span>
             Delete ({{ selectedIds.size }})
           </button>
@@ -87,15 +87,17 @@
                     <span class="material-symbols-outlined text-[16px] text-outline">info</span>
                     View Details
                   </button>
-                  <button @click.stop="openEdit(asset)" class="flex items-center gap-2.5 w-full px-4 py-2.5 text-label-sm font-label-sm text-on-surface text-left">
-                    <span class="material-symbols-outlined text-[16px] text-outline">edit</span>
-                    Edit
-                  </button>
-                  <div class="border-t border-outline-variant my-1"></div>
-                  <button @click.stop="deleteAsset(asset)" class="flex items-center gap-2.5 w-full px-4 py-2.5 text-label-sm font-label-sm text-error text-left">
-                    <span class="material-symbols-outlined text-[16px]">delete</span>
-                    Delete
-                  </button>
+                  <template v-if="canManageInventory">
+                    <button @click.stop="openEdit(asset)" class="flex items-center gap-2.5 w-full px-4 py-2.5 text-label-sm font-label-sm text-on-surface text-left">
+                      <span class="material-symbols-outlined text-[16px] text-outline">edit</span>
+                      Edit
+                    </button>
+                    <div class="border-t border-outline-variant my-1"></div>
+                    <button @click.stop="deleteAsset(asset)" class="flex items-center gap-2.5 w-full px-4 py-2.5 text-label-sm font-label-sm text-error text-left">
+                      <span class="material-symbols-outlined text-[16px]">delete</span>
+                      Delete
+                    </button>
+                  </template>
                 </div>
               </td>
             </tr>
@@ -109,10 +111,15 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useUIStore } from '@/stores/ui'
+import { useAuthStore } from '@/stores/auth'
 import { useInventoryStore } from '@/stores/inventory'
 
 const ui = useUIStore()
+const authStore = useAuthStore()
 const inventoryStore = useInventoryStore()
+
+const canManageInventory = computed(() => ['Sys Administrator', 'Hospital Admin', 'ICT Officer'].includes(authStore.role))
+const canAddInventory = computed(() => canManageInventory.value || !!authStore.departmentHeadOf)
 
 const searchQuery = ref('')
 const filterCategory = ref('')
@@ -124,7 +131,14 @@ function toggleSort() {
 }
 
 const filteredAssets = computed(() => {
-  const items = inventoryStore.assets.filter(a => {
+  let items = inventoryStore.assets
+  if (!canManageInventory.value) {
+    const userDept = authStore.user?.department
+    const headDept = authStore.departmentHeadOf
+    const dept = headDept || userDept
+    if (dept) items = items.filter(a => a.department === dept)
+  }
+  items = items.filter(a => {
     const q = searchQuery.value.toLowerCase()
     if (q && !(a.assetTag || a.id).toLowerCase().includes(q) && !(a.name || '').toLowerCase().includes(q)) return false
     if (filterCategory.value && a.category !== filterCategory.value) return false

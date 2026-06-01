@@ -58,7 +58,7 @@ const saving = ref(false)
 const { saveSettings } = useSettings()
 
 const defaults = {
-  hospitalName: 'Hospital ICT Service Management',
+  hospitalName: 'Medical Records System',
   displayName: 'ICT Admin Console',
   timeZone: 'America/New_York',
   language: 'English (US)',
@@ -86,7 +86,7 @@ function buildSections(overrides = {}) {
       description: 'Basic system identification and regional preferences.',
       items: [
         item('hospitalName', 'Hospital Name', 'Display name for the system', 'text'),
-        item('displayName', 'System Display Name', 'Title shown in the sidebar and browser tab', 'text'),
+
         item('timeZone', 'Time Zone', 'System-wide time zone for all logs and schedules', 'select', { options: ['America/New_York', 'America/Chicago', 'America/Denver', 'America/Los_Angeles', 'Europe/London', 'Europe/Berlin', 'Asia/Dubai', 'Asia/Tokyo', 'UTC'] }),
         item('language', 'Language', 'Default interface language', 'select', { options: ['English (US)', 'English (UK)', 'French', 'Spanish', 'Arabic'] }),
         item('dateFormat', 'Date Format', 'How dates are displayed throughout the system', 'select', { options: ['MM/DD/YYYY', 'DD/MM/YYYY', 'YYYY-MM-DD'] }),
