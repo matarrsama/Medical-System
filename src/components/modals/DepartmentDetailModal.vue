@@ -96,6 +96,7 @@ import { useUIStore } from '@/stores/ui'
 import { useToast } from '@/composables/useToast'
 import { useAuditLog } from '@/composables/useAuditLog'
 import { useUsersStore } from '@/stores/users'
+import { setDeptHead } from '@/services/api'
 import { db, auth } from '@/lib/firebase'
 import { doc, updateDoc, collection, onSnapshot } from 'firebase/firestore'
 import { getDeptColor } from '@/stores/departments'
@@ -140,13 +141,24 @@ async function save() {
   if (!editForm.name.trim()) return
   saving.value = true
   try {
+    const oldHeadId = dept.value.headId
+    const newHeadId = editForm.headId
+
     await updateDoc(doc(db, 'departments', dept.value.id), {
       name: editForm.name,
-      headId: editForm.headId || null,
+      headId: newHeadId || null,
       headName: editForm.headName || null,
       head: editForm.headName || null,
       location: editForm.location
     })
+
+    if (oldHeadId && oldHeadId !== newHeadId) {
+      await setDeptHead(oldHeadId, null).catch(() => {})
+    }
+    if (newHeadId && newHeadId !== oldHeadId) {
+      await setDeptHead(newHeadId, editForm.name).catch(() => {})
+    }
+
     await logActivity({ action: 'Update', resource: `Department ${editForm.name}`, details: `Updated department info` })
     toast.success(`Department ${editForm.name} updated successfully!`)
     editing.value = false

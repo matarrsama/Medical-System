@@ -10,7 +10,7 @@
         <h2 class="text-display font-display text-on-surface">Requests</h2>
         <p class="text-body-md font-body-md text-on-surface-variant mt-1">Track and approve equipment, access, and service requests.</p>
       </div>
-      <button @click="ui.openModal('NewRequest')" class="bg-primary text-on-primary text-label-md font-label-md px-4 py-2 rounded-lg hover:bg-primary-container transition-colors shadow-sm flex items-center gap-2">
+      <button v-if="auth.canManageUsers || auth.departmentHeadOf" @click="ui.openModal('NewRequest')" class="bg-primary text-on-primary text-label-md font-label-md px-4 py-2 rounded-lg hover:bg-primary-container transition-colors shadow-sm flex items-center gap-2">
         <span class="material-symbols-outlined text-[18px]">add</span>
         New Request
       </button>

@@ -22,7 +22,9 @@ export function useGlobalSearch() {
   if (cachedDepartments) departments.value = cachedDepartments
 
   function onError(label) {
-    return (err) => console.error(`[useGlobalSearch] ${label} onSnapshot error:`, err.code, err.message)
+    return (err) => {
+      if (err.code !== 'permission-denied') console.error(`[useGlobalSearch] ${label} onSnapshot error:`, err.code, err.message)
+    }
   }
 
   const unsubTickets = onSnapshot(

@@ -6,12 +6,16 @@ export const handler = async (event) => {
   }
   try {
     const data = JSON.parse(event.body)
-    const { email, password, displayName, employeeId, title, department, role, mfa, avatar } = data
+    const { email, password, displayName, employeeId, title, department, role, mfa, avatar, makeDepartmentHead } = data
 
     const userRecord = await auth.createUser({ email, password, displayName })
     const uid = userRecord.uid
 
-    await auth.setCustomUserClaims(uid, { role })
+    const claims = { role }
+    if (makeDepartmentHead && department) {
+      claims.deptHeadOf = department
+    }
+    await auth.setCustomUserClaims(uid, claims)
 
     await db.collection('users').doc(uid).set({
       uid,

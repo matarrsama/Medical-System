@@ -74,15 +74,19 @@
 </template>
 
 <script setup>
-import { reactive, ref, computed, onMounted, onUnmounted } from 'vue'
+import { reactive, ref, computed, onMounted } from 'vue'
 import { useToast } from '@/composables/useToast'
 import { generateId } from '@/utils/generateId'
 import { useAuthStore } from '@/stores/auth'
+import { useDepartmentsStore } from '@/stores/departments'
 import { useAuditLog } from '@/composables/useAuditLog'
+import { db, auth } from '@/lib/firebase'
+import { collection, addDoc, serverTimestamp, doc, getDoc } from 'firebase/firestore'
 
 const emit = defineEmits(['close'])
 const toast = useToast()
 const authStore = useAuthStore()
+const deptStore = useDepartmentsStore()
 const { logActivity } = useAuditLog()
 const saving = ref(false)
 const userDept = ref('')
@@ -133,5 +137,5 @@ onMounted(async () => {
   }
 })
 
-onUnmounted(() => {})
+
 </script>

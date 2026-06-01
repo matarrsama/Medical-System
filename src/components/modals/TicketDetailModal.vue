@@ -32,7 +32,7 @@
         </div>
       </div>
 
-      <div v-if="!editing" class="flex items-center gap-2">
+      <div v-if="!editing && authStore.canViewAllTickets" class="flex items-center gap-2">
         <span class="text-label-sm text-outline font-medium mr-1">Status:</span>
         <button v-for="s in ['Open', 'Assigned', 'In Progress', 'Resolved', 'Closed']" :key="s" @click="updateStatus(s)" :class="[s === ticket.status ? 'bg-primary text-on-primary shadow-sm' : 'bg-surface-container hover:bg-surface-container-higher text-on-surface-variant', 'px-3 py-1.5 rounded-lg text-label-sm font-label-sm transition-all']">{{ s }}</button>
       </div>
@@ -150,6 +150,7 @@
 <script setup>
 import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import { useUIStore } from '@/stores/ui'
+import { useAuthStore } from '@/stores/auth'
 import { useToast } from '@/composables/useToast'
 import { useDepartmentsStore } from '@/stores/departments'
 import { useUsersStore } from '@/stores/users'
@@ -158,6 +159,7 @@ import { db, auth } from '@/lib/firebase'
 import { doc, updateDoc, onSnapshot } from 'firebase/firestore'
 
 const ui = useUIStore()
+const authStore = useAuthStore()
 const toast = useToast()
 const { logActivity } = useAuditLog()
 const modalData = computed(() => ui.modalData || {})

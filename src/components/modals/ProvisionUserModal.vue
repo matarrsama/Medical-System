@@ -188,7 +188,8 @@ async function submit() {
       department: wizardData.department,
       role: idToLabel(wizardData.role),
       mfa: wizardData.credentials.mfa,
-      avatar: wizardData.avatar
+      avatar: wizardData.avatar,
+      makeDepartmentHead: wizardData.makeDepartmentHead
     })
     if (wizardData.makeDepartmentHead && result.uid && wizardData.department) {
       const snap = await getDocs(query(collection(db, 'departments'), where('name', '==', wizardData.department)))

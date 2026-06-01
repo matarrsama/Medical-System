@@ -46,7 +46,8 @@
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="text-label-md font-label-md text-on-surface mb-1.5 block">Department <span class="text-error">*</span></label>
-            <select v-model="form.department" class="w-full px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary focus:border-primary transition-colors" required>
+            <select v-model="form.department" :disabled="departmentLocked" class="w-full px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary focus:border-primary transition-colors disabled:opacity-60 disabled:cursor-not-allowed" required>
+              <option disabled value="">Select Department</option>
               <option v-for="dept in deptStore.items" :key="dept.id" :value="dept.name">{{ dept.name }}</option>
             </select>
           </div>
@@ -91,21 +92,30 @@
 </template>
 
 <script setup>
-import { reactive, ref, onMounted, onUnmounted } from 'vue'
+import { reactive, ref, computed, onMounted } from 'vue'
 import { useToast } from '@/composables/useToast'
 import { generateId } from '@/utils/generateId'
 import { useAuditLog } from '@/composables/useAuditLog'
+import { useDepartmentsStore } from '@/stores/departments'
+import { useAuthStore } from '@/stores/auth'
+import { db, auth } from '@/lib/firebase'
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
 
 const emit = defineEmits(['close'])
 const toast = useToast()
 const { logActivity } = useAuditLog()
-const saving = ref(false)
 const deptStore = useDepartmentsStore()
+const authStore = useAuthStore()
+const saving = ref(false)
 
 const requestId = ref('')
 
+const departmentLocked = computed(() =>
+  !!authStore.departmentHeadOf && !authStore.canManageUsers
+)
+
 const form = reactive({
-  title: '', type: 'Equipment', priority: 'Medium', department: 'ER', location: '', description: ''
+  title: '', type: 'Equipment', priority: 'Medium', department: '', location: '', description: ''
 })
 
 async function submit() {
@@ -139,7 +149,12 @@ async function submit() {
 onMounted(() => {
   const year = new Date().getFullYear()
   requestId.value = generateId(`REQ-${year}-`, 6)
+  if (departmentLocked.value) {
+    form.department = authStore.departmentHeadOf
+  } else if (!form.department) {
+    form.department = deptStore.items[0]?.name || ''
+  }
 })
 
-onUnmounted(() => {})
+
 </script>

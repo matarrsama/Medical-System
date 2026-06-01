@@ -47,6 +47,8 @@ service cloud.firestore {
 
     function role() { return request.auth.token.role }
 
+    function isDeptHead() { return request.auth.token.deptHeadOf != null }
+
     // Returns permission level (0=none, 1=view, 2=create, 3=edit, 4=full)
     // for a given role and area (tickets/inventory/users/reports/settings).
     function level(area) {
@@ -80,7 +82,7 @@ service cloud.firestore {
 
     // ── Tickets ───────────────────────────────────
     match /tickets/{ticketId} {
-      allow read: if isAuth() && minLevel('tickets', 1)
+      allow read: if isAuth() && minLevel('tickets', 3)
       allow create: if isAuth() && minLevel('tickets', 2)
       allow update, delete: if isAuth() && minLevel('tickets', 3)
     }
@@ -88,8 +90,8 @@ service cloud.firestore {
     // ── Inventory ────────────────────────────────
     match /inventory/{itemId} {
       allow read: if isAuth() && minLevel('inventory', 1)
-      allow create: if isAuth() && minLevel('inventory', 2)
-      allow update, delete: if isAuth() && minLevel('inventory', 3)
+      allow create: if isAuth() && (minLevel('inventory', 2) || (isDeptHead() && request.resource.data.department == request.auth.token.deptHeadOf))
+      allow update, delete: if isAuth() && (minLevel('inventory', 3) || (isDeptHead() && resource.data.department == request.auth.token.deptHeadOf))
     }
 
     // ── Reports ──────────────────────────────────

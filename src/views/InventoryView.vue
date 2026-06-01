@@ -98,6 +98,12 @@
                       Delete
                     </button>
                   </template>
+                  <template v-else-if="authStore.departmentHeadOf && asset.department === authStore.departmentHeadOf">
+                    <button @click.stop="openEdit(asset)" class="flex items-center gap-2.5 w-full px-4 py-2.5 text-label-sm font-label-sm text-on-surface text-left">
+                      <span class="material-symbols-outlined text-[16px] text-outline">edit</span>
+                      Edit
+                    </button>
+                  </template>
                 </div>
               </td>
             </tr>
