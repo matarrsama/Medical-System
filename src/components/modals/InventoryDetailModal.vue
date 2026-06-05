@@ -1,14 +1,14 @@
 <template>
   <div class="flex flex-col h-full">
-    <div class="flex items-center justify-between px-6 py-4 border-b border-outline-variant shrink-0">
+    <div class="flex items-center justify-between px-6 py-4 border-b border-outline-variant dark:border-outline shrink-0">
       <div class="flex items-center gap-3">
-        <span class="material-symbols-outlined text-primary text-[22px]">inventory_2</span>
+        <span class="material-symbols-outlined text-primary dark:text-inverse-primary text-[22px]">inventory_2</span>
         <div>
-          <h3 class="text-headline-md font-headline-md text-on-surface">{{ editing ? 'Edit Asset' : 'Asset Details' }}</h3>
-          <p class="text-body-sm text-on-surface-variant mt-0.5">{{ asset.assetTag || asset.id }}</p>
+          <h3 class="text-headline-md font-headline-md text-on-surface dark:text-inverse-on-surface">{{ editing ? 'Edit Asset' : 'Asset Details' }}</h3>
+          <p class="text-body-sm text-on-surface-variant dark:text-outline mt-0.5">{{ asset.assetTag || asset.id }}</p>
         </div>
       </div>
-      <button @click="$emit('close')" class="p-1.5 rounded-lg hover:bg-surface-container text-on-surface-variant transition-colors">
+      <button @click="$emit('close')" class="p-1.5 rounded-lg hover:bg-surface-container dark:hover:bg-white/[0.08] text-on-surface-variant dark:text-outline transition-colors">
         <span class="material-symbols-outlined text-[20px]">close</span>
       </button>
     </div>
@@ -17,10 +17,10 @@
       <div class="flex items-start gap-4">
         <div class="min-w-0 flex-1">
           <template v-if="editing">
-            <input v-model="editForm.name" class="w-full px-3 py-2.5 border border-outline-variant rounded-lg text-headline-sm font-headline-md bg-surface focus:ring-1 focus:ring-primary" />
+            <input v-model="editForm.name" class="w-full px-3 py-2.5 border border-outline-variant dark:border-outline rounded-lg text-headline-sm font-headline-md bg-surface dark:bg-inverse-surface focus:ring-1 focus:ring-primary" />
           </template>
           <template v-else>
-            <h2 class="text-headline-sm font-headline-md text-on-surface">{{ asset.name }}</h2>
+            <h2 class="text-headline-sm font-headline-md text-on-surface dark:text-inverse-on-surface">{{ asset.name }}</h2>
           </template>
           <div class="flex items-center gap-3 mt-2">
             <span :class="statusClass(editing ? editForm.status : asset.status)" class="px-2.5 py-0.5 rounded text-label-sm font-label-sm">{{ editing ? editForm.status : asset.status }}</span>
@@ -31,70 +31,70 @@
 
       <div v-if="!editing && canChangeStatus" class="flex items-center gap-2">
         <span class="text-label-sm text-outline font-medium mr-1">Status:</span>
-        <button v-for="s in ['Active', 'Maintenance', 'Retired']" :key="s" @click="updateStatus(s)" :class="[s === asset.status ? 'bg-primary text-on-primary shadow-sm' : 'bg-surface-container hover:bg-surface-container-higher text-on-surface-variant', 'px-3 py-1.5 rounded-lg text-label-sm font-label-sm transition-all']">{{ s }}</button>
+        <button v-for="s in ['Active', 'Maintenance', 'Retired']" :key="s" @click="updateStatus(s)" :class="[s === asset.status ? 'bg-primary text-on-primary shadow-sm' : 'bg-surface-container hover:bg-surface-container-higher text-on-surface-variant dark:text-outline dark:hover:bg-white/[0.08]', 'px-3 py-1.5 rounded-lg text-label-sm font-label-sm transition-all']">{{ s }}</button>
       </div>
 
-      <div class="grid grid-cols-2 gap-x-6 gap-y-4 p-4 rounded-xl bg-surface-container-low">
+      <div class="grid grid-cols-2 gap-x-6 gap-y-4 p-4 rounded-xl bg-surface-container-low dark:bg-inverse-surface">
         <div>
           <span class="text-label-sm text-outline font-medium">Asset Tag</span>
-          <p class="text-body-md text-on-surface font-medium mt-0.5 font-mono">{{ asset.assetTag || asset.id }}</p>
+          <p class="text-body-md text-on-surface dark:text-inverse-on-surface font-medium mt-0.5 font-mono">{{ asset.assetTag || asset.id }}</p>
         </div>
         <div>
           <span class="text-label-sm text-outline font-medium">Category</span>
           <template v-if="editing">
-            <select v-model="editForm.category" class="w-full mt-0.5 px-3 py-2 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary">
+            <select v-model="editForm.category" class="w-full mt-0.5 px-3 py-2 border border-outline-variant dark:border-outline rounded-lg text-body-sm bg-surface dark:bg-inverse-surface focus:ring-1 focus:ring-primary">
               <option>Desktop</option><option>Network</option><option>Printer</option><option>Server</option><option>Mobile</option>
             </select>
           </template>
           <template v-else>
-            <p class="text-body-md text-on-surface font-medium mt-0.5">{{ asset.category || '—' }}</p>
+            <p class="text-body-md text-on-surface dark:text-inverse-on-surface font-medium mt-0.5">{{ asset.category || '—' }}</p>
           </template>
         </div>
         <div>
           <span class="text-label-sm text-outline font-medium">Department</span>
           <template v-if="editing">
-            <select v-model="editForm.department" class="w-full mt-0.5 px-3 py-2 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary">
+            <select v-model="editForm.department" class="w-full mt-0.5 px-3 py-2 border border-outline-variant dark:border-outline rounded-lg text-body-sm bg-surface dark:bg-inverse-surface focus:ring-1 focus:ring-primary">
               <option v-for="dept in deptStore.items" :key="dept.id" :value="dept.name">{{ dept.name }}</option>
             </select>
           </template>
           <template v-else>
-            <p class="text-body-md text-on-surface font-medium mt-0.5">{{ asset.department || '—' }}</p>
+            <p class="text-body-md text-on-surface dark:text-inverse-on-surface font-medium mt-0.5">{{ asset.department || '—' }}</p>
           </template>
         </div>
         <div>
           <span class="text-label-sm text-outline font-medium">Status</span>
           <template v-if="editing">
-            <select v-model="editForm.status" class="w-full mt-0.5 px-3 py-2 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary">
+            <select v-model="editForm.status" class="w-full mt-0.5 px-3 py-2 border border-outline-variant dark:border-outline rounded-lg text-body-sm bg-surface dark:bg-inverse-surface focus:ring-1 focus:ring-primary">
               <option>Active</option><option>Maintenance</option><option>Retired</option>
             </select>
           </template>
           <template v-else>
-            <p class="text-body-md text-on-surface font-medium mt-0.5">{{ asset.status || '—' }}</p>
+            <p class="text-body-md text-on-surface dark:text-inverse-on-surface font-medium mt-0.5">{{ asset.status || '—' }}</p>
           </template>
         </div>
         <div>
           <span class="text-label-sm text-outline font-medium">Location</span>
           <template v-if="editing">
-            <input v-model="editForm.location" class="w-full mt-0.5 px-3 py-2 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary" />
+            <input v-model="editForm.location" class="w-full mt-0.5 px-3 py-2 border border-outline-variant dark:border-outline rounded-lg text-body-sm bg-surface dark:bg-inverse-surface focus:ring-1 focus:ring-primary" />
           </template>
           <template v-else>
-            <p class="text-body-md text-on-surface font-medium mt-0.5">{{ asset.location || '—' }}</p>
+            <p class="text-body-md text-on-surface dark:text-inverse-on-surface font-medium mt-0.5">{{ asset.location || '—' }}</p>
           </template>
         </div>
         <div>
           <span class="text-label-sm text-outline font-medium">Created by</span>
-          <p class="text-body-md text-on-surface font-medium mt-0.5">{{ asset.createdByName || asset.createdBy || '—' }}</p>
+          <p class="text-body-md text-on-surface dark:text-inverse-on-surface font-medium mt-0.5">{{ asset.createdByName || asset.createdBy || '—' }}</p>
         </div>
         <div>
           <span class="text-label-sm text-outline font-medium">Created</span>
-          <p class="text-body-md text-on-surface font-medium mt-0.5">{{ formatDate(asset.created) }}</p>
+          <p class="text-body-md text-on-surface dark:text-inverse-on-surface font-medium mt-0.5">{{ formatDate(asset.created) }}</p>
         </div>
       </div>
     </div>
 
-    <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-outline-variant shrink-0 bg-surface-container-low">
+    <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-outline-variant dark:border-outline shrink-0 bg-surface-container-low dark:bg-inverse-surface">
       <template v-if="editing">
-        <button @click="cancelEdit" class="px-5 py-2.5 rounded-lg text-label-md font-label-md text-on-surface hover:bg-surface-container-higher transition-colors">
+        <button @click="cancelEdit" class="px-5 py-2.5 rounded-lg text-label-md font-label-md text-on-surface dark:text-inverse-on-surface hover:bg-surface-container-higher dark:hover:bg-white/[0.08] transition-colors">
           Cancel
         </button>
         <button @click="save" :disabled="saving" class="flex items-center gap-2 px-6 py-2.5 rounded-lg text-label-md font-label-md text-on-primary bg-primary hover:bg-primary-container transition-all shadow-sm disabled:opacity-40 disabled:cursor-not-allowed">
@@ -104,11 +104,11 @@
         </button>
       </template>
       <template v-else>
-        <button @click="deleteAsset" class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-label-md font-label-md text-error hover:bg-error-container/20 transition-colors">
+        <button @click="deleteAsset" class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-label-md font-label-md text-error hover:bg-error-container/20 dark:hover:bg-error-container/10 transition-colors">
           <span class="material-symbols-outlined text-[18px]">delete</span>
           Delete
         </button>
-        <button @click="$emit('close')" class="px-5 py-2.5 rounded-lg text-label-md font-label-md text-on-surface hover:bg-surface-container-higher transition-colors">
+        <button @click="$emit('close')" class="px-5 py-2.5 rounded-lg text-label-md font-label-md text-on-surface dark:text-inverse-on-surface hover:bg-surface-container-higher dark:hover:bg-white/[0.08] transition-colors">
           Close
         </button>
         <button @click="startEdit" class="flex items-center gap-2 px-6 py-2.5 rounded-lg text-label-md font-label-md text-on-primary bg-primary hover:bg-primary-container transition-all shadow-sm">
@@ -125,6 +125,7 @@ import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import { useUIStore } from '@/stores/ui'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from '@/composables/useToast'
+import { mapFirebaseError } from '@/utils/mapFirebaseError'
 import { useDepartmentsStore } from '@/stores/departments'
 import { useAuditLog } from '@/composables/useAuditLog'
 import { db, auth } from '@/lib/firebase'
@@ -142,10 +143,7 @@ const saving = ref(false)
 const deptStore = useDepartmentsStore()
 let unsubAsset = null
 
-const canChangeStatus = computed(() =>
-  ['Sys Administrator', 'Hospital Admin', 'ICT Officer'].includes(authStore.role) ||
-  (!!authStore.departmentHeadOf && authStore.departmentHeadOf === asset.value.department)
-)
+const canChangeStatus = computed(() => authStore.canChangeInventoryStatus || (!!authStore.departmentHeadOf && authStore.departmentHeadOf === asset.value.department))
 
 const editForm = reactive({
   name: '', category: '', status: '', department: '', location: ''
@@ -183,7 +181,7 @@ async function save() {
     editing.value = false
   } catch (err) {
     console.error('[InventoryDetailModal] error updating asset:', err)
-    toast.error(err.code === 'permission-denied' ? 'You do not have permission to edit assets.' : 'Failed to update asset.')
+    toast.error(mapFirebaseError(err, 'Failed to update asset.'))
   } finally {
     saving.value = false
   }
@@ -214,7 +212,7 @@ async function updateStatus(status) {
     toast.success(`Status updated to ${status}`)
   } catch (err) {
     console.error('[InventoryDetailModal] error updating status:', err)
-    toast.error(err.code === 'permission-denied' ? 'You do not have permission to update assets.' : 'Failed to update status.')
+    toast.error(mapFirebaseError(err, 'Failed to update status.'))
   } finally {
     saving.value = false
   }
@@ -232,7 +230,7 @@ function formatDate(v) {
 }
 
 function statusClass(s) {
-  const map = { Active: 'bg-green-100 text-green-800', Maintenance: 'bg-amber-100 text-amber-800', Retired: 'bg-gray-100 text-gray-600' }
+  const map = { Active: 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200', Maintenance: 'bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-200', Retired: 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300' }
   return map[s] || ''
 }
 </script>

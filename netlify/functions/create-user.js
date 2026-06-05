@@ -6,7 +6,7 @@ export const handler = async (event) => {
   }
   try {
     const data = JSON.parse(event.body)
-    const { email, password, displayName, employeeId, title, department, role, mfa, avatar, makeDepartmentHead } = data
+    const { email, password, displayName, employeeId, title, department, role, mfa, avatar, makeDepartmentHead, phoneNumber, sex, dateOfBirth, maritalStatus, bloodGroup, nationality, district, region, homeAddress, nextOfKin, hasMedicalCondition, medicalConditionDetails } = data
 
     const userRecord = await auth.createUser({ email, password, displayName })
     const uid = userRecord.uid
@@ -29,6 +29,18 @@ export const handler = async (event) => {
       mfa: mfa || 'push',
       status: 'Active',
       avatar: avatar || '',
+      phoneNumber: phoneNumber || '',
+      sex: sex || '',
+      dateOfBirth: dateOfBirth || '',
+      maritalStatus: maritalStatus || '',
+      bloodGroup: bloodGroup || '',
+      nationality: nationality || '',
+      district: district || '',
+      region: region || '',
+      homeAddress: homeAddress || '',
+      nextOfKin: nextOfKin || '',
+      hasMedicalCondition: hasMedicalCondition ?? null,
+      medicalConditionDetails: medicalConditionDetails || '',
       created: new Date().toISOString().split('T')[0],
       lastActive: new Date().toISOString(),
       mustChangePassword: true

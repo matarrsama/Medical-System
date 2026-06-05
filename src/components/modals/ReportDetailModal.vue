@@ -1,18 +1,18 @@
 <template>
   <div class="flex flex-col h-full">
-    <div class="flex items-center justify-between px-6 py-4 border-b border-outline-variant shrink-0">
+    <div class="flex items-center justify-between px-6 py-4 border-b border-outline-variant dark:border-outline shrink-0">
       <div class="flex items-center gap-3">
         <span class="material-symbols-outlined text-primary text-[22px]">summarize</span>
         <div>
-          <h3 class="text-headline-md font-headline-md text-on-surface">{{ editing ? 'Edit Report' : 'Report Details' }}</h3>
-          <p class="text-body-sm text-on-surface-variant mt-0.5">{{ report.reportId }}</p>
+          <h3 class="text-headline-md font-headline-md text-on-surface dark:text-inverse-on-surface">{{ editing ? 'Edit Report' : 'Report Details' }}</h3>
+          <p class="text-body-sm text-on-surface-variant dark:text-outline mt-0.5">{{ report.reportId }}</p>
         </div>
       </div>
       <div class="flex items-center gap-1">
-        <button @click="toggleExpanded" class="p-1.5 rounded-lg hover:bg-surface-container text-on-surface-variant transition-colors" :title="ui.modalExpanded ? 'Collapse' : 'Expand'">
+        <button @click="toggleExpanded" class="p-1.5 rounded-lg hover:bg-surface-container dark:hover:bg-white/[0.08] text-on-surface-variant dark:text-outline transition-colors" :title="ui.modalExpanded ? 'Collapse' : 'Expand'">
           <span class="material-symbols-outlined text-[20px]">{{ ui.modalExpanded ? 'collapse_content' : 'expand_content' }}</span>
         </button>
-        <button @click="$emit('close')" class="p-1.5 rounded-lg hover:bg-surface-container text-on-surface-variant transition-colors">
+        <button @click="$emit('close')" class="p-1.5 rounded-lg hover:bg-surface-container dark:hover:bg-white/[0.08] text-on-surface-variant dark:text-outline transition-colors">
           <span class="material-symbols-outlined text-[20px]">close</span>
         </button>
       </div>
@@ -20,23 +20,23 @@
 
     <div class="flex-1 overflow-y-auto px-6 py-5 space-y-6">
       <div class="flex items-center gap-4">
-        <div class="w-14 h-14 rounded-xl bg-surface-container flex items-center justify-center text-primary">
+        <div class="w-14 h-14 rounded-xl bg-surface-container dark:bg-white/[0.08] flex items-center justify-center text-primary">
           <span class="material-symbols-outlined text-[28px]">{{ report.icon || 'summarize' }}</span>
         </div>
         <div class="min-w-0 flex-1">
           <template v-if="editing">
-            <input v-model="editForm.title" class="w-full px-3 py-2.5 border border-outline-variant rounded-lg text-headline-sm font-headline-md bg-surface focus:ring-1 focus:ring-primary" />
+            <input v-model="editForm.title" class="w-full px-3 py-2.5 border border-outline-variant dark:border-outline rounded-lg text-headline-sm font-headline-md bg-surface dark:bg-inverse-surface focus:ring-1 focus:ring-primary" />
           </template>
           <template v-else>
-            <h2 class="text-headline-sm font-headline-md text-on-surface">{{ report.title }}</h2>
+            <h2 class="text-headline-sm font-headline-md text-on-surface dark:text-inverse-on-surface">{{ report.title }}</h2>
           </template>
-          <p class="text-body-sm text-on-surface-variant mt-0.5">{{ report.reportId }}</p>
+          <p class="text-body-sm text-on-surface-variant dark:text-outline mt-0.5">{{ report.reportId }}</p>
         </div>
       </div>
 
       <div>
         <div class="flex items-center justify-between mb-3">
-          <h4 class="text-headline-sm font-headline-md text-on-surface">Description</h4>
+          <h4 class="text-headline-sm font-headline-md text-on-surface dark:text-inverse-on-surface">Description</h4>
           <div class="flex items-center gap-2">
             <span :class="typeClass(report.type)" class="px-3 py-1 rounded text-label-sm font-label-sm">{{ report.type || '—' }}</span>
             <span :class="statusClass(report.status)" class="inline-flex items-center gap-1.5 px-3 py-1 rounded text-label-sm font-label-sm">
@@ -46,37 +46,37 @@
           </div>
         </div>
         <template v-if="editing">
-          <textarea v-model="editForm.description" rows="6" class="w-full px-4 py-3 border border-outline-variant rounded-xl text-body-md bg-surface focus:ring-1 focus:ring-primary resize-none" placeholder="Enter report description..."></textarea>
+          <textarea v-model="editForm.description" rows="6" class="w-full px-4 py-3 border border-outline-variant dark:border-outline rounded-xl text-body-md bg-surface dark:bg-inverse-surface focus:ring-1 focus:ring-primary resize-none" placeholder="Enter report description..."></textarea>
         </template>
         <template v-else>
-          <div class="text-body-lg text-on-surface bg-surface-container-low rounded-xl p-5 whitespace-pre-wrap leading-relaxed min-h-[8rem] border border-outline-variant/20">
+          <div class="text-body-lg text-on-surface dark:text-inverse-on-surface bg-surface-container-low dark:bg-inverse-surface rounded-xl p-5 whitespace-pre-wrap leading-relaxed min-h-[8rem] border border-outline-variant dark:border-outline/20">
             {{ report.description || 'No description provided.' }}
           </div>
         </template>
       </div>
 
-      <div class="flex flex-wrap gap-x-8 gap-y-3 px-4 py-3 rounded-xl bg-surface-container-low">
+      <div class="flex flex-wrap gap-x-8 gap-y-3 px-4 py-3 rounded-xl bg-surface-container-low dark:bg-inverse-surface">
         <div>
           <span class="text-label-xs text-outline font-medium uppercase tracking-wide">Icon</span>
-          <p class="text-body-sm text-on-surface font-medium mt-0.5 flex items-center gap-1.5">
+          <p class="text-body-sm text-on-surface dark:text-inverse-on-surface font-medium mt-0.5 flex items-center gap-1.5">
             <span class="material-symbols-outlined text-primary text-[16px]">{{ report.icon || 'summarize' }}</span>
             {{ report.icon || 'summarize' }}
           </p>
         </div>
         <div>
           <span class="text-label-xs text-outline font-medium uppercase tracking-wide">Created</span>
-          <p class="text-body-sm text-on-surface font-medium mt-0.5">{{ formatDate(report.created) }}</p>
+          <p class="text-body-sm text-on-surface dark:text-inverse-on-surface font-medium mt-0.5">{{ formatDate(report.created) }}</p>
         </div>
         <div>
           <span class="text-label-xs text-outline font-medium uppercase tracking-wide">Created by</span>
-          <p class="text-body-sm text-on-surface font-medium mt-0.5">{{ report.createdByName || report.createdBy || '—' }}</p>
+          <p class="text-body-sm text-on-surface dark:text-inverse-on-surface font-medium mt-0.5">{{ report.createdByName || report.createdBy || '—' }}</p>
         </div>
       </div>
     </div>
 
-    <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-outline-variant shrink-0 bg-surface-container-low">
+    <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-outline-variant dark:border-outline shrink-0 bg-surface-container-low dark:bg-inverse-surface">
       <template v-if="editing">
-        <button @click="cancelEdit" class="px-5 py-2.5 rounded-lg text-label-md font-label-md text-on-surface hover:bg-surface-container-higher transition-colors">
+        <button @click="cancelEdit" class="px-5 py-2.5 rounded-lg text-label-md font-label-md text-on-surface dark:text-inverse-on-surface hover:bg-surface-container-higher transition-colors">
           Cancel
         </button>
         <button @click="save" :disabled="saving" class="flex items-center gap-2 px-6 py-2.5 rounded-lg text-label-md font-label-md text-on-primary bg-primary hover:bg-primary-container transition-all shadow-sm disabled:opacity-40 disabled:cursor-not-allowed">
@@ -90,7 +90,7 @@
           <span class="material-symbols-outlined text-[18px]">delete</span>
           Delete
         </button>
-        <button @click="$emit('close')" class="px-5 py-2.5 rounded-lg text-label-md font-label-md text-on-surface hover:bg-surface-container-higher transition-colors">
+        <button @click="$emit('close')" class="px-5 py-2.5 rounded-lg text-label-md font-label-md text-on-surface dark:text-inverse-on-surface hover:bg-surface-container-higher transition-colors">
           Close
         </button>
         <button @click="exportPdf" :disabled="exporting" class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-label-md font-label-md text-on-primary bg-primary hover:bg-primary-container transition-all shadow-sm disabled:opacity-40 disabled:cursor-not-allowed">
@@ -180,6 +180,7 @@
 import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import { useUIStore } from '@/stores/ui'
 import { useToast } from '@/composables/useToast'
+import { mapFirebaseError } from '@/utils/mapFirebaseError'
 import { db, auth } from '@/lib/firebase'
 import { useSettings } from '@/composables/useSettings'
 import { doc, updateDoc, onSnapshot, collection, getDocs, query, limit } from 'firebase/firestore'
@@ -234,7 +235,7 @@ async function save() {
     editing.value = false
   } catch (err) {
     console.error('[ReportDetailModal] error updating report:', err)
-    toast.error(err.code === 'permission-denied' ? 'You do not have permission to edit reports.' : 'Failed to update report.')
+    toast.error(mapFirebaseError(err, 'Failed to update report.'))
   } finally {
     saving.value = false
   }
@@ -343,12 +344,12 @@ function formatDate(v) {
 }
 
 function typeClass(t) {
-  const map = { Tickets: 'bg-primary-container/30 text-primary', Inventory: 'bg-surface-container-highest text-on-surface-variant', Maintenance: 'bg-amber-100 text-amber-800', Equipment: 'bg-tertiary-container/20 text-tertiary', Procurement: 'bg-secondary-container/30 text-secondary', Custom: 'bg-surface-container text-on-surface-variant' }
+  const map = { Tickets: 'bg-primary-container/30 text-primary dark:bg-primary-container/40 dark:text-inverse-primary', Inventory: 'bg-surface-container-highest text-on-surface-variant dark:text-outline', Maintenance: 'bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-200', Equipment: 'bg-tertiary-container/20 text-tertiary', Procurement: 'bg-secondary-container/30 text-secondary', Custom: 'bg-surface-container text-on-surface-variant dark:text-outline' }
   return map[t] || ''
 }
 
 function statusClass(s) {
-  const map = { Active: 'bg-green-100 text-green-800', Draft: 'bg-amber-100 text-amber-800', Archived: 'bg-surface-container-highest text-on-surface-variant' }
+  const map = { Active: 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200', Draft: 'bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-200', Archived: 'bg-surface-container-highest text-on-surface-variant dark:text-outline' }
   return map[s] || ''
 }
 

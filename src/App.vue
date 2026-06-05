@@ -24,9 +24,7 @@
     </template>
 
     <!-- Floating new ticket button -->
-    <button v-if="!isLoginPage" @click="ui.openModal('NewTicket')"
-      class="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-primary text-on-primary shadow-lg hover:bg-primary-container hover:scale-105 active:scale-95 transition-all duration-150 flex items-center justify-center"
-      title="New Ticket">
+    <button v-if="!isLoginPage" ref="fabRef" @mousedown="startDrag" @touchstart="startDrag" @click="handleFabClick" :style="fabStyle" class="fixed z-50 w-14 h-14 rounded-full bg-primary text-on-primary shadow-lg hover:bg-primary-container hover:scale-105 active:scale-95 transition-all duration-150 flex items-center justify-center will-change-transform" :class="[fabPos ? '' : 'bottom-6 right-6', dragging ? 'cursor-grabbing scale-110 shadow-2xl' : 'cursor-grab']" title="New Ticket">
       <span class="material-symbols-outlined text-[24px]">confirmation_number</span>
     </button>
 
@@ -50,7 +48,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, onUnmounted, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useUIStore } from '@/stores/ui'
 import { useAuthStore } from '@/stores/auth'
@@ -95,7 +93,75 @@ watch(hospitalName, (val) => {
 
 const isLoginPage = computed(() => route.path === '/login' || route.path === '/')
 
+// Draggable FAB
+const fabRef = ref(null)
+const dragging = ref(false)
+const hasDragged = ref(false)
+const fabPos = ref(null)
+const fabTransform = ref(null)
 
+const fabStyle = computed(() => {
+  if (!fabPos.value) return {}
+  return { top: fabPos.value.y + 'px', left: fabPos.value.x + 'px', bottom: 'auto', right: 'auto' }
+})
+
+function startDrag(e) {
+  if (e.button && e.button !== 0) return
+  dragging.value = true
+  hasDragged.value = false
+  const ev = e.touches ? e.touches[0] : e
+  const startX = ev.clientX
+  const startY = ev.clientY
+  const rect = fabRef.value?.getBoundingClientRect()
+  if (!rect) return
+  const offsetX = startX - rect.left
+  const offsetY = startY - rect.top
+  let rafId = null
+
+  function onMove(e) {
+    const ev = e.touches ? e.touches[0] : e
+    if (!ev) return
+    hasDragged.value = true
+    if (!rafId) {
+      rafId = requestAnimationFrame(() => {
+        rafId = null
+        fabPos.value = {
+          x: Math.max(0, Math.min(window.innerWidth - 56, ev.clientX - offsetX)),
+          y: Math.max(0, Math.min(window.innerHeight - 56, ev.clientY - offsetY))
+        }
+      })
+    }
+  }
+
+  function onUp() {
+    dragging.value = false
+    if (rafId) { cancelAnimationFrame(rafId); rafId = null }
+    if (fabPos.value) {
+      localStorage.setItem('fabPosition', JSON.stringify(fabPos.value))
+    }
+    document.removeEventListener('mousemove', onMove)
+    document.removeEventListener('mouseup', onUp)
+    document.removeEventListener('touchmove', onMove)
+    document.removeEventListener('touchend', onUp)
+  }
+
+  document.addEventListener('mousemove', onMove)
+  document.addEventListener('mouseup', onUp)
+  document.addEventListener('touchmove', onMove, { passive: true })
+  document.addEventListener('touchend', onUp)
+}
+
+function handleFabClick() {
+  if (hasDragged.value) return
+  ui.openModal('NewTicket')
+}
+
+onMounted(() => {
+  try {
+    const saved = localStorage.getItem('fabPosition')
+    if (saved) fabPos.value = JSON.parse(saved)
+  } catch {}
+})
 </script>
 
 <style scoped>

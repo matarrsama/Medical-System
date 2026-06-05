@@ -1,14 +1,14 @@
 <template>
   <div class="flex flex-col h-full">
-    <div class="flex items-center justify-between px-6 py-4 border-b border-outline-variant shrink-0">
+    <div class="flex items-center justify-between px-6 py-4 border-b border-outline-variant dark:border-outline shrink-0">
       <div>
         <h3 class="text-headline-md font-headline-md text-primary flex items-center gap-2">
           <span class="material-symbols-outlined text-[20px]">person_add</span>
-          Provision New User
+          Provision New Staff
         </h3>
-        <p class="text-body-sm text-on-surface-variant mt-0.5">Step {{ currentStep }} of 3 — {{ stepLabel }}</p>
+        <p class="text-body-sm text-on-surface-variant dark:text-outline mt-0.5">Step {{ currentStep }} of 3 — {{ stepLabel }}</p>
       </div>
-      <button @click="$emit('close')" class="p-1.5 rounded-lg hover:bg-surface-container text-on-surface-variant transition-colors">
+      <button @click="$emit('close')" class="p-1.5 rounded-lg hover:bg-surface-container dark:hover:bg-white/[0.08] text-on-surface-variant dark:text-outline transition-colors">
         <span class="material-symbols-outlined text-[20px]">close</span>
       </button>
     </div>
@@ -18,7 +18,7 @@
         <div v-for="step in 3" :key="step" class="flex items-center flex-1 last:flex-none last:w-auto">
           <div
             class="flex items-center gap-2 cursor-pointer"
-            :class="step <= currentStep ? 'text-primary' : 'text-outline'"
+            :class="step <= currentStep ? 'text-primary dark:text-inverse-primary' : 'text-outline'"
           >
             <div
               class="w-8 h-8 rounded-full flex items-center justify-center text-label-sm font-bold transition-all"
@@ -59,18 +59,18 @@
       </transition>
     </div>
 
-    <div class="flex items-center justify-between px-6 py-4 border-t border-outline-variant shrink-0 bg-surface-container-low">
+    <div class="flex items-center justify-between px-6 py-4 border-t border-outline-variant dark:border-outline shrink-0 bg-surface-container-low dark:bg-inverse-surface">
       <button
         v-if="currentStep > 1"
         @click="prevStep"
-        class="flex items-center gap-1.5 px-5 py-2.5 rounded-lg font-label-md font-label-md text-on-surface hover:bg-surface-container-higher transition-colors"
+        class="flex items-center gap-1.5 px-5 py-2.5 rounded-lg font-label-md font-label-md text-on-surface dark:text-inverse-on-surface hover:bg-surface-container-higher transition-colors"
       >
         <span class="material-symbols-outlined text-[18px]">arrow_back</span>
         Back
       </button>
       <div v-else></div>
       <div class="flex items-center gap-3">
-        <button @click="$emit('close')" class="px-5 py-2.5 rounded-lg text-label-md font-label-md text-outline hover:text-on-surface transition-colors">
+        <button @click="$emit('close')" class="px-5 py-2.5 rounded-lg text-label-md font-label-md text-outline hover:text-on-surface dark:text-inverse-on-surface transition-colors">
           Cancel
         </button>
         <button
@@ -100,10 +100,11 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useToast } from '@/composables/useToast'
+import { mapFirebaseError } from '@/utils/mapFirebaseError'
 import { useAuditLog } from '@/composables/useAuditLog'
 import { useAuthStore } from '@/stores/auth'
 import { createUser } from '@/services/api'
-import { idToLabel } from '@/data/roles'
+import { sendWelcomeEmail } from '@/services/email'
 import { db } from '@/lib/firebase'
 import StepPersonalDetails from '@/components/provision/StepPersonalDetails.vue'
 import StepRoleAccess from '@/components/provision/StepRoleAccess.vue'
@@ -124,6 +125,18 @@ const wizardData = reactive({
   title: '',
   department: '',
   makeDepartmentHead: false,
+  phoneNumber: '+220 ',
+  sex: '',
+  dateOfBirth: '',
+  maritalStatus: '',
+  bloodGroup: '',
+  nationality: '',
+  district: '',
+  region: '',
+  homeAddress: '',
+  nextOfKin: '',
+  hasMedicalCondition: null,
+  medicalConditionDetails: '',
   role: '',
   credentials: {
     email: '',
@@ -132,9 +145,7 @@ const wizardData = reactive({
   }
 })
 
-const departmentLocked = computed(() =>
-  !!authStore.departmentHeadOf && !['Sys Administrator', 'Hospital Admin', 'ICT Officer'].includes(authStore.role)
-)
+const departmentLocked = computed(() => !!authStore.departmentHeadOf && !(authStore.canCreateUsers || authStore.canEditUsers))
 
 onMounted(() => {
   if (departmentLocked.value) {
@@ -152,6 +163,9 @@ const canAdvance = computed(() => {
   if (currentStep.value === 1) {
     const validId = /^BGH-[A-Z0-9]{3}-[A-Z0-9]{2}$/i.test(wizardData.employeeId)
     return wizardData.fullName && wizardData.employeeId && validId && wizardData.title && wizardData.department
+      && wizardData.phoneNumber && wizardData.phoneNumber.replace(/[^0-9]/g, '').length >= 7 && wizardData.sex && wizardData.dateOfBirth && wizardData.maritalStatus
+      && wizardData.nationality && wizardData.district && wizardData.region
+      && wizardData.homeAddress && wizardData.nextOfKin
   }
   if (currentStep.value === 2) {
     return !!wizardData.role
@@ -186,10 +200,22 @@ async function submit() {
       employeeId: wizardData.employeeId,
       title: wizardData.title,
       department: wizardData.department,
-      role: idToLabel(wizardData.role),
+      role: wizardData.role,
       mfa: wizardData.credentials.mfa,
       avatar: wizardData.avatar,
-      makeDepartmentHead: wizardData.makeDepartmentHead
+      makeDepartmentHead: wizardData.makeDepartmentHead,
+      phoneNumber: wizardData.phoneNumber,
+      sex: wizardData.sex,
+      dateOfBirth: wizardData.dateOfBirth,
+      maritalStatus: wizardData.maritalStatus,
+      bloodGroup: wizardData.bloodGroup,
+      nationality: wizardData.nationality,
+      district: wizardData.district,
+      region: wizardData.region,
+      homeAddress: wizardData.homeAddress,
+      nextOfKin: wizardData.nextOfKin,
+      hasMedicalCondition: wizardData.hasMedicalCondition,
+      medicalConditionDetails: wizardData.medicalConditionDetails
     })
     if (wizardData.makeDepartmentHead && result.uid && wizardData.department) {
       const snap = await getDocs(query(collection(db, 'departments'), where('name', '==', wizardData.department)))
@@ -200,15 +226,12 @@ async function submit() {
         })
       }
     }
-    await logActivity({ action: 'Create', resource: `User ${wizardData.fullName}`, details: `Provisioned with role ${wizardData.role}` })
-    toast.success(`User "${wizardData.fullName}" provisioned successfully!`)
+    await logActivity({ action: 'Create', resource: `Staff ${wizardData.fullName}`, details: `Provisioned with role ${wizardData.role}` })
+    sendWelcomeEmail({ name: wizardData.fullName, email: wizardData.credentials.email, employeeId: wizardData.employeeId, role: wizardData.role, department: wizardData.department })
+    toast.success(`Staff "${wizardData.fullName}" provisioned successfully!`)
     emit('close')
   } catch (err) {
-    const msg = err.code === 'auth/email-already-exists' ? 'This email is already in use.'
-      : err.code === 'auth/invalid-email' ? 'Invalid email format.'
-      : err.code === 'auth/weak-password' ? 'Password is too weak.'
-      : err.message
-    toast.error(msg)
+    toast.error(mapFirebaseError(err, 'Failed to provision user.'))
   } finally {
     saving.value = false
   }

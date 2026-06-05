@@ -6,8 +6,8 @@
       @click.self="ui.closeModal()"
     >
       <div class="absolute inset-0 bg-on-surface/40 backdrop-blur-sm transition-opacity"></div>
-      <div class="relative w-full flex flex-col z-10 shadow-2xl transition-all pointer-events-auto bg-surface-container-lowest rounded-xl overflow-hidden" :class="wrapperClass">
-        <component :is="currentModal" @close="ui.closeModal()" />
+      <div class="relative w-full flex flex-col z-10 shadow-2xl transition-all pointer-events-auto bg-surface-container-lowest dark:bg-inverse-surface rounded-xl overflow-hidden" :class="wrapperClass">
+        <component :is="currentModal" @close="ui.closeModal()" @edit="handleEditFromDetail" @delete="handleDeleteFromDetail" />
       </div>
     </div>
   </Teleport>
@@ -21,6 +21,9 @@ const ui = useUIStore()
 
 const modals = {
   NewTicket: defineAsyncComponent(() => import('./NewTicketModal.vue')),
+  NewLeaveRequest: defineAsyncComponent(() => import('./NewLeaveRequestModal.vue')),
+  LeaveDetail: defineAsyncComponent(() => import('./LeaveDetailModal.vue')),
+  LeaveSettings: defineAsyncComponent(() => import('./LeaveSettingsModal.vue')),
 
   AddDepartment: defineAsyncComponent(() => import('./AddDepartmentModal.vue')),
   AddInventory: defineAsyncComponent(() => import('./AddInventoryModal.vue')),
@@ -46,16 +49,27 @@ const modals = {
   ExportReports: defineAsyncComponent(() => import('./ExportReportsModal.vue')),
   DeleteConfirm: defineAsyncComponent(() => import('./DeleteConfirmModal.vue')),
   ChangePassword: defineAsyncComponent(() => import('./ChangePasswordModal.vue')),
-  Help: defineAsyncComponent(() => import('./HelpModal.vue'))
+  Help: defineAsyncComponent(() => import('./HelpModal.vue')),
+  RoleForm: defineAsyncComponent(() => import('./RoleFormModal.vue'))
 }
 
 const currentModal = computed(() => modals[ui.activeModal] || null)
 
+function handleEditFromDetail() {
+  ui.switchModal('EditUser', ui.modalData)
+}
+
+function handleDeleteFromDetail() {
+  ui.switchModal('DeleteConfirm', ui.modalData)
+}
+
 const wrapperClass = computed(() => {
   if (ui.modalExpanded) return 'max-w-6xl w-[95vw] h-[95vh] max-h-[95vh]'
   if (ui.activeModal === 'ProvisionUser') return 'max-w-4xl h-[90vh] max-h-[90vh]'
+  if (ui.activeModal === 'DepartmentDetail') return 'max-w-6xl w-[95vw] h-[95vh] max-h-[95vh]'
   if (ui.activeModal === 'ResetPassword') return 'max-w-md'
   if (ui.activeModal === 'DeleteConfirm') return 'max-w-md'
+  if (ui.activeModal === 'RoleForm') return 'max-w-3xl h-[90vh] max-h-[90vh]'
   return 'max-w-3xl h-[90vh] max-h-[90vh]'
 })
 </script>

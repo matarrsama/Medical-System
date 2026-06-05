@@ -16,12 +16,14 @@ const routes = [
   { path: '/maintenance', name: 'Maintenance', component: () => import('@/views/MaintenanceView.vue') },
   { path: '/procurement', name: 'Procurement', component: () => import('@/views/ProcurementView.vue') },
   { path: '/biomedical', name: 'Biomedical', component: () => import('@/views/BiomedicalView.vue') },
-  { path: '/departments', name: 'Departments', component: () => import('@/views/DepartmentsView.vue'), meta: { requireRole: 'canManageDepartments' } },
+  { path: '/leave-requests', name: 'LeaveRequests', component: () => import('@/views/LeaveRequestsView.vue') },
+  { path: '/departments', name: 'Departments', component: () => import('@/views/DepartmentsView.vue'), meta: { requireRole: 'canAccessDepartments' } },
   { path: '/reports', name: 'Reports', component: () => import('@/views/ReportsView.vue') },
-  { path: '/users', name: 'Users', component: () => import('@/views/UsersView.vue'), meta: { requireRole: 'canViewUsers' } },
+  { path: '/staffs', name: 'Staffs', component: () => import('@/views/UsersView.vue'), meta: { requireRole: 'canViewUsers' } },
   { path: '/notifications', name: 'Notifications', component: () => import('@/views/NotificationsView.vue') },
   { path: '/audit-logs', name: 'AuditLogs', component: () => import('@/views/AuditLogsView.vue'), meta: { requireRole: 'canAccessAuditLogs' } },
   { path: '/admin', name: 'AdminSettings', component: () => import('@/views/AdminSettingsView.vue'), meta: { requireRole: 'canAccessAdmin' } },
+  { path: '/roles', name: 'Roles', component: () => import('@/views/RolesView.vue'), meta: { requireRole: 'canManageRoles' } },
   { path: '/settings', name: 'Settings', component: () => import('@/views/SettingsView.vue') },
   { path: '/404', name: 'NotFound', component: () => import('@/views/NotFoundView.vue') },
   { path: '/500', name: 'ServerError', component: () => import('@/views/ServerErrorView.vue') },
@@ -41,11 +43,14 @@ router.beforeEach(async (to, from, next) => {
   const auth = useAuthStore()
 
   if (auth.loading) {
-    await new Promise((resolve) => {
-      const unwatch = watch(() => auth.loading, (val) => {
-        if (!val) { unwatch(); resolve() }
-      }, { immediate: true })
-    })
+    await Promise.race([
+      new Promise((resolve) => {
+        const unwatch = watch(() => auth.loading, (val) => {
+          if (!val) { unwatch(); resolve() }
+        }, { immediate: true })
+      }),
+      new Promise(r => setTimeout(r, 5000))
+    ])
   }
 
   if (publicRoutes.includes(to.name)) return next()
@@ -53,7 +58,11 @@ router.beforeEach(async (to, from, next) => {
   if (!auth.isAuthenticated) return next('/login')
 
   const required = to.meta?.requireRole
-  if (required && !auth[required]) return next('/access-denied')
+  if (required) {
+    const val = auth[required]
+    console.log(`[RouteGuard] path: ${to.path}, required: ${required}, value:`, val, 'departmentHeadOf:', auth.departmentHeadOf)
+    if (!val) return next('/access-denied')
+  }
 
   next()
 })

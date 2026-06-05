@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { db } from '@/lib/firebase'
-import { collection, onSnapshot } from 'firebase/firestore'
+import { collection, onSnapshot, query, where } from 'firebase/firestore'
 import { loadCache, saveCache } from './cache'
 
 const CACHE_KEY = 'purchaseOrders'
@@ -10,9 +10,12 @@ export const usePurchaseOrdersStore = defineStore('purchaseOrders', () => {
   const orders = ref(loadCache(CACHE_KEY) || [])
   let unsub = null
 
-  function startListening() {
+  function startListening(department) {
     if (unsub) return
-    unsub = onSnapshot(collection(db, 'purchaseOrders'), (snap) => {
+    const ref = department
+      ? query(collection(db, 'purchaseOrders'), where('department', '==', department))
+      : query(collection(db, 'purchaseOrders'))
+    unsub = onSnapshot(ref, (snap) => {
       orders.value = snap.docs.map(doc => ({
         id: doc.id,
         poNumber: doc.data().poNumber || doc.id,
@@ -28,8 +31,6 @@ export const usePurchaseOrdersStore = defineStore('purchaseOrders', () => {
       unsub = null
     }
   }
-
-  startListening()
 
   return { orders, startListening, stopListening }
 })

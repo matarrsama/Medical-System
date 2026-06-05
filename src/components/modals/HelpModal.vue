@@ -6,23 +6,23 @@
           <span class="material-symbols-outlined text-on-primary">help</span>
         </div>
         <div>
-          <h3 class="text-headline-sm font-headline-md text-on-surface">Help & Guide</h3>
-          <p class="text-body-sm text-on-surface-variant">How to use the Medical Records System</p>
+          <h3 class="text-headline-sm font-headline-md text-on-surface dark:text-inverse-on-surface">Help & Guide</h3>
+          <p class="text-body-sm text-on-surface-variant dark:text-outline">How to use the Medical Records System</p>
         </div>
       </div>
-      <button @click="ui.closeModal()" class="p-2 rounded-full hover:bg-surface-container-low transition-colors text-on-surface-variant">
+      <button @click="ui.closeModal()" class="p-2 rounded-full hover:bg-surface-container-low dark:hover:bg-white/[0.08] transition-colors text-on-surface-variant dark:text-outline">
         <span class="material-symbols-outlined">close</span>
       </button>
     </div>
 
     <div class="flex-1 overflow-y-auto p-6 space-y-6">
-      <div v-for="section in sections" :key="section.title" class="border border-outline-variant rounded-xl p-4">
+      <div v-for="section in sections" :key="section.title" class="border border-outline-variant dark:border-outline rounded-xl p-4">
         <div class="flex items-center gap-2 mb-3">
           <span class="material-symbols-outlined text-primary text-[20px]">{{ section.icon }}</span>
-          <h4 class="text-title-md font-label-md text-on-surface">{{ section.title }}</h4>
+          <h4 class="text-title-md font-label-md text-on-surface dark:text-inverse-on-surface">{{ section.title }}</h4>
         </div>
         <div v-for="(item, i) in section.items" :key="i" class="ml-8 mb-2 last:mb-0">
-          <p class="text-body-sm font-label-sm text-on-surface-variant">{{ item }}</p>
+          <p class="text-body-sm font-label-sm text-on-surface-variant dark:text-outline">{{ item }}</p>
         </div>
       </div>
     </div>

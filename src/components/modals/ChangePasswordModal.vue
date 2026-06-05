@@ -5,30 +5,30 @@
         <span class="material-symbols-outlined text-on-primary">lock_reset</span>
       </div>
       <div>
-        <h3 class="text-headline-sm font-headline-md text-on-surface">Change Your Password</h3>
-        <p class="text-body-sm text-on-surface-variant">You must update your temporary password to continue.</p>
+        <h3 class="text-headline-sm font-headline-md text-on-surface dark:text-inverse-on-surface">Change Your Password</h3>
+        <p class="text-body-sm text-on-surface-variant dark:text-outline">You must update your temporary password to continue.</p>
       </div>
     </div>
     <form @submit.prevent="handleSubmit" class="flex flex-col gap-4">
       <div class="flex flex-col gap-1">
-        <label class="text-label-md font-label-md text-on-surface" for="newPassword">New Password <span class="text-error">*</span></label>
+        <label class="text-label-md font-label-md text-on-surface dark:text-inverse-on-surface" for="newPassword">New Password <span class="text-error">*</span></label>
         <input
           id="newPassword"
           v-model="newPassword"
           type="password"
-          class="w-full px-3 py-2 rounded-lg border border-outline-variant bg-surface-container-low text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent placeholder-on-surface-variant"
+          class="w-full px-3 py-2 rounded-lg border border-outline-variant dark:border-outline bg-surface-container-low dark:bg-inverse-surface text-body-md text-on-surface dark:text-inverse-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent placeholder-on-surface-variant dark:placeholder:text-outline"
           placeholder="Enter new password"
           required
           minlength="8"
         />
       </div>
       <div class="flex flex-col gap-1">
-        <label class="text-label-md font-label-md text-on-surface" for="confirmPassword">Confirm New Password <span class="text-error">*</span></label>
+        <label class="text-label-md font-label-md text-on-surface dark:text-inverse-on-surface" for="confirmPassword">Confirm New Password <span class="text-error">*</span></label>
         <input
           id="confirmPassword"
           v-model="confirmPassword"
           type="password"
-          class="w-full px-3 py-2 rounded-lg border border-outline-variant bg-surface-container-low text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent placeholder-on-surface-variant"
+          class="w-full px-3 py-2 rounded-lg border border-outline-variant dark:border-outline bg-surface-container-low dark:bg-inverse-surface text-body-md text-on-surface dark:text-inverse-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent placeholder-on-surface-variant"
           placeholder="Confirm new password"
           required
           minlength="8"
@@ -53,6 +53,7 @@ import { ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
 import { useUIStore } from '@/stores/ui'
+import { mapFirebaseError } from '@/utils/mapFirebaseError'
 import { changePassword } from '@/services/api'
 
 const auth = useAuthStore()
@@ -81,7 +82,7 @@ async function handleSubmit() {
     auth.clearMustChange()
     ui.showToast('Password updated successfully', 'success')
   } catch (err) {
-    error.value = err.message
+    error.value = mapFirebaseError(err, 'Failed to change password.')
   } finally {
     submitting.value = false
   }

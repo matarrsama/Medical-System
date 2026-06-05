@@ -2,55 +2,55 @@
   <div>
     <div class="flex justify-between items-end mb-lg">
       <div>
-        <h1 class="text-display font-display text-on-surface">Super Admin Dashboard</h1>
-        <p class="text-body-md font-body-md text-on-surface-variant mt-1">System-wide metrics and tenant management.</p>
+        <h1 class="text-display font-display text-on-surface dark:text-inverse-on-surface">Super Admin Dashboard</h1>
+        <p class="text-body-md font-body-md text-on-surface-variant dark:text-outline mt-1">System-wide metrics and tenant management.</p>
       </div>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter mb-lg">
-      <div v-for="stat in stats" :key="stat.label" class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md">
-        <div class="text-label-md font-label-md text-on-surface-variant">{{ stat.label }}</div>
-        <div class="text-display font-display text-on-surface mt-1">{{ stat.value }}</div>
-        <div class="text-label-sm font-label-sm text-on-surface-variant mt-1">{{ stat.subtext }}</div>
+      <div v-for="stat in stats" :key="stat.label" class="bg-surface-container-lowest dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded-xl p-md">
+        <div class="text-label-md font-label-md text-on-surface-variant dark:text-outline">{{ stat.label }}</div>
+        <div class="text-display font-display text-on-surface dark:text-inverse-on-surface mt-1">{{ stat.value }}</div>
+        <div class="text-label-sm font-label-sm text-on-surface-variant dark:text-outline mt-1">{{ stat.subtext }}</div>
       </div>
     </div>
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-gutter">
-      <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden">
-        <div class="p-4 border-b border-outline-variant">
-          <h3 class="text-headline-sm font-headline-md text-on-surface">Tenant Overview</h3>
+      <div class="bg-surface-container-lowest dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded-xl shadow-sm overflow-hidden">
+        <div class="p-4 border-b border-outline-variant dark:border-outline">
+          <h3 class="text-headline-sm font-headline-md text-on-surface dark:text-inverse-on-surface">Tenant Overview</h3>
         </div>
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead>
-              <tr class="bg-surface-container-low text-on-surface-variant text-label-sm font-label-sm uppercase tracking-wider">
-                <th class="p-3 pl-4 border-b border-outline-variant font-medium">Tenant</th>
-                <th class="p-3 border-b border-outline-variant font-medium">Users</th>
-                <th class="p-3 border-b border-outline-variant font-medium">Tickets</th>
-                <th class="p-3 border-b border-outline-variant font-medium">Status</th>
+              <tr class="bg-surface-container-low dark:bg-inverse-surface text-on-surface-variant dark:text-outline text-label-sm font-label-sm uppercase tracking-wider">
+                <th class="p-3 pl-4 border-b border-outline-variant dark:border-outline font-medium">Tenant</th>
+                <th class="p-3 border-b border-outline-variant dark:border-outline font-medium">Users</th>
+                <th class="p-3 border-b border-outline-variant dark:border-outline font-medium">Tickets</th>
+                <th class="p-3 border-b border-outline-variant dark:border-outline font-medium">Status</th>
               </tr>
             </thead>
-            <tbody class="text-body-sm text-on-surface">
-              <tr v-for="tenant in tenants" :key="tenant.name" class="border-b border-outline-variant/30 last:border-0">
+            <tbody class="text-body-sm text-on-surface dark:text-inverse-on-surface">
+              <tr v-for="tenant in tenants" :key="tenant.name" class="border-b border-outline-variant/30 dark:border-outline/30 last:border-0">
                 <td class="p-3 pl-4 font-medium">{{ tenant.name }}</td>
                 <td class="p-3">{{ tenant.users }}</td>
                 <td class="p-3">{{ tenant.tickets }}</td>
                 <td class="p-3">
-                  <span :class="tenant.status === 'Healthy' ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'" class="px-2 py-0.5 rounded text-label-sm font-label-sm">{{ tenant.status }}</span>
+                  <span :class="tenant.status === 'Healthy' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200'" class="px-2 py-0.5 rounded text-label-sm font-label-sm">{{ tenant.status }}</span>
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
-      <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg shadow-sm">
-        <h3 class="text-headline-sm font-headline-md text-on-surface mb-4">System Health</h3>
+      <div class="bg-surface-container-lowest dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded-xl p-lg shadow-sm">
+        <h3 class="text-headline-sm font-headline-md text-on-surface dark:text-inverse-on-surface mb-4">System Health</h3>
         <div class="space-y-4">
           <div v-for="health in systemHealth" :key="health.label" class="flex items-center justify-between">
-            <span class="text-body-md text-on-surface">{{ health.label }}</span>
+            <span class="text-body-md text-on-surface dark:text-inverse-on-surface">{{ health.label }}</span>
             <div class="flex items-center gap-2">
-              <div class="w-24 h-2 rounded-full bg-surface-container">
+              <div class="w-24 h-2 rounded-full bg-surface-container dark:bg-white/[0.08]">
                 <div class="h-full rounded-full" :class="health.color" :style="{ width: health.percent + '%' }"></div>
               </div>
-              <span class="text-label-sm font-label-sm text-on-surface-variant">{{ health.percent }}%</span>
+              <span class="text-label-sm font-label-sm text-on-surface-variant dark:text-outline">{{ health.percent }}%</span>
             </div>
           </div>
         </div>

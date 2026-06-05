@@ -3,7 +3,7 @@
     <div class="flex items-end gap-[2px] h-5 px-1.5">
       <div v-for="i in 4" :key="i"
         class="w-[3px] rounded-sm transition-all duration-300"
-        :class="i <= network.bars ? network.color : 'bg-outline-variant/30'"
+        :class="i <= network.bars ? network.color : 'bg-outline/20 dark:bg-outline-variant'"
         :style="{ height: `${4 + i * 4}px` }"
       ></div>
     </div>

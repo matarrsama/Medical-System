@@ -2,58 +2,58 @@
   <div>
     <div class="flex justify-between items-end mb-lg">
       <div>
-        <h1 class="text-display font-display text-on-surface">Overview</h1>
-        <p class="text-body-md font-body-md text-on-surface-variant mt-1">Real-time status of hospital ICT infrastructure and service desk operations.</p>
+        <h1 class="text-display font-display text-on-surface dark:text-inverse-on-surface">Overview</h1>
+        <p class="text-body-md font-body-md text-on-surface-variant dark:text-outline mt-1">Real-time status of hospital ICT infrastructure and service desk operations.</p>
       </div>
       <div class="flex gap-2">
-        <span v-if="ui.isOnline" class="bg-surface-container-high text-on-surface-variant text-label-sm font-label-sm px-3 py-1 rounded-full border border-outline-variant flex items-center gap-1">
+        <span v-if="ui.isOnline" class="bg-surface-container-high dark:bg-inverse-surface text-on-surface-variant dark:text-outline text-label-sm font-label-sm px-3 py-1 rounded-full border border-outline-variant dark:border-outline flex items-center gap-1">
           <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Live Updates Active
         </span>
-        <span v-else class="bg-surface-container-high text-on-surface-variant text-label-sm font-label-sm px-3 py-1 rounded-full border border-outline-variant flex items-center gap-1">
+        <span v-else class="bg-surface-container-high dark:bg-inverse-surface text-on-surface-variant dark:text-outline text-label-sm font-label-sm px-3 py-1 rounded-full border border-outline-variant dark:border-outline flex items-center gap-1">
           <span class="w-2 h-2 rounded-full bg-outline-variant"></span> Offline — Cached Data
         </span>
       </div>
     </div>
     <div class="grid grid-cols-12 gap-gutter mb-lg">
-      <div class="col-span-12 sm:col-span-6 lg:col-span-3 bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col justify-between shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+      <div class="col-span-12 sm:col-span-6 lg:col-span-3 bg-surface-container-lowest dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded-xl p-md flex flex-col justify-between shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
         <div class="flex justify-between items-start mb-4">
-          <div class="p-2 bg-surface-container rounded-lg text-primary">
+          <div class="p-2 bg-surface-container dark:bg-white/[0.08] rounded-lg text-primary dark:text-inverse-primary">
             <span class="material-symbols-outlined">folder_open</span>
           </div>
-          <span class="text-label-sm font-label-sm text-on-surface-variant flex items-center gap-1">
+          <span class="text-label-sm font-label-sm text-on-surface-variant dark:text-outline flex items-center gap-1">
             <span class="material-symbols-outlined text-[14px]" :class="trendColor">{{ trendIcon }}</span> {{ ticketTrend }}% vs last week
           </span>
         </div>
         <div>
-          <h3 class="text-display font-display text-on-surface leading-none mb-1">{{ openTickets }}</h3>
-          <p class="text-label-md font-label-md text-on-surface-variant">Open Tickets</p>
+          <h3 class="text-display font-display text-on-surface dark:text-inverse-on-surface leading-none mb-1">{{ openTickets }}</h3>
+          <p class="text-label-md font-label-md text-on-surface-variant dark:text-outline">Open Tickets</p>
         </div>
       </div>
-      <div class="col-span-12 sm:col-span-6 lg:col-span-3 bg-surface-container-lowest border-l-4 border-l-error border-y border-y-outline-variant border-r border-r-outline-variant rounded-xl p-md flex flex-col justify-between shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+      <div class="col-span-12 sm:col-span-6 lg:col-span-3 bg-surface-container-lowest dark:bg-inverse-surface border-l-4 border-l-error border-y border-y-outline-variant dark:border-y-outline border-r border-r-outline-variant dark:border-r-outline rounded-xl p-md flex flex-col justify-between shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
         <div class="flex justify-between items-start mb-4">
-          <div class="p-2 bg-error-container text-on-error-container rounded-lg">
+          <div class="p-2 bg-error-container dark:bg-error-container/30 text-on-error-container dark:text-on-error-container rounded-lg">
             <span class="material-symbols-outlined icon-fill">warning</span>
           </div>
-          <span class="text-label-sm font-label-sm text-error flex items-center gap-1 bg-error-container/50 px-2 py-0.5 rounded-full">Action Required</span>
+          <span class="text-label-sm font-label-sm text-error dark:text-error flex items-center gap-1 bg-error-container/50 dark:bg-error-container/20 px-2 py-0.5 rounded-full">Action Required</span>
         </div>
         <div>
-          <h3 class="text-display font-display text-on-surface leading-none mb-1">{{ criticalTickets }}</h3>
-          <p class="text-label-md font-label-md text-on-surface-variant">Critical Tickets</p>
+          <h3 class="text-display font-display text-on-surface dark:text-inverse-on-surface leading-none mb-1">{{ criticalTickets }}</h3>
+          <p class="text-label-md font-label-md text-on-surface-variant dark:text-outline">Critical Tickets</p>
         </div>
       </div>
-      <div class="col-span-12 sm:col-span-6 lg:col-span-3 bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col justify-between shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+      <div class="col-span-12 sm:col-span-6 lg:col-span-3 bg-surface-container-lowest dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded-xl p-md flex flex-col justify-between shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
         <div class="flex justify-between items-start mb-4">
-          <div class="p-2 bg-surface-container rounded-lg text-primary">
+          <div class="p-2 bg-surface-container dark:bg-white/[0.08] rounded-lg text-primary dark:text-inverse-primary">
             <span class="material-symbols-outlined">support_agent</span>
           </div>
-          <span class="text-label-sm font-label-sm text-on-surface-variant flex items-center gap-1">{{ todayTickets }} created today</span>
+          <span class="text-label-sm font-label-sm text-on-surface-variant dark:text-outline flex items-center gap-1">{{ todayTickets }} created today</span>
         </div>
         <div>
-          <h3 class="text-display font-display text-on-surface leading-none mb-1">{{ assignedTechs }}</h3>
-          <p class="text-label-md font-label-md text-on-surface-variant">Assigned Technicians</p>
+          <h3 class="text-display font-display text-on-surface dark:text-inverse-on-surface leading-none mb-1">{{ assignedTechs }}</h3>
+          <p class="text-label-md font-label-md text-on-surface-variant dark:text-outline">Assigned Technicians</p>
         </div>
       </div>
-      <div class="col-span-12 sm:col-span-6 lg:col-span-3 bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col justify-between shadow-[0_2px_8px_rgba(0,0,0,0.02)] relative overflow-hidden">
+      <div class="col-span-12 sm:col-span-6 lg:col-span-3 bg-surface-container-lowest dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded-xl p-md flex flex-col justify-between shadow-[0_2px_8px_rgba(0,0,0,0.02)] relative overflow-hidden">
         <div class="absolute inset-0 bg-gradient-to-br from-tertiary-container/10 to-transparent"></div>
         <div class="relative z-10 flex justify-between items-start mb-4">
           <div class="p-2 bg-tertiary-container/20 text-tertiary rounded-lg">
@@ -61,15 +61,15 @@
           </div>
         </div>
         <div class="relative z-10">
-          <h3 class="text-display font-display text-tertiary leading-none mb-1">{{ slaBreach }}</h3>
-          <p class="text-label-md font-label-md text-on-surface-variant">SLA Near Breach</p>
+          <h3 class="text-display font-display text-tertiary dark:text-tertiary leading-none mb-1">{{ slaBreach }}</h3>
+          <p class="text-label-md font-label-md text-on-surface-variant dark:text-outline">SLA Near Breach</p>
         </div>
       </div>
-      <div class="col-span-12 lg:col-span-8 bg-surface-container-lowest border border-outline-variant rounded-xl p-lg shadow-[0_2px_8px_rgba(0,0,0,0.02)] flex flex-col min-h-[300px]">
+      <div class="col-span-12 lg:col-span-8 bg-surface-container-lowest dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded-xl p-lg shadow-[0_2px_8px_rgba(0,0,0,0.02)] flex flex-col min-h-[300px]">
         <div class="flex justify-between items-center mb-6">
           <div>
-            <h3 class="text-headline-sm font-headline-md text-on-surface">Tickets by Status</h3>
-            <p class="text-body-sm font-body-sm text-on-surface-variant">Distribution across all tickets</p>
+            <h3 class="text-headline-sm font-headline-md text-on-surface dark:text-inverse-on-surface">Tickets by Status</h3>
+            <p class="text-body-sm font-body-sm text-on-surface-variant dark:text-outline">Distribution across all tickets</p>
           </div>
         </div>
         <div class="flex-1 relative w-full pt-8 pb-4">
@@ -82,10 +82,10 @@
           </div>
           <div class="ml-12 flex-1 h-full relative">
             <div class="absolute inset-0 flex flex-col justify-between pointer-events-none pb-0.5">
-              <div class="w-full h-px bg-outline-variant/20"></div>
-              <div class="w-full h-px bg-outline-variant/20"></div>
-              <div class="w-full h-px bg-outline-variant/20"></div>
-              <div class="w-full h-px bg-outline-variant/20"></div>
+              <div class="w-full h-px bg-outline-variant/20 dark:bg-white/[0.06]"></div>
+              <div class="w-full h-px bg-outline-variant/20 dark:bg-white/[0.06]"></div>
+              <div class="w-full h-px bg-outline-variant/20 dark:bg-white/[0.06]"></div>
+              <div class="w-full h-px bg-outline-variant/20 dark:bg-white/[0.06]"></div>
               <div class="w-full h-px bg-transparent"></div>
             </div>
             <svg v-if="chartData.length" viewBox="0 0 600 250" class="w-full h-full overflow-visible" preserveAspectRatio="xMidYMid meet">
@@ -98,69 +98,69 @@
               <path :d="areaPath" fill="url(#areaGrad)" />
               <path :d="linePath" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="drop-shadow-sm" />
               <circle v-for="p in chartData" :key="p.label" :cx="p.x" :cy="p.y" r="4.5" fill="#2563eb" stroke="white" stroke-width="2" class="drop-shadow-sm" />
-              <text v-for="p in chartData" :key="'l'+p.label" :x="p.x" :y="238" text-anchor="middle" class="fill-outline font-label-sm" style="font-size: 11px;">{{ p.label }}</text>
-              <text v-for="p in chartData" :key="'c'+p.label" :x="p.x" :y="p.y - 14" text-anchor="middle" class="fill-on-surface-variant font-label-sm" style="font-size: 11px;">{{ p.count }}</text>
+              <text v-for="p in chartData" :key="'l'+p.label" :x="p.x" :y="238" text-anchor="middle" class="fill-outline dark:fill-white/40 font-label-sm" style="font-size: 11px;">{{ p.label }}</text>
+              <text v-for="p in chartData" :key="'c'+p.label" :x="p.x" :y="p.y - 14" text-anchor="middle" class="fill-on-surface-variant dark:fill-white/60 font-label-sm" style="font-size: 11px;">{{ p.count }}</text>
             </svg>
-            <div v-else class="flex items-center justify-center h-full text-on-surface-variant text-body-sm font-body-sm">No ticket data available</div>
+            <div v-else class="flex items-center justify-center h-full text-on-surface-variant dark:text-outline text-body-sm font-body-sm">No ticket data available</div>
           </div>
         </div>
       </div>
-      <div class="col-span-12 lg:col-span-4 bg-surface-container-lowest border border-outline-variant rounded-xl p-lg shadow-[0_2px_8px_rgba(0,0,0,0.02)] flex flex-col">
-        <h3 class="text-headline-sm font-headline-md text-on-surface mb-4">Quick Actions</h3>
+      <div class="col-span-12 lg:col-span-4 bg-surface-container-lowest dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded-xl p-lg shadow-[0_2px_8px_rgba(0,0,0,0.02)] flex flex-col">
+        <h3 class="text-headline-sm font-headline-md text-on-surface dark:text-inverse-on-surface mb-4">Quick Actions</h3>
         <div class="flex flex-col gap-sm flex-1">
-          <button class="flex items-center gap-3 p-3 rounded-lg bg-surface-container hover:bg-surface-container-high border border-transparent hover:border-outline-variant transition-all text-left group">
-            <div class="p-2 bg-surface-container-highest rounded text-primary group-hover:bg-primary group-hover:text-on-primary transition-colors">
+          <button class="flex items-center gap-3 p-3 rounded-lg bg-surface-container dark:bg-white/[0.05] hover:bg-surface-container-high dark:hover:bg-white/[0.1] border border-transparent hover:border-outline-variant dark:hover:border-outline transition-all text-left group">
+            <div class="p-2 bg-surface-container-highest dark:bg-white/[0.12] rounded text-primary dark:text-inverse-primary group-hover:bg-primary group-hover:text-on-primary transition-colors">
               <span class="material-symbols-outlined text-[20px]">person_add</span>
             </div>
             <div>
-              <div class="text-body-md font-label-md text-on-surface">Provision User Account</div>
-              <div class="text-body-sm text-on-surface-variant">Active Directory &amp; EHR access</div>
+              <div class="text-body-md font-label-md text-on-surface dark:text-inverse-on-surface">Provision Staff Account</div>
+              <div class="text-body-sm text-on-surface-variant dark:text-outline">Active Directory &amp; EHR access</div>
             </div>
           </button>
-          <button class="flex items-center gap-3 p-3 rounded-lg bg-surface-container hover:bg-surface-container-high border border-transparent hover:border-outline-variant transition-all text-left group">
-            <div class="p-2 bg-surface-container-highest rounded text-primary group-hover:bg-primary group-hover:text-on-primary transition-colors">
+          <button class="flex items-center gap-3 p-3 rounded-lg bg-surface-container dark:bg-white/[0.05] hover:bg-surface-container-high dark:hover:bg-white/[0.1] border border-transparent hover:border-outline-variant dark:hover:border-outline transition-all text-left group">
+            <div class="p-2 bg-surface-container-highest dark:bg-white/[0.12] rounded text-primary dark:text-inverse-primary group-hover:bg-primary group-hover:text-on-primary transition-colors">
               <span class="material-symbols-outlined text-[20px]">router</span>
             </div>
             <div>
-              <div class="text-body-md font-label-md text-on-surface">Network Diagnostic</div>
-              <div class="text-body-sm text-on-surface-variant">Run ping &amp; traceroute tools</div>
+              <div class="text-body-md font-label-md text-on-surface dark:text-inverse-on-surface">Network Diagnostic</div>
+              <div class="text-body-sm text-on-surface-variant dark:text-outline">Run ping &amp; traceroute tools</div>
             </div>
           </button>
-          <button class="flex items-center gap-3 p-3 rounded-lg bg-surface-container hover:bg-surface-container-high border border-transparent hover:border-outline-variant transition-all text-left group">
-            <div class="p-2 bg-error-container text-on-error-container rounded group-hover:bg-error group-hover:text-on-error transition-colors">
+          <button class="flex items-center gap-3 p-3 rounded-lg bg-surface-container dark:bg-white/[0.05] hover:bg-surface-container-high dark:hover:bg-white/[0.1] border border-transparent hover:border-outline-variant dark:hover:border-outline transition-all text-left group">
+            <div class="p-2 bg-error-container dark:bg-error-container/30 text-on-error-container dark:text-on-error-container rounded group-hover:bg-error group-hover:text-on-error transition-colors">
               <span class="material-symbols-outlined text-[20px]">campaign</span>
             </div>
             <div>
-              <div class="text-body-md font-label-md text-on-surface">Broadcast Outage</div>
-              <div class="text-body-sm text-on-surface-variant">Send P1 alert to all staff</div>
+              <div class="text-body-md font-label-md text-on-surface dark:text-inverse-on-surface">Broadcast Outage</div>
+              <div class="text-body-sm text-on-surface-variant dark:text-outline">Send P1 alert to all staff</div>
             </div>
           </button>
         </div>
       </div>
     </div>
     <div class="grid grid-cols-12 gap-gutter">
-      <div class="col-span-12 lg:col-span-8 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.02)] overflow-hidden flex flex-col">
-        <div class="p-lg border-b border-outline-variant flex justify-between items-center bg-surface-bright">
-          <h3 class="text-headline-sm font-headline-md text-on-surface">Recent Critical Incidents</h3>
-          <router-link class="text-label-md font-label-md text-primary hover:underline" to="/tickets">View All</router-link>
+      <div class="col-span-12 lg:col-span-8 bg-surface-container-lowest dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.02)] overflow-hidden flex flex-col">
+        <div class="p-lg border-b border-outline-variant dark:border-outline flex justify-between items-center bg-surface-bright dark:bg-inverse-surface">
+          <h3 class="text-headline-sm font-headline-md text-on-surface dark:text-inverse-on-surface">Recent Critical Incidents</h3>
+          <router-link class="text-label-md font-label-md text-primary dark:text-inverse-primary hover:underline" to="/tickets">View All</router-link>
         </div>
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead>
-              <tr class="bg-surface-container-low text-on-surface-variant text-label-sm font-label-sm uppercase tracking-wider">
-                <th class="p-4 border-b border-outline-variant font-medium">Ticket ID</th>
-                <th class="p-4 border-b border-outline-variant font-medium">Issue Summary</th>
-                <th class="p-4 border-b border-outline-variant font-medium">Department</th>
-                <th class="p-4 border-b border-outline-variant font-medium">Time Logged</th>
-                <th class="p-4 border-b border-outline-variant font-medium">Status</th>
+              <tr class="bg-surface-container-low dark:bg-inverse-surface text-on-surface-variant dark:text-outline text-label-sm font-label-sm uppercase tracking-wider">
+                <th class="p-4 border-b border-outline-variant dark:border-outline font-medium">Ticket ID</th>
+                <th class="p-4 border-b border-outline-variant dark:border-outline font-medium">Issue Summary</th>
+                <th class="p-4 border-b border-outline-variant dark:border-outline font-medium">Department</th>
+                <th class="p-4 border-b border-outline-variant dark:border-outline font-medium">Time Logged</th>
+                <th class="p-4 border-b border-outline-variant dark:border-outline font-medium">Status</th>
               </tr>
             </thead>
-            <tbody class="text-body-sm font-body-sm text-on-surface">
-              <tr v-for="incident in incidents" :key="incident.id" class="hover:bg-surface-container-lowest transition-colors group cursor-pointer border-b border-outline-variant/30 last:border-0">
-                <td class="p-4 text-primary font-medium">{{ incident.id }}</td>
+            <tbody class="text-body-sm font-body-sm text-on-surface dark:text-inverse-on-surface">
+              <tr v-for="incident in incidents" :key="incident.id" class="hover:bg-surface-container-lowest dark:hover:bg-inverse-surface transition-colors group cursor-pointer border-b border-outline-variant/30 dark:border-outline/30 last:border-0">
+                <td class="p-4 text-primary dark:text-inverse-primary font-medium">{{ incident.id }}</td>
                 <td class="p-4">{{ incident.summary }}</td>
-                <td class="p-4 text-on-surface-variant">{{ incident.department }}</td>
-                <td class="p-4 text-on-surface-variant">{{ incident.time }}</td>
+                <td class="p-4 text-on-surface-variant dark:text-outline">{{ incident.department }}</td>
+                <td class="p-4 text-on-surface-variant dark:text-outline">{{ incident.time }}</td>
                 <td class="p-4">
                   <span :class="statusClass(incident.status)" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-label-sm font-label-md">
                     <span :class="statusDot(incident.status)" class="w-1.5 h-1.5 rounded-full"></span> {{ incident.status }}
@@ -171,12 +171,12 @@
           </table>
         </div>
       </div>
-      <div class="col-span-12 lg:col-span-4 bg-surface-container-lowest border border-outline-variant rounded-xl p-lg shadow-[0_2px_8px_rgba(0,0,0,0.02)] flex flex-col">
-        <h3 class="text-headline-sm font-headline-md text-on-surface mb-6">Categories</h3>
+      <div class="col-span-12 lg:col-span-4 bg-surface-container-lowest dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded-xl p-lg shadow-[0_2px_8px_rgba(0,0,0,0.02)] flex flex-col">
+        <h3 class="text-headline-sm font-headline-md text-on-surface dark:text-inverse-on-surface mb-6">Categories</h3>
         <div class="flex-1 flex flex-col items-center justify-center relative">
           <div class="relative w-40 h-40 flex items-center justify-center">
             <svg viewBox="0 0 120 120" class="absolute inset-0 w-full h-full -rotate-90">
-              <circle cx="60" cy="60" r="42" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="16" />
+              <circle cx="60" cy="60" r="42" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="16" class="dark:stroke-white/10" />
               <circle v-for="seg in donutSegments" :key="seg.label"
                 cx="60" cy="60" r="42"
                 fill="none"
@@ -188,14 +188,14 @@
                 class="transition-all duration-500"
               />
             </svg>
-            <div class="z-10 bg-surface-container-lowest w-24 h-24 rounded-full flex flex-col items-center justify-center shadow-sm">
-              <span class="text-headline-lg font-headline-md text-on-surface leading-none">{{ totalTickets }}</span>
-              <span class="text-[10px] text-on-surface-variant uppercase tracking-wider font-label-sm mt-1">Total</span>
+            <div class="z-10 bg-surface-container-lowest dark:bg-white/[0.08] w-24 h-24 rounded-full flex flex-col items-center justify-center shadow-sm">
+              <span class="text-headline-lg font-headline-md text-on-surface dark:text-inverse-on-surface leading-none">{{ totalTickets }}</span>
+              <span class="text-[10px] text-on-surface-variant dark:text-outline uppercase tracking-wider font-label-sm mt-1">Total</span>
             </div>
           </div>
           <div class="w-full mt-8 flex flex-col gap-2">
             <div v-for="cat in ['Hardware', 'Software', 'Network', 'Access']" :key="cat" class="flex items-center justify-between text-body-sm font-body-sm">
-              <div class="flex items-center gap-2 text-on-surface"><span class="w-3 h-3 rounded-sm" :class="catColor[cat]"></span> {{ cat }}</div>
+              <div class="flex items-center gap-2 text-on-surface dark:text-inverse-on-surface"><span class="w-3 h-3 rounded-sm" :class="catColor[cat]"></span> {{ cat }}</div>
               <span class="font-medium">{{ catPct(cat) }}%</span>
             </div>
           </div>
@@ -293,7 +293,7 @@ const ticketTrend = computed(() => {
 })
 
 const trendIcon = computed(() => ticketTrend.value >= 0 ? 'arrow_upward' : 'arrow_downward')
-const trendColor = computed(() => ticketTrend.value > 0 ? 'text-error' : 'text-green-600')
+const trendColor = computed(() => ticketTrend.value > 0 ? 'text-error' : 'text-green-600 dark:text-green-400')
 
 function catPct(cat) {
   const total = myTickets.value.length || 1
@@ -302,10 +302,10 @@ function catPct(cat) {
 }
 
 const catColor = {
-  Hardware: 'bg-primary-container',
-  Software: 'bg-secondary',
-  Network: 'bg-outline-variant',
-  Access: 'bg-tertiary-container'
+  Hardware: 'bg-primary-container dark:bg-primary-container/30',
+  Software: 'bg-secondary dark:bg-secondary/30',
+  Network: 'bg-outline-variant dark:bg-outline',
+  Access: 'bg-tertiary-container dark:bg-tertiary-container/30'
 }
 
 const catColorHex = {
@@ -406,10 +406,10 @@ function smoothPath(points) {
 
 function statusClass(status) {
   const map = {
-    'Investigating': 'bg-error-container/40 text-on-error-container',
-    'Assigned': 'bg-surface-container-highest text-on-surface-variant',
-    'Pending Vendor': 'bg-tertiary-container/20 text-tertiary',
-    'Resolved': 'bg-green-100 text-green-800'
+    'Investigating': 'bg-error-container/40 text-on-error-container dark:bg-error-container/20 dark:text-error',
+    'Assigned': 'bg-surface-container-highest text-on-surface-variant dark:bg-white/[0.08] dark:text-outline',
+    'Pending Vendor': 'bg-tertiary-container/20 text-tertiary dark:bg-tertiary-container/10 dark:text-tertiary',
+    'Resolved': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
   }
   return map[status] || ''
 }

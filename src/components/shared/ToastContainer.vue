@@ -24,7 +24,7 @@ const ui = useUIStore()
 function toastClass(type) {
   if (type === 'success') return 'bg-green-500 text-white border-green-600'
   if (type === 'error') return 'bg-error text-white border-error-container'
-  return 'bg-surface-container text-on-surface border-outline-variant'
+  return 'bg-surface-container text-on-surface border-outline-variant dark:bg-inverse-surface dark:text-inverse-on-surface dark:border-outline'
 }
 </script>
 

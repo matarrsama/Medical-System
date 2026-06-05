@@ -5,21 +5,21 @@ service cloud.firestore {
     // ── Equipment (Biomedical) ────────────────────
     match /equipment/{itemId} {
       allow read: if isAuth()
-      allow create: if isAuth() && minLevel('inventory', 2)
-      allow update, delete: if isAuth() && minLevel('inventory', 3)
+      allow create: if isAuth() && (minLevel('inventory', 2) || (isDeptHead() && request.resource.data.department == request.auth.token.deptHeadOf))
+      allow update, delete: if isAuth() && (minLevel('inventory', 3) || (isDeptHead() && resource.data.department == request.auth.token.deptHeadOf))
     }
 
     // ── Maintenance Tasks ──────────────────────────
     match /maintenanceTasks/{taskId} {
       allow read: if isAuth()
-      allow create: if isAuth() && minLevel('inventory', 2)
-      allow update, delete: if isAuth() && minLevel('inventory', 3)
+      allow create: if isAuth() && (minLevel('inventory', 2) || (isDeptHead() && request.resource.data.department == request.auth.token.deptHeadOf))
+      allow update, delete: if isAuth() && (minLevel('inventory', 3) || (isDeptHead() && resource.data.department == request.auth.token.deptHeadOf))
     }
 
     // ── Purchase Orders ────────────────────────────
     match /purchaseOrders/{poId} {
       allow read: if isAuth()
-      allow create: if isAuth() && minLevel('inventory', 2)
+      allow create: if isAuth()
       allow update, delete: if isAuth() && minLevel('inventory', 3)
     }
 
@@ -49,17 +49,23 @@ service cloud.firestore {
 
     function isDeptHead() { return request.auth.token.deptHeadOf != null }
 
+    function hasRolePermission(perm) {
+      let permsDoc = get(/databases/$(database)/documents/config/rolePermissions);
+      return permsDoc.exists && request.auth.token.role in (permsDoc.data[perm] || []);
+    }
+
     // Returns permission level (0=none, 1=view, 2=create, 3=edit, 4=full)
     // for a given role and area (tickets/inventory/users/reports/settings).
     function level(area) {
       return role() == 'Sys Administrator' ? 4
            : role() == 'ICT Officer' ? (area == 'tickets' || area == 'inventory' ? 4
-                                      : area == 'users' ? 3
-                                      : 1)
+                                        : area == 'users' ? 3
+                                        : 1)
            : role() == 'Physician' ? (area == 'tickets' ? 2 : area == 'settings' ? 0 : 1)
            : role() == 'Nurse' ? (area == 'tickets' ? 2 : 0)
            : role() == 'Viewer' ? 1
            : role() == 'Accounting' ? (area == 'tickets' ? 2 : area == 'reports' ? 4 : 1)
+           : role() == 'Finance Head' || role() == 'finance_head' ? (area == 'tickets' ? 2 : area == 'inventory' ? 2 : area == 'reports' ? 4 : 1)
            : role() == 'Procurement' ? (area == 'tickets' ? 2 : area == 'inventory' ? 3 : 1)
            : role() == 'Hospital Admin' ? (area == 'settings' ? 1 : area == 'users' ? 3 : 4)
            : role() == 'Lab Technician' ? (area == 'tickets' ? 2 : 0)
@@ -89,7 +95,7 @@ service cloud.firestore {
 
     // ── Inventory ────────────────────────────────
     match /inventory/{itemId} {
-      allow read: if isAuth() && minLevel('inventory', 1)
+      allow read: if isAuth()
       allow create: if isAuth() && (minLevel('inventory', 2) || (isDeptHead() && request.resource.data.department == request.auth.token.deptHeadOf))
       allow update, delete: if isAuth() && (minLevel('inventory', 3) || (isDeptHead() && resource.data.department == request.auth.token.deptHeadOf))
     }
@@ -103,7 +109,7 @@ service cloud.firestore {
 
     // ── Settings ─────────────────────────────────
     match /settings/{settingId} {
-      allow read: if isAuth() && minLevel('settings', 1)
+      allow read: if isAuth()
       allow create: if isAuth() && minLevel('settings', 2)
       allow update, delete: if isAuth() && minLevel('settings', 3)
     }
@@ -128,9 +134,29 @@ service cloud.firestore {
       allow update, delete: if isAuth() && level('settings') >= 3
     }
 
+    // ── Leave Requests ────────────────────────────
+    match /leaveRequests/{leaveId} {
+      allow read: if isAuth()
+      allow create: if isAuth()
+      allow update: if isAuth() && (hasRolePermission('canManageLeaves') || role() == 'Sys Administrator' || role() == 'Hospital Admin')
+      allow delete: if isAuth() && (hasRolePermission('canManageLeaves') || role() == 'Sys Administrator' || role() == 'Hospital Admin')
+    }
+
     // ── ID Counters ───────────────────────────────
     match /counters/{counterName} {
       allow read, write: if isAuth()
+    }
+
+    // ── Roles ────────────────────────────────────
+    match /roles/{roleId} {
+      allow read: if isAuth()
+      allow write: if isAuth() && (role() == 'Sys Administrator' || role() == 'Hospital Admin')
+    }
+
+    // ── Config ────────────────────────────────────
+    match /config/{configId} {
+      allow read: if isAuth()
+      allow write: if isAuth() && (role() == 'Sys Administrator' || role() == 'Hospital Admin')
     }
   }
 }

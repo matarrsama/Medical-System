@@ -36,6 +36,12 @@ export const useUIStore = defineStore('ui', () => {
     modalExpanded.value = false
   }
 
+  function switchModal(name, data) {
+    activeModal.value = name
+    modalData.value = data
+    modalExpanded.value = false
+  }
+
   function toggleModalExpanded() {
     modalExpanded.value = !modalExpanded.value
   }
@@ -52,5 +58,5 @@ export const useUIStore = defineStore('ui', () => {
     searchOpen.value = !searchOpen.value
   }
 
-  return { isDark, toasts, activeModal, modalData, modalExpanded, sidebarOpen, searchOpen, isOnline, toggleTheme, showToast, openModal, closeModal, toggleModalExpanded, toggleSidebar, closeSidebar, toggleSearch }
+  return { isDark, toasts, activeModal, modalData, modalExpanded, sidebarOpen, searchOpen, isOnline, toggleTheme, showToast, openModal, closeModal, switchModal, toggleModalExpanded, toggleSidebar, closeSidebar, toggleSearch }
 })

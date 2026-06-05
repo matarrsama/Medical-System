@@ -2,16 +2,16 @@
   <div>
     <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-lg">
       <div>
-        <div class="flex items-center space-x-2 text-label-md font-label-md text-on-surface-variant mb-1">
+        <div class="flex items-center space-x-2 text-label-md font-label-md text-on-surface-variant dark:text-outline mb-1">
           <span>Operations</span>
           <span class="material-symbols-outlined" style="font-size: 14px;">chevron_right</span>
-          <span class="text-primary font-bold">Reports</span>
+          <span class="text-primary dark:text-inverse-primary font-bold">Reports</span>
         </div>
-        <h2 class="text-display font-display text-on-surface">Reports &amp; Analytics</h2>
-        <p class="text-body-md font-body-md text-on-surface-variant mt-1">Generate and view system reports and analytics.</p>
+        <h2 class="text-display font-display text-on-surface dark:text-inverse-on-surface">Reports &amp; Analytics</h2>
+        <p class="text-body-md font-body-md text-on-surface-variant dark:text-outline mt-1">Generate and view system reports and analytics.</p>
       </div>
       <div class="flex items-center gap-2">
-        <button @click="ui.openModal('ExportReports')" class="bg-surface-container-highest text-on-surface text-label-md font-label-md px-4 py-2 rounded-lg hover:bg-surface-container transition-colors shadow-sm flex items-center gap-2">
+        <button @click="ui.openModal('ExportReports')" class="bg-surface-container-highest dark:bg-white/[0.08] text-on-surface dark:text-inverse-on-surface text-label-md font-label-md px-4 py-2 rounded-lg hover:bg-surface-container dark:hover:bg-white/[0.12] transition-colors shadow-sm flex items-center gap-2">
           <span class="material-symbols-outlined text-[18px]">download</span>
           Export
         </button>
@@ -22,15 +22,15 @@
       </div>
     </div>
 
-    <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden flex flex-col flex-1 min-h-[500px]">
-      <div class="border-b border-outline-variant p-4 bg-surface-container-lowest flex flex-wrap gap-3 items-center justify-between">
+    <div class="bg-surface-container-lowest dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded-xl shadow-sm overflow-hidden flex flex-col flex-1 min-h-[500px]">
+      <div class="border-b border-outline-variant dark:border-outline p-4 bg-surface-container-lowest dark:bg-inverse-surface flex flex-wrap gap-3 items-center justify-between">
         <div class="flex flex-wrap gap-3 items-center flex-1">
           <div class="relative w-full sm:w-64">
-            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" style="font-size: 18px;">search</span>
-            <input v-model="searchQuery" class="w-full bg-surface-container pl-9 pr-3 py-1.5 rounded border border-outline-variant text-body-sm font-body-sm placeholder:text-on-surface-variant focus:ring-1 focus:ring-primary focus:border-primary focus:bg-surface-container-lowest transition-colors" placeholder="Search by title or ID..." type="text" />
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant dark:text-outline" style="font-size: 18px;">search</span>
+            <input v-model="searchQuery" class="w-full bg-surface-container dark:bg-inverse-surface pl-9 pr-3 py-1.5 rounded border border-outline-variant dark:border-outline text-body-sm font-body-sm placeholder:text-on-surface-variant dark:placeholder:text-outline focus:ring-1 focus:ring-primary focus:border-primary focus:bg-surface-container-lowest dark:focus:bg-inverse-surface transition-colors" placeholder="Search by title or ID..." type="text" />
           </div>
           <div class="relative hidden sm:block">
-            <select v-model="filterType" class="appearance-none bg-surface-container border border-outline-variant rounded pl-3 pr-8 py-1.5 text-body-sm font-body-sm text-on-surface focus:ring-1 focus:ring-primary focus:border-primary focus:bg-surface-container-lowest transition-colors cursor-pointer">
+            <select v-model="filterType" class="appearance-none bg-surface-container dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded pl-3 pr-8 py-1.5 text-body-sm font-body-sm text-on-surface dark:text-inverse-on-surface focus:ring-1 focus:ring-primary focus:border-primary focus:bg-surface-container-lowest dark:focus:bg-inverse-surface transition-colors cursor-pointer">
               <option value="">Type: All</option>
               <option>Tickets</option>
               <option>Inventory</option>
@@ -41,7 +41,7 @@
             </select>
           </div>
           <div class="relative hidden sm:block">
-            <select v-model="filterStatus" class="appearance-none bg-surface-container border border-outline-variant rounded pl-3 pr-8 py-1.5 text-body-sm font-body-sm text-on-surface focus:ring-1 focus:ring-primary focus:border-primary focus:bg-surface-container-lowest transition-colors cursor-pointer">
+            <select v-model="filterStatus" class="appearance-none bg-surface-container dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded pl-3 pr-8 py-1.5 text-body-sm font-body-sm text-on-surface dark:text-inverse-on-surface focus:ring-1 focus:ring-primary focus:border-primary focus:bg-surface-container-lowest dark:focus:bg-inverse-surface transition-colors cursor-pointer">
               <option value="">Status: All</option>
               <option>Active</option>
               <option>Draft</option>
@@ -58,24 +58,24 @@
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter p-4">
-        <div v-for="item in filteredItems" :key="item.id" class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm hover:shadow-md transition-shadow group relative cursor-pointer" @click="openDetail(item)">
+        <div v-for="item in filteredItems" :key="item.id" class="bg-surface-container-lowest dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded-xl shadow-sm hover:shadow-md transition-shadow group relative cursor-pointer" @click="openDetail(item)">
           <div class="absolute top-3 left-3 z-10" @click.stop>
-            <input type="checkbox" :checked="selectedIds.has(item.id)" @change="toggleSelect(item.id)" class="rounded border-outline-variant text-primary focus:ring-primary opacity-0 group-hover:opacity-100 transition-opacity" :class="{ 'opacity-100': selectedIds.has(item.id) }" />
+            <input type="checkbox" :checked="selectedIds.has(item.id)" @change="toggleSelect(item.id)" class="rounded border-outline-variant dark:border-outline text-primary focus:ring-primary opacity-0 group-hover:opacity-100 transition-opacity" :class="{ 'opacity-100': selectedIds.has(item.id) }" />
           </div>
           <div class="absolute top-3 right-3 z-10" @click.stop>
-            <button @click.stop="toggleDropdown(item.id, $event)" class="p-1 rounded hover:bg-surface-container text-on-surface-variant opacity-0 group-hover:opacity-100 transition-all">
+            <button @click.stop="toggleDropdown(item.id, $event)" class="p-1 rounded hover:bg-surface-container dark:hover:bg-white/[0.08] text-on-surface-variant dark:text-outline opacity-0 group-hover:opacity-100 transition-all">
               <span class="material-symbols-outlined" style="font-size: 18px;">more_vert</span>
             </button>
-            <div v-if="openDropdownId === item.id" class="report-dropdown absolute right-0 z-50 w-44 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-lg py-1" :class="dropdownUp ? 'bottom-full mb-2' : 'top-full mt-2'">
-              <button @click.stop="openDetail(item)" class="flex items-center gap-2.5 w-full px-4 py-2.5 text-label-sm font-label-sm text-on-surface text-left">
+            <div v-if="openDropdownId === item.id" class="report-dropdown absolute right-0 z-50 w-44 bg-surface-container-lowest dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded-xl shadow-lg py-1" :class="dropdownUp ? 'bottom-full mb-2' : 'top-full mt-2'">
+              <button @click.stop="openDetail(item)" class="flex items-center gap-2.5 w-full px-4 py-2.5 text-label-sm font-label-sm text-on-surface dark:text-inverse-on-surface text-left">
                 <span class="material-symbols-outlined text-[16px] text-outline">info</span>
                 View Details
               </button>
-              <button @click.stop="openEdit(item)" class="flex items-center gap-2.5 w-full px-4 py-2.5 text-label-sm font-label-sm text-on-surface text-left">
+              <button @click.stop="openEdit(item)" class="flex items-center gap-2.5 w-full px-4 py-2.5 text-label-sm font-label-sm text-on-surface dark:text-inverse-on-surface text-left">
                 <span class="material-symbols-outlined text-[16px] text-outline">edit</span>
                 Edit
               </button>
-              <div class="border-t border-outline-variant my-1"></div>
+              <div class="border-t border-outline-variant dark:border-outline my-1"></div>
               <button @click.stop="deleteItem(item)" class="flex items-center gap-2.5 w-full px-4 py-2.5 text-label-sm font-label-sm text-error text-left">
                 <span class="material-symbols-outlined text-[16px]">delete</span>
                 Delete
@@ -88,12 +88,12 @@
                 <span class="material-symbols-outlined text-on-primary">{{ item.icon || 'summarize' }}</span>
               </div>
               <div class="min-w-0">
-                <h3 class="text-body-md font-bold text-on-surface truncate">{{ item.title }}</h3>
-                <p class="text-label-sm text-on-surface-variant truncate">{{ item.reportId }}</p>
+                <h3 class="text-body-md font-bold text-on-surface dark:text-inverse-on-surface truncate">{{ item.title }}</h3>
+                <p class="text-label-sm text-on-surface-variant dark:text-outline truncate">{{ item.reportId }}</p>
               </div>
             </div>
-            <p class="text-body-sm text-on-surface-variant line-clamp-2 mb-3">{{ item.description || '—' }}</p>
-            <div class="flex items-center justify-between text-label-sm text-on-surface-variant mt-4 pt-3 border-t border-outline-variant/30">
+            <p class="text-body-sm text-on-surface-variant dark:text-outline line-clamp-2 mb-3">{{ item.description || '—' }}</p>
+            <div class="flex items-center justify-between text-label-sm text-on-surface-variant dark:text-outline mt-4 pt-3 border-t border-outline-variant/30 dark:border-outline/30">
               <span :class="typeClass(item.type)" class="px-2 py-0.5 rounded text-label-sm font-label-sm">{{ item.type }}</span>
               <span :class="statusClass(item.status)" class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-label-sm font-label-sm">
                 <span class="w-1.5 h-1.5 rounded-full" :class="statusDot(item.status)"></span>
@@ -104,7 +104,7 @@
         </div>
       </div>
 
-      <div v-if="filteredItems.length === 0" class="flex flex-col items-center justify-center py-16 text-on-surface-variant">
+      <div v-if="filteredItems.length === 0" class="flex flex-col items-center justify-center py-16 text-on-surface-variant dark:text-outline">
         <span class="material-symbols-outlined text-[48px] mb-4">summarize</span>
         <p class="text-body-sm font-body-sm">No reports found.</p>
       </div>
@@ -204,19 +204,19 @@ function deleteSelected() {
 function iconBg(icon) {
   const map = {
     bar_chart: 'bg-primary', pie_chart: 'bg-tertiary', show_chart: 'bg-secondary',
-    table_chart: 'bg-cyan-600', summarize: 'bg-surface-variant text-on-surface',
+    table_chart: 'bg-cyan-600', summarize: 'bg-surface-variant text-on-surface dark:bg-white/[0.08] dark:text-outline',
     assessment: 'bg-amber-600', dashboard: 'bg-purple-600', analytics: 'bg-orange-600'
   }
   return map[icon] || 'bg-primary'
 }
 
 function typeClass(t) {
-  const map = { Tickets: 'bg-primary-container/30 text-primary', Inventory: 'bg-surface-container-highest text-on-surface-variant', Maintenance: 'bg-amber-100 text-amber-800', Equipment: 'bg-tertiary-container/20 text-tertiary', Procurement: 'bg-secondary-container/30 text-secondary', Custom: 'bg-surface-container text-on-surface-variant' }
+  const map = { Tickets: 'bg-primary-container/30 text-primary dark:text-inverse-primary', Inventory: 'bg-surface-container-highest dark:bg-white/[0.08] text-on-surface-variant dark:text-outline', Maintenance: 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200', Equipment: 'bg-tertiary-container/20 text-tertiary dark:text-inverse-primary', Procurement: 'bg-secondary-container/30 text-secondary dark:text-inverse-primary', Custom: 'bg-surface-container dark:bg-white/[0.05] text-on-surface-variant dark:text-outline' }
   return map[t] || ''
 }
 
 function statusClass(s) {
-  const map = { Active: 'bg-green-100 text-green-800', Draft: 'bg-amber-100 text-amber-800', Archived: 'bg-surface-container-highest text-on-surface-variant' }
+  const map = { Active: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200', Draft: 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200', Archived: 'bg-surface-container-highest dark:bg-white/[0.08] text-on-surface-variant dark:text-outline' }
   return map[s] || ''
 }
 

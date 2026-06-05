@@ -21,7 +21,7 @@
               <label class="text-label-md font-label-md text-on-surface dark:text-inverse-on-surface" for="staff-id">Email Address <span class="text-error">*</span></label>
               <div class="relative">
                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline-variant">badge</span>
-                <input v-model="email" class="w-full pl-10 pr-3 py-2 bg-surface dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded focus:ring-2 focus:ring-primary focus:border-primary text-body-md font-body-md text-on-surface dark:text-inverse-on-surface placeholder:text-outline-variant transition-colors outline-none h-10" id="staff-id" placeholder="e.g. sarah.chen@hospital.org" type="email" required />
+                <input v-model="email" class="w-full pl-10 pr-3 py-2 bg-surface dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded focus:ring-2 focus:ring-primary focus:border-primary text-body-md font-body-md text-on-surface dark:text-inverse-on-surface placeholder:text-outline-variant dark:placeholder:text-outline transition-colors outline-none h-10" id="staff-id" placeholder="e.g. sarah.chen@hospital.org" type="email" required />
               </div>
             </div>
             <div class="flex flex-col gap-xs">
@@ -31,7 +31,7 @@
               </div>
               <div class="relative">
                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline-variant">lock</span>
-                <input v-model="password" class="w-full pl-10 pr-10 py-2 bg-surface dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded focus:ring-2 focus:ring-primary focus:border-primary text-body-md font-body-md text-on-surface dark:text-inverse-on-surface placeholder:text-outline-variant transition-colors outline-none h-10" id="password" placeholder="••••••••" :type="showPassword ? 'text' : 'password'" required />
+                <input v-model="password" class="w-full pl-10 pr-10 py-2 bg-surface dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded focus:ring-2 focus:ring-primary focus:border-primary text-body-md font-body-md text-on-surface dark:text-inverse-on-surface placeholder:text-outline-variant dark:placeholder:text-outline transition-colors outline-none h-10" id="password" placeholder="••••••••" :type="showPassword ? 'text' : 'password'" required />
                 <button type="button" @click="showPassword = !showPassword" class="absolute right-3 top-1/2 -translate-y-1/2 text-outline-variant hover:text-on-surface dark:hover:text-inverse-on-surface transition-colors">
                   <span class="material-symbols-outlined text-[20px]">{{ showPassword ? 'visibility' : 'visibility_off' }}</span>
                 </button>
@@ -48,7 +48,7 @@
             <span class="text-label-sm font-label-sm text-outline">OR</span>
             <div class="flex-1 h-px bg-outline-variant dark:bg-outline opacity-50"></div>
           </div>
-          <button type="button" @click="handleSSO" :disabled="anyLoggingIn" class="w-full h-10 bg-surface dark:bg-inverse-surface border border-outline-variant dark:border-outline hover:bg-surface-container-low dark:hover:bg-surface-variant text-on-surface dark:text-inverse-on-surface text-label-md font-label-md rounded flex items-center justify-center gap-sm transition-colors shadow-sm disabled:opacity-40 disabled:cursor-not-allowed">
+          <button type="button" @click="handleSSO" :disabled="anyLoggingIn" class="w-full h-10 bg-surface dark:bg-inverse-surface border border-outline-variant dark:border-outline hover:bg-surface-container-low dark:hover:bg-white/[0.08] text-on-surface dark:text-inverse-on-surface text-label-md font-label-md rounded flex items-center justify-center gap-sm transition-colors shadow-sm disabled:opacity-40 disabled:cursor-not-allowed">
             <span v-if="ssoLoggingIn" class="material-symbols-outlined animate-spin text-[18px]">sync</span>
             <svg v-else class="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -73,13 +73,16 @@
             <label class="text-label-md font-label-md text-on-surface dark:text-inverse-on-surface" for="reset-email">Email Address <span class="text-error">*</span></label>
             <div class="relative">
               <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline-variant">badge</span>
-              <input v-model="forgotEmail" class="w-full pl-10 pr-3 py-2 bg-surface dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded focus:ring-2 focus:ring-primary focus:border-primary text-body-md font-body-md text-on-surface dark:text-inverse-on-surface placeholder:text-outline-variant transition-colors outline-none h-10" id="reset-email" placeholder="e.g. sarah.chen@hospital.org" type="email" required />
+              <input v-model="forgotEmail" class="w-full pl-10 pr-3 py-2 bg-surface dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded focus:ring-2 focus:ring-primary focus:border-primary text-body-md font-body-md text-on-surface dark:text-inverse-on-surface placeholder:text-outline-variant dark:placeholder:text-outline transition-colors outline-none h-10" id="reset-email" placeholder="e.g. sarah.chen@hospital.org" type="email" required />
             </div>
           </div>
-          <p v-if="resetSent" class="text-body-sm text-success flex items-center gap-1">
-            <span class="material-symbols-outlined text-[16px]">check_circle</span>
-            Reset link sent! Check your email <span class="text-on-surface-variant">(check spam folder if not found)</span>
-          </p>
+          <div v-if="resetSent" class="text-body-sm text-success">
+            <span class="flex items-center gap-1 mb-1">
+              <span class="material-symbols-outlined text-[16px]">check_circle</span>
+              Reset link sent! Check your email
+            </span>
+            <span class="text-on-surface-variant dark:text-outline block">(check spam folder if not found)</span>
+          </div>
           <p v-if="resetError" class="text-body-sm text-error">{{ resetError }}</p>
           <button type="submit" :disabled="resetting" class="w-full h-10 bg-primary hover:bg-primary-container text-on-primary text-label-md font-label-md rounded flex items-center justify-center gap-xs transition-colors shadow-sm disabled:opacity-40 disabled:cursor-not-allowed">
             <span v-if="resetting" class="material-symbols-outlined animate-spin text-[18px]">sync</span>
@@ -98,7 +101,7 @@
         </p>
       </div>
     </div>
-    <button @click="ui.toggleTheme()" class="fixed bottom-4 right-4 w-10 h-10 rounded-full bg-surface-container border border-outline-variant flex items-center justify-center text-on-surface shadow-md hover:bg-surface-container-high transition-colors z-50">
+    <button @click="ui.toggleTheme()" class="fixed bottom-4 right-4 w-10 h-10 rounded-full bg-surface-container dark:bg-inverse-surface border border-outline-variant dark:border-outline flex items-center justify-center text-on-surface dark:text-inverse-on-surface shadow-md hover:bg-surface-container-high dark:hover:bg-white/[0.08] transition-colors z-50">
       <span class="material-symbols-outlined">contrast</span>
     </button>
   </div>
@@ -110,6 +113,7 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useUIStore } from '@/stores/ui'
 import { useToast } from '@/composables/useToast'
+import { mapFirebaseError, shouldSuppressError } from '@/utils/mapFirebaseError'
 import { useSettings } from '@/composables/useSettings'
 import { useAuditLog } from '@/composables/useAuditLog'
 import { GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail } from 'firebase/auth'
@@ -143,14 +147,7 @@ async function handleLogin() {
     toast.success('Authentication Successful! Logging in...')
     setTimeout(() => router.push('/dashboard'), 1000)
   } catch (err) {
-    const msg = err.code === 'auth/invalid-credential' ? 'Invalid email or password.'
-      : err.code === 'auth/user-not-found' ? 'No account found with this email.'
-      : err.code === 'auth/wrong-password' ? 'Incorrect password.'
-      : err.code === 'auth/too-many-requests' ? 'Too many attempts. Try again later.'
-      : err.code === 'auth/user-disabled' ? 'This account has been disabled.'
-      : err.code === 'auth/invalid-email' ? 'Invalid email format.'
-      : err.message
-    toast.error(msg)
+    toast.error(mapFirebaseError(err, 'Login failed. Please try again.'))
   } finally {
     emailLoggingIn.value = false
   }
@@ -165,8 +162,8 @@ async function handleSSO() {
     toast.success('SSO Authorized. Logging in...')
     setTimeout(() => router.push('/dashboard'), 1000)
   } catch (err) {
-    if (err.code !== 'auth/popup-closed-by-user') {
-      toast.error(err.message)
+    if (!shouldSuppressError(err)) {
+      toast.error(mapFirebaseError(err, 'SSO login failed.'))
     }
   } finally {
     ssoLoggingIn.value = false
@@ -183,13 +180,7 @@ async function handleForgotPassword() {
     toast.success('Password reset email sent! Check your inbox.')
   } catch (err) {
     console.error('[ForgotPassword]', err.code, err.message)
-    resetError.value = err.code === 'auth/user-not-found'
-      ? 'No account found with this email address.'
-      : err.code === 'auth/too-many-requests'
-        ? 'Too many requests. Please try again later.'
-        : err.code === 'auth/invalid-email'
-          ? 'Invalid email address.'
-          : err.message
+    resetError.value = mapFirebaseError(err, 'Failed to send reset email.')
   } finally {
     resetting.value = false
   }

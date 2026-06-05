@@ -2,42 +2,42 @@
   <div>
     <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-lg">
       <div>
-        <div class="flex items-center space-x-2 text-label-md font-label-md text-on-surface-variant mb-1">
+        <div class="flex items-center space-x-2 text-label-md font-label-md text-on-surface-variant dark:text-outline mb-1">
           <span>Operations</span>
           <span class="material-symbols-outlined" style="font-size: 14px;">chevron_right</span>
-          <span class="text-primary font-bold">Requests &amp; Approvals</span>
+          <span class="text-primary dark:text-inverse-primary font-bold">Requests &amp; Approvals</span>
         </div>
-        <h2 class="text-display font-display text-on-surface">Requests</h2>
-        <p class="text-body-md font-body-md text-on-surface-variant mt-1">Track and approve equipment, access, and service requests.</p>
+        <h2 class="text-display font-display text-on-surface dark:text-inverse-on-surface">Requests</h2>
+        <p class="text-body-md font-body-md text-on-surface-variant dark:text-outline mt-1">Track and approve equipment, access, and service requests.</p>
       </div>
-      <button v-if="auth.canManageUsers || auth.departmentHeadOf" @click="ui.openModal('NewRequest')" class="bg-primary text-on-primary text-label-md font-label-md px-4 py-2 rounded-lg hover:bg-primary-container transition-colors shadow-sm flex items-center gap-2">
+      <button v-if="auth.canManageServiceRequests || auth.departmentHeadOf" @click="ui.openModal('NewRequest')" class="bg-primary text-on-primary text-label-md font-label-md px-4 py-2 rounded-lg hover:bg-primary-container transition-colors shadow-sm flex items-center gap-2">
         <span class="material-symbols-outlined text-[18px]">add</span>
         New Request
       </button>
     </div>
-    <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden">
-      <div class="border-b border-outline-variant">
+    <div class="bg-surface-container-lowest dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded-xl shadow-sm overflow-hidden flex flex-col flex-1 min-h-[500px]">
+      <div class="border-b border-outline-variant dark:border-outline">
         <div class="flex">
-          <button v-for="tab in tabs" :key="tab.key" @click="activeTab = tab.key" :class="activeTab === tab.key ? 'border-b-2 border-primary text-primary font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low'" class="px-4 py-3 text-label-md font-label-md transition-colors">
+          <button v-for="tab in tabs" :key="tab.key" @click="activeTab = tab.key" :class="activeTab === tab.key ? 'border-b-2 border-primary text-primary dark:text-inverse-primary font-bold' : 'text-on-surface-variant dark:text-outline hover:text-on-surface dark:hover:text-inverse-on-surface hover:bg-surface-container-low dark:hover:bg-inverse-surface'" class="px-4 py-3 text-label-md font-label-md transition-colors">
             {{ tab.label }}
-            <span :class="activeTab === tab.key ? 'bg-primary text-on-primary' : 'bg-surface-container text-on-surface-variant'" class="ml-2 px-1.5 py-0.5 rounded text-[10px]">{{ tab.count }}</span>
+            <span :class="activeTab === tab.key ? 'bg-primary text-on-primary' : 'bg-surface-container dark:bg-white/[0.08] text-on-surface-variant dark:text-outline'" class="ml-2 px-1.5 py-0.5 rounded text-[10px]">{{ tab.count }}</span>
           </button>
         </div>
       </div>
-      <div class="border-b border-outline-variant p-4 bg-surface-container-lowest flex flex-wrap gap-3 items-center justify-between">
+      <div class="border-b border-outline-variant dark:border-outline p-4 bg-surface-container-lowest dark:bg-inverse-surface flex flex-wrap gap-3 items-center justify-between">
         <div class="flex flex-wrap gap-3 items-center flex-1">
           <div class="relative w-full sm:w-64">
-            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" style="font-size: 18px;">search</span>
-            <input v-model="searchQuery" class="w-full bg-surface-container pl-9 pr-3 py-1.5 rounded border border-outline-variant text-body-sm font-body-sm placeholder:text-on-surface-variant focus:ring-1 focus:ring-primary focus:border-primary focus:bg-surface-container-lowest transition-colors" placeholder="Filter by ID or title..." type="text" />
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant dark:text-outline" style="font-size: 18px;">search</span>
+            <input v-model="searchQuery" class="w-full bg-surface-container dark:bg-inverse-surface pl-9 pr-3 py-1.5 rounded border border-outline-variant dark:border-outline text-body-sm font-body-sm placeholder:text-on-surface-variant dark:placeholder:text-outline focus:ring-1 focus:ring-primary focus:border-primary focus:bg-surface-container-lowest dark:focus:bg-inverse-surface transition-colors" placeholder="Filter by ID or title..." type="text" />
           </div>
           <div class="relative hidden sm:block">
-            <select v-model="filterDepartment" class="appearance-none bg-surface-container border border-outline-variant rounded pl-3 pr-8 py-1.5 text-body-sm font-body-sm text-on-surface focus:ring-1 focus:ring-primary focus:border-primary focus:bg-surface-container-lowest transition-colors cursor-pointer">
+            <select v-model="filterDepartment" class="appearance-none bg-surface-container dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded pl-3 pr-8 py-1.5 text-body-sm font-body-sm text-on-surface dark:text-inverse-on-surface focus:ring-1 focus:ring-primary focus:border-primary focus:bg-surface-container-lowest dark:focus:bg-inverse-surface transition-colors cursor-pointer">
               <option value="">Department: All</option>
               <option v-for="d in departments" :key="d" :value="d">{{ d }}</option>
             </select>
           </div>
           <div class="relative hidden sm:block">
-            <select v-model="filterStatus" class="appearance-none bg-surface-container border border-outline-variant rounded pl-3 pr-8 py-1.5 text-body-sm font-body-sm text-on-surface focus:ring-1 focus:ring-primary focus:border-primary focus:bg-surface-container-lowest transition-colors cursor-pointer">
+            <select v-model="filterStatus" class="appearance-none bg-surface-container dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded pl-3 pr-8 py-1.5 text-body-sm font-body-sm text-on-surface dark:text-inverse-on-surface focus:ring-1 focus:ring-primary focus:border-primary focus:bg-surface-container-lowest dark:focus:bg-inverse-surface transition-colors cursor-pointer">
               <option value="">Status: All</option>
               <option>Pending</option>
               <option>Approved</option>
@@ -46,74 +46,87 @@
           </div>
         </div>
         <div class="flex items-center gap-2">
-          <button v-if="selectedIds.size > 0" @click="deleteSelected" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-label-sm font-label-sm text-on-error bg-error transition-colors shadow-sm">
+          <button v-if="auth.canManageServiceRequests && selectedIds.size > 0" @click="deleteSelected" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-label-sm font-label-sm text-on-error bg-error transition-colors shadow-sm">
             <span class="material-symbols-outlined" style="font-size: 16px;">delete</span>
             Delete ({{ selectedIds.size }})
           </button>
         </div>
       </div>
-      <div class="overflow-x-auto">
+      <div class="overflow-x-auto flex-1">
         <table class="w-full text-left border-collapse">
           <thead>
-            <tr class="bg-surface-container-low text-on-surface-variant text-label-sm font-label-sm uppercase tracking-wider">
-              <th class="p-3 pl-4 border-b border-outline-variant font-medium w-10">
-                <input type="checkbox" :checked="allSelected" @change="toggleSelectAll" class="rounded border-outline-variant text-primary focus:ring-primary" />
+            <tr class="bg-surface-container-low dark:bg-inverse-surface text-on-surface-variant dark:text-outline text-label-sm font-label-sm uppercase tracking-wider">
+              <th class="p-3 pl-4 border-b border-outline-variant dark:border-outline font-medium w-10">
+                <input type="checkbox" :checked="allSelected" @change="toggleSelectAll" class="rounded border-outline-variant dark:border-outline text-primary focus:ring-primary" />
               </th>
-              <th class="p-3 border-b border-outline-variant font-medium cursor-pointer select-none" @click="toggleSort">Request ID <span class="material-symbols-outlined align-middle text-[14px]" style="font-size: 14px;">{{ sortDir === 'asc' ? 'arrow_upward' : 'arrow_downward' }}</span></th>
-              <th class="p-3 border-b border-outline-variant font-medium">Title</th>
-              <th class="p-3 border-b border-outline-variant font-medium hidden md:table-cell">Requester</th>
-              <th class="p-3 border-b border-outline-variant font-medium hidden md:table-cell">Department</th>
-              <th class="p-3 border-b border-outline-variant font-medium">Status</th>
-              <th class="p-3 border-b border-outline-variant font-medium hidden lg:table-cell">Date</th>
-              <th class="p-3 pr-4 border-b border-outline-variant font-medium w-10"></th>
+              <th class="p-3 border-b border-outline-variant dark:border-outline font-medium cursor-pointer select-none" @click="toggleSort">Request ID <span class="material-symbols-outlined align-middle text-[14px]" style="font-size: 14px;">{{ sortDir === 'asc' ? 'arrow_upward' : 'arrow_downward' }}</span></th>
+              <th class="p-3 border-b border-outline-variant dark:border-outline font-medium">Title</th>
+              <th class="p-3 border-b border-outline-variant dark:border-outline font-medium hidden md:table-cell">Requester</th>
+              <th class="p-3 border-b border-outline-variant dark:border-outline font-medium hidden md:table-cell">Department</th>
+              <th class="p-3 border-b border-outline-variant dark:border-outline font-medium">Status</th>
+              <th class="p-3 border-b border-outline-variant dark:border-outline font-medium hidden lg:table-cell">Date</th>
+              <th class="p-3 pr-4 border-b border-outline-variant dark:border-outline font-medium w-10"></th>
             </tr>
           </thead>
-          <tbody class="text-body-sm font-body-sm text-on-surface">
-            <tr v-for="req in filteredRequests" :key="req.id" class="hover:bg-surface-container-lowest transition-colors group cursor-pointer border-b border-outline-variant/30 last:border-0" @click="openDetail(req)">
+          <tbody class="text-body-sm font-body-sm text-on-surface dark:text-inverse-on-surface">
+            <tr v-for="req in paginatedRequests" :key="req.id" class="hover:bg-surface-container-lowest dark:hover:bg-inverse-surface transition-colors group cursor-pointer border-b border-outline-variant/30 dark:border-outline/30 last:border-0" @click="openDetail(req)">
               <td class="p-3 pl-4" @click.stop>
-                <input type="checkbox" :checked="selectedIds.has(req.id)" @change="toggleSelect(req.id)" class="rounded border-outline-variant text-primary focus:ring-primary" />
+                <input type="checkbox" :checked="selectedIds.has(req.id)" @change="toggleSelect(req.id)" class="rounded border-outline-variant dark:border-outline text-primary focus:ring-primary" />
               </td>
-              <td class="p-3 text-primary font-medium">{{ req.requestId || req.id }}</td>
+              <td class="p-3 text-primary dark:text-inverse-primary font-medium">{{ req.requestId || req.id }}</td>
               <td class="p-3 font-medium">{{ req.title }}</td>
-              <td class="p-3 hidden md:table-cell text-on-surface-variant">{{ req.createdByName || req.requester || '—' }}</td>
-              <td class="p-3 hidden md:table-cell text-on-surface-variant">{{ req.department }}</td>
+              <td class="p-3 hidden md:table-cell text-on-surface-variant dark:text-outline">{{ req.createdByName || req.requester || '—' }}</td>
+              <td class="p-3 hidden md:table-cell text-on-surface-variant dark:text-outline">{{ req.department }}</td>
               <td class="p-3">
                 <span :class="statusClass(req.status)" class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-label-sm font-label-sm">
                   <span class="w-1.5 h-1.5 rounded-full" :class="statusDot(req.status)"></span>
                   {{ req.status }}
                 </span>
               </td>
-              <td class="p-3 hidden lg:table-cell text-on-surface-variant">{{ formatDate(req.created) }}</td>
+              <td class="p-3 hidden lg:table-cell text-on-surface-variant dark:text-outline">{{ formatDate(req.created) }}</td>
               <td class="p-3 pr-4 relative" @click.stop>
-                <button @click.stop="toggleDropdown(req.id, $event)" class="p-1 rounded hover:bg-surface-container text-on-surface-variant opacity-0 group-hover:opacity-100 transition-all">
+                <button @click.stop="toggleDropdown(req.id, $event)" class="p-1 rounded hover:bg-surface-container dark:hover:bg-white/[0.08] text-on-surface-variant dark:text-outline opacity-0 group-hover:opacity-100 transition-all">
                   <span class="material-symbols-outlined" style="font-size: 18px;">more_vert</span>
                 </button>
-                <div v-if="openDropdownId === req.id" class="request-dropdown absolute right-4 z-50 w-44 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-lg py-1" :class="dropdownUp ? 'bottom-full mb-1' : 'top-full mt-1'">
-                  <button @click.stop="openDetail(req)" class="flex items-center gap-2.5 w-full px-4 py-2.5 text-label-sm font-label-sm text-on-surface text-left">
+                <div v-if="openDropdownId === req.id" class="request-dropdown absolute right-4 z-50 w-44 bg-surface-container-lowest dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded-xl shadow-lg py-1" :class="dropdownUp ? 'bottom-full mb-1' : 'top-full mt-1'">
+                  <button @click.stop="openDetail(req)" class="flex items-center gap-2.5 w-full px-4 py-2.5 text-label-sm font-label-sm text-on-surface dark:text-inverse-on-surface text-left">
                     <span class="material-symbols-outlined text-[16px] text-outline">info</span>
                     View Details
                   </button>
-                  <button @click.stop="openEdit(req)" class="flex items-center gap-2.5 w-full px-4 py-2.5 text-label-sm font-label-sm text-on-surface text-left">
-                    <span class="material-symbols-outlined text-[16px] text-outline">edit</span>
-                    Edit
-                  </button>
-                  <div class="border-t border-outline-variant my-1"></div>
-                  <button @click.stop="deleteRequest(req)" class="flex items-center gap-2.5 w-full px-4 py-2.5 text-label-sm font-label-sm text-error text-left">
-                    <span class="material-symbols-outlined text-[16px]">delete</span>
-                    Delete
-                  </button>
+                  <template v-if="auth.canManageServiceRequests">
+                    <button @click.stop="openEdit(req)" class="flex items-center gap-2.5 w-full px-4 py-2.5 text-label-sm font-label-sm text-on-surface dark:text-inverse-on-surface text-left">
+                      <span class="material-symbols-outlined text-[16px] text-outline">edit</span>
+                      Edit
+                    </button>
+                    <div class="border-t border-outline-variant dark:border-outline my-1"></div>
+                    <button @click.stop="deleteRequest(req)" class="flex items-center gap-2.5 w-full px-4 py-2.5 text-label-sm font-label-sm text-error text-left">
+                      <span class="material-symbols-outlined text-[16px]">delete</span>
+                      Delete
+                    </button>
+                  </template>
                 </div>
               </td>
             </tr>
           </tbody>
         </table>
+      <div class="border-t border-outline-variant dark:border-outline p-4 bg-surface-container-lowest dark:bg-inverse-surface flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div class="text-body-sm font-body-sm text-on-surface-variant dark:text-outline">Showing {{ paginatedRequests.length }} of {{ filteredRequests.length }} requests</div>
+        <div class="flex items-center gap-2">
+          <button @click="goToPage(currentPage - 1)" :disabled="currentPage <= 1" class="px-2 py-1 rounded border border-outline-variant dark:border-outline text-on-surface-variant dark:text-outline hover:bg-surface-container dark:hover:bg-white/[0.08] text-label-sm font-label-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed">Previous</button>
+          <template v-for="n in visiblePages" :key="n">
+            <button v-if="n !== '...'" @click="goToPage(n)" :class="n === currentPage ? 'bg-primary text-on-primary' : 'border border-outline-variant dark:border-outline text-on-surface-variant dark:text-outline hover:bg-surface-container dark:hover:bg-white/[0.08]'" class="px-3 py-1 rounded text-label-sm font-label-sm transition-colors">{{ n }}</button>
+            <span v-else class="px-1 text-on-surface-variant dark:text-outline">...</span>
+          </template>
+          <button @click="goToPage(currentPage + 1)" :disabled="currentPage >= totalPages" class="px-2 py-1 rounded border border-outline-variant dark:border-outline text-on-surface-variant dark:text-outline hover:bg-surface-container dark:hover:bg-white/[0.08] text-label-sm font-label-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed">Next</button>
+        </div>
       </div>
     </div>
+  </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useUIStore } from '@/stores/ui'
 import { useAuthStore } from '@/stores/auth'
 import { db } from '@/lib/firebase'
@@ -131,7 +144,7 @@ if (cached) allRequests.value = cached
 let unsubscribe = null
 
 onMounted(() => {
-  const canViewAll = auth.role && ['Sys Administrator', 'Hospital Admin', 'ICT Officer'].includes(auth.role)
+  const canViewAll = auth.canViewAllTickets
   const q = canViewAll
     ? collection(db, 'requests')
     : query(collection(db, 'requests'), where('department', '==', auth.user?.department || ''))
@@ -163,6 +176,41 @@ const sortDir = ref('asc')
 function toggleSort() {
   sortDir.value = sortDir.value === 'asc' ? 'desc' : 'asc'
 }
+
+const currentPage = ref(1)
+const pageSize = ref(20)
+
+const totalPages = computed(() => Math.ceil(filteredRequests.value.length / pageSize.value) || 1)
+
+const visiblePages = computed(() => {
+  const total = totalPages.value
+  const current = currentPage.value
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1)
+  const pages = [1]
+  if (current > 3) pages.push('...')
+  const start = Math.max(2, current - 1)
+  const end = Math.min(total - 1, current + 1)
+  for (let i = start; i <= end; i++) pages.push(i)
+  if (current < total - 2) pages.push('...')
+  if (total > 1) pages.push(total)
+  return pages
+})
+
+const paginatedRequests = computed(() => {
+  const tp = totalPages.value
+  const page = Math.min(currentPage.value, tp)
+  const start = (page - 1) * pageSize.value
+  return filteredRequests.value.slice(start, start + pageSize.value)
+})
+
+function goToPage(n) {
+  const tp = totalPages.value
+  if (n < 1) currentPage.value = 1
+  else if (n > tp) currentPage.value = tp
+  else currentPage.value = n
+}
+
+watch([searchQuery, filterDepartment, filterStatus, activeTab], () => { currentPage.value = 1 })
 
 const departments = computed(() => {
   const set = new Set()
@@ -257,7 +305,7 @@ function formatDate(v) {
 }
 
 function statusClass(s) {
-  const map = { Pending: 'bg-amber-100 text-amber-800', Approved: 'bg-green-100 text-green-800', Rejected: 'bg-error-container/40 text-on-error-container', Open: 'bg-surface-container-highest text-on-surface-variant' }
+  const map = { Pending: 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200', Approved: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200', Rejected: 'bg-error-container/40 text-on-error-container dark:bg-error/15 dark:text-error', Open: 'bg-surface-container-highest dark:bg-white/[0.08] text-on-surface-variant dark:text-outline' }
   return map[s] || ''
 }
 function statusDot(s) {

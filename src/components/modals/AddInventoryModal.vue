@@ -1,35 +1,35 @@
 <template>
   <div class="flex flex-col h-full">
-    <div class="flex items-center justify-between px-6 py-4 border-b border-outline-variant shrink-0">
+    <div class="flex items-center justify-between px-6 py-4 border-b border-outline-variant dark:border-outline shrink-0">
       <div class="flex items-center gap-3">
-        <span class="material-symbols-outlined text-primary text-[22px]">inventory_2</span>
+        <span class="material-symbols-outlined text-primary dark:text-inverse-primary text-[22px]">inventory_2</span>
         <div>
-          <h3 class="text-headline-md font-headline-md text-on-surface">Add Inventory Asset</h3>
-          <p class="text-body-sm text-on-surface-variant mt-0.5">Register a new ICT asset in the system</p>
+          <h3 class="text-headline-md font-headline-md text-on-surface dark:text-inverse-on-surface">Add Inventory Asset</h3>
+          <p class="text-body-sm text-on-surface-variant dark:text-outline mt-0.5">Register a new ICT asset in the system</p>
         </div>
       </div>
-      <button @click="$emit('close')" class="p-1.5 rounded-lg hover:bg-surface-container text-on-surface-variant transition-colors">
+      <button @click="$emit('close')" class="p-1.5 rounded-lg hover:bg-surface-container dark:hover:bg-white/[0.08] text-on-surface-variant dark:text-outline transition-colors">
         <span class="material-symbols-outlined text-[20px]">close</span>
       </button>
     </div>
 
     <form @submit.prevent="submit" class="flex-1 overflow-y-auto px-6 py-5 space-y-5">
-      <div class="flex items-center gap-3 p-4 rounded-xl bg-surface-container-low border border-outline-variant/50">
-        <span class="material-symbols-outlined text-primary text-[20px]">tag</span>
+      <div class="flex items-center gap-3 p-4 rounded-xl bg-surface-container-low dark:bg-inverse-surface border border-outline-variant/50 dark:border-outline">
+        <span class="material-symbols-outlined text-primary dark:text-inverse-primary text-[20px]">tag</span>
         <div>
           <span class="text-label-sm text-outline font-medium">Asset Tag</span>
-          <p class="text-body-md text-on-surface font-mono font-medium mt-0.5">{{ assetTag || 'Generating…' }}</p>
+          <p class="text-body-md text-on-surface dark:text-inverse-on-surface font-mono font-medium mt-0.5">{{ assetTag || 'Generating…' }}</p>
         </div>
       </div>
 
       <div class="grid grid-cols-2 gap-4">
         <div>
-          <label class="text-label-md font-label-md text-on-surface">Asset Name <span class="text-error">*</span></label>
-          <input v-model="form.name" class="w-full mt-1 px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary" required />
+          <label class="text-label-md font-label-md text-on-surface dark:text-inverse-on-surface">Asset Name <span class="text-error">*</span></label>
+          <input v-model="form.name" class="w-full mt-1 px-3 py-2.5 border border-outline-variant dark:border-outline rounded-lg text-body-sm bg-surface dark:bg-inverse-surface focus:ring-1 focus:ring-primary" required />
         </div>
         <div>
-          <label class="text-label-md font-label-md text-on-surface">Category <span class="text-error">*</span></label>
-          <select v-model="form.category" class="w-full mt-1 px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary" required>
+          <label class="text-label-md font-label-md text-on-surface dark:text-inverse-on-surface">Category <span class="text-error">*</span></label>
+          <select v-model="form.category" class="w-full mt-1 px-3 py-2.5 border border-outline-variant dark:border-outline rounded-lg text-body-sm bg-surface dark:bg-inverse-surface focus:ring-1 focus:ring-primary" required>
             <option>Desktop</option><option>Network</option><option>Printer</option><option>Server</option><option>Mobile</option>
           </select>
         </div>
@@ -37,31 +37,31 @@
 
       <div class="grid grid-cols-2 gap-4">
         <div>
-          <label class="text-label-md font-label-md text-on-surface">Department <span class="text-error">*</span></label>
-          <select v-if="canChooseDepartment" v-model="form.department" class="w-full mt-1 px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary" required>
+          <label class="text-label-md font-label-md text-on-surface dark:text-inverse-on-surface">Department <span class="text-error">*</span></label>
+          <select v-if="canChooseDepartment" v-model="form.department" class="w-full mt-1 px-3 py-2.5 border border-outline-variant dark:border-outline rounded-lg text-body-sm bg-surface dark:bg-inverse-surface focus:ring-1 focus:ring-primary" required>
             <option v-for="dept in deptStore.items" :key="dept.id" :value="dept.name">{{ dept.name }}</option>
           </select>
-          <div v-else class="flex items-center gap-2 mt-1 px-3 py-2.5 border border-outline-variant/50 rounded-lg bg-surface-container text-body-sm text-on-surface font-medium">
+          <div v-else class="flex items-center gap-2 mt-1 px-3 py-2.5 border border-outline-variant/50 dark:border-outline rounded-lg bg-surface-container dark:bg-inverse-surface text-body-sm text-on-surface dark:text-inverse-on-surface font-medium">
             <span class="material-symbols-outlined text-[16px] text-outline">business</span>
             {{ userDept }}
           </div>
         </div>
         <div>
-          <label class="text-label-md font-label-md text-on-surface">Status</label>
-          <select v-model="form.status" class="w-full mt-1 px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary" required>
+          <label class="text-label-md font-label-md text-on-surface dark:text-inverse-on-surface">Status</label>
+          <select v-model="form.status" class="w-full mt-1 px-3 py-2.5 border border-outline-variant dark:border-outline rounded-lg text-body-sm bg-surface dark:bg-inverse-surface focus:ring-1 focus:ring-primary" required>
             <option>Active</option><option>Maintenance</option><option>Retired</option>
           </select>
         </div>
       </div>
 
       <div>
-        <label class="text-label-md font-label-md text-on-surface">Location</label>
-        <input v-model="form.location" class="w-full mt-1 px-3 py-2.5 border border-outline-variant rounded-lg text-body-sm bg-surface focus:ring-1 focus:ring-primary" placeholder="e.g. Room 101, Building A" />
+        <label class="text-label-md font-label-md text-on-surface dark:text-inverse-on-surface">Location</label>
+        <input v-model="form.location" class="w-full mt-1 px-3 py-2.5 border border-outline-variant dark:border-outline rounded-lg text-body-sm bg-surface dark:bg-inverse-surface focus:ring-1 focus:ring-primary" placeholder="e.g. Room 101, Building A" />
       </div>
     </form>
 
-    <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-outline-variant shrink-0 bg-surface-container-low">
-      <button type="button" @click="$emit('close')" class="px-5 py-2.5 rounded-lg text-label-md font-label-md text-on-surface hover:bg-surface-container-higher transition-colors">
+    <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-outline-variant dark:border-outline shrink-0 bg-surface-container-low dark:bg-inverse-surface">
+      <button type="button" @click="$emit('close')" class="px-5 py-2.5 rounded-lg text-label-md font-label-md text-on-surface dark:text-inverse-on-surface hover:bg-surface-container-higher dark:hover:bg-white/[0.08] transition-colors">
         Cancel
       </button>
       <button @click="submit" :disabled="saving" class="flex items-center gap-2 px-6 py-2.5 rounded-lg text-label-md font-label-md text-on-primary bg-primary hover:bg-primary-container transition-all shadow-sm disabled:opacity-40 disabled:cursor-not-allowed">
@@ -76,6 +76,7 @@
 <script setup>
 import { reactive, ref, computed, onMounted } from 'vue'
 import { useToast } from '@/composables/useToast'
+import { mapFirebaseError } from '@/utils/mapFirebaseError'
 import { generateId } from '@/utils/generateId'
 import { useAuthStore } from '@/stores/auth'
 import { useDepartmentsStore } from '@/stores/departments'
@@ -90,9 +91,7 @@ const deptStore = useDepartmentsStore()
 const { logActivity } = useAuditLog()
 const saving = ref(false)
 const userDept = ref('')
-const canChooseDepartment = computed(() =>
-  ['Sys Administrator', 'Hospital Admin', 'ICT Officer'].includes(authStore.role)
-)
+const canChooseDepartment = computed(() => authStore.canChooseDepartment)
 
 const assetTag = ref('')
 const form = reactive({
@@ -119,7 +118,7 @@ async function submit() {
     emit('close')
   } catch (err) {
     console.error('[AddInventoryModal] error adding asset:', err)
-    toast.error(err.code === 'permission-denied' ? 'You do not have permission to add assets.' : 'Failed to add asset.')
+    toast.error(mapFirebaseError(err, 'Failed to add asset.'))
   } finally {
     saving.value = false
   }

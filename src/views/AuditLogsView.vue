@@ -2,11 +2,11 @@
   <div>
     <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-lg">
       <div>
-        <h2 class="text-display font-display text-on-surface">Audit Logs</h2>
-        <p class="text-body-md font-body-md text-on-surface-variant mt-1">Track all system changes and user activities.</p>
+        <h2 class="text-display font-display text-on-surface dark:text-inverse-on-surface">Audit Logs</h2>
+        <p class="text-body-md font-body-md text-on-surface-variant dark:text-outline mt-1">Track all system changes and user activities.</p>
       </div>
       <div v-if="authStore.isSuperAdmin" class="flex items-center gap-3 mt-2 sm:mt-0">
-        <button v-if="selectedIds.size > 0" @click="clearSelection" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-label-sm font-label-sm text-on-surface-variant hover:bg-surface-container-higher transition-colors">
+        <button v-if="selectedIds.size > 0" @click="clearSelection" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-label-sm font-label-sm text-on-surface-variant dark:text-outline hover:bg-surface-container-higher dark:hover:bg-white/[0.08] transition-colors">
           <span class="material-symbols-outlined text-[16px]">close</span>
           Clear ({{ selectedIds.size }})
         </button>
@@ -16,16 +16,16 @@
         </button>
       </div>
     </div>
-    <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden">
-      <div class="p-4 border-b border-outline-variant flex flex-wrap gap-3 items-center">
-        <select v-model="filterAction" class="border border-outline-variant rounded px-3 py-1.5 text-body-sm bg-surface-container">
+    <div class="bg-surface-container-lowest dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded-xl shadow-sm overflow-hidden">
+      <div class="p-4 border-b border-outline-variant dark:border-outline flex flex-wrap gap-3 items-center">
+        <select v-model="filterAction" class="border border-outline-variant dark:border-outline rounded px-3 py-1.5 text-body-sm bg-surface-container dark:bg-inverse-surface">
           <option value="">All Actions</option>
           <option>Create</option>
           <option>Update</option>
           <option>Delete</option>
           <option>Login</option>
         </select>
-        <select v-model="filterUser" class="border border-outline-variant rounded px-3 py-1.5 text-body-sm bg-surface-container">
+        <select v-model="filterUser" class="border border-outline-variant dark:border-outline rounded px-3 py-1.5 text-body-sm bg-surface-container dark:bg-inverse-surface">
           <option value="">All Users</option>
           <option>Ahmed Al-Rashid</option>
           <option>Maria Gonzalez</option>
@@ -35,29 +35,29 @@
       <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
           <thead>
-            <tr class="bg-surface-container-low text-on-surface-variant text-label-sm font-label-sm uppercase tracking-wider">
-              <th v-if="authStore.isSuperAdmin" class="p-3 pl-4 border-b border-outline-variant font-medium w-10">
-                <input type="checkbox" :checked="allSelected" :indeterminate="someSelected" @change="toggleSelectAll" class="w-4 h-4 rounded border-outline-variant text-primary cursor-pointer" />
+            <tr class="bg-surface-container-low dark:bg-inverse-surface text-on-surface-variant dark:text-outline text-label-sm font-label-sm uppercase tracking-wider">
+              <th v-if="authStore.isSuperAdmin" class="p-3 pl-4 border-b border-outline-variant dark:border-outline font-medium w-10">
+                <input type="checkbox" :checked="allSelected" :indeterminate="someSelected" @change="toggleSelectAll" class="w-4 h-4 rounded border-outline-variant dark:border-outline text-primary cursor-pointer" />
               </th>
-              <th class="p-3 pl-4 border-b border-outline-variant font-medium">Timestamp</th>
-              <th class="p-3 border-b border-outline-variant font-medium">User</th>
-              <th class="p-3 border-b border-outline-variant font-medium">Action</th>
-              <th class="p-3 border-b border-outline-variant font-medium hidden md:table-cell">Resource</th>
-              <th class="p-3 border-b border-outline-variant font-medium hidden lg:table-cell">Details</th>
+              <th class="p-3 pl-4 border-b border-outline-variant dark:border-outline font-medium">Timestamp</th>
+              <th class="p-3 border-b border-outline-variant dark:border-outline font-medium">User</th>
+              <th class="p-3 border-b border-outline-variant dark:border-outline font-medium">Action</th>
+              <th class="p-3 border-b border-outline-variant dark:border-outline font-medium hidden md:table-cell">Resource</th>
+              <th class="p-3 border-b border-outline-variant dark:border-outline font-medium hidden lg:table-cell">Details</th>
             </tr>
           </thead>
-          <tbody class="text-body-sm text-on-surface">
-            <tr v-for="log in filteredLogs" :key="log.id" class="hover:bg-surface-container-lowest cursor-pointer border-b border-outline-variant/30 last:border-0" :class="{ 'bg-primary-container/10': selectedIds.has(log.id) }" @click="ui.openModal('AuditDetail')">
+          <tbody class="text-body-sm text-on-surface dark:text-inverse-on-surface">
+            <tr v-for="log in filteredLogs" :key="log.id" class="hover:bg-surface-container-lowest dark:hover:bg-inverse-surface cursor-pointer border-b border-outline-variant/30 dark:border-outline/30 last:border-0" :class="{ 'bg-primary-container/10': selectedIds.has(log.id) }" @click="ui.openModal('AuditDetail')">
               <td v-if="authStore.isSuperAdmin" class="p-3 pl-4" @click.stop>
-                <input type="checkbox" :checked="selectedIds.has(log.id)" @change="toggleSelect(log.id)" class="w-4 h-4 rounded border-outline-variant text-primary cursor-pointer" />
+                <input type="checkbox" :checked="selectedIds.has(log.id)" @change="toggleSelect(log.id)" class="w-4 h-4 rounded border-outline-variant dark:border-outline text-primary cursor-pointer" />
               </td>
-              <td class="p-3 pl-4 text-on-surface-variant">{{ log.timestamp }}</td>
+              <td class="p-3 pl-4 text-on-surface-variant dark:text-outline">{{ log.timestamp }}</td>
               <td class="p-3 font-medium">{{ log.user }}</td>
               <td class="p-3">
                 <span :class="actionClass(log.action)" class="px-2 py-0.5 rounded text-label-sm font-label-sm">{{ log.action }}</span>
               </td>
-              <td class="p-3 hidden md:table-cell text-on-surface-variant">{{ log.resource }}</td>
-              <td class="p-3 hidden lg:table-cell text-on-surface-variant max-w-[300px] break-words whitespace-pre-wrap">{{ log.details }}</td>
+              <td class="p-3 hidden md:table-cell text-on-surface-variant dark:text-outline">{{ log.resource }}</td>
+              <td class="p-3 hidden lg:table-cell text-on-surface-variant dark:text-outline max-w-[300px] break-words whitespace-pre-wrap">{{ log.details }}</td>
             </tr>
           </tbody>
         </table>
@@ -149,7 +149,7 @@ function deleteSelected() {
 }
 
 function actionClass(a) {
-  const map = { Create: 'bg-green-100 text-green-800', Update: 'bg-blue-100 text-blue-800', Delete: 'bg-error-container/40 text-on-error-container', Login: 'bg-surface-container text-on-surface-variant' }
+  const map = { Create: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200', Update: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200', Delete: 'bg-error-container/40 text-on-error-container dark:bg-error/15 dark:text-error', Login: 'bg-surface-container dark:bg-white/[0.08] text-on-surface-variant dark:text-outline' }
   return map[a] || ''
 }
 </script>

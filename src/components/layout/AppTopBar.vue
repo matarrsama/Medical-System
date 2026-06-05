@@ -1,7 +1,7 @@
 <template>
   <header class="bg-surface-container-lowest dark:bg-inverse-surface text-primary border-b border-outline-variant dark:border-outline flex justify-between items-center w-full px-lg h-16 sticky top-0 z-50 shrink-0">
     <div class="flex items-center gap-md sm:w-1/3">
-      <button @click="ui.toggleSidebar()" class="p-2 rounded-full hover:bg-surface-container-low dark:hover:bg-surface-variant transition-colors text-on-surface-variant sm:hidden">
+      <button @click="ui.toggleSidebar()" class="p-2 rounded-full hover:bg-surface-container-low dark:hover:bg-white/[0.08] transition-colors text-on-surface-variant dark:text-outline sm:hidden">
         <span class="material-symbols-outlined">menu</span>
       </button>
       <span class="material-symbols-outlined text-primary dark:text-inverse-primary text-[28px]">health_and_safety</span>
@@ -17,7 +17,7 @@
           @blur="onBlur"
           @keydown="onKeydown"
           @input="onSearchInput"
-          class="w-full bg-surface-container-low dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded-full py-2 pl-10 pr-10 text-body-md text-on-surface dark:text-inverse-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent placeholder-on-surface-variant transition-colors"
+          class="w-full bg-surface-container-low dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded-full py-2 pl-10 pr-10 text-body-md text-on-surface dark:text-inverse-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent placeholder-on-surface-variant dark:placeholder:text-outline transition-colors"
           placeholder="Search tickets, assets, users..."
           type="text"
         />
@@ -47,7 +47,7 @@
               class="flex items-center gap-3 px-4 py-2.5 cursor-pointer transition-colors mx-1 rounded-lg"
               :class="highlightIndex === flatIndex(gi, ii)
                 ? 'bg-primary/10 dark:bg-primary/20 text-primary dark:text-inverse-primary'
-                : 'hover:bg-surface-container-low dark:hover:bg-surface-variant text-on-surface dark:text-inverse-on-surface'"
+                : 'hover:bg-surface-container-low dark:hover:bg-white/[0.08] text-on-surface dark:text-inverse-on-surface'"
             >
               <span class="material-symbols-outlined text-[20px] shrink-0">{{ item.icon }}</span>
               <div class="flex-1 min-w-0">
@@ -61,53 +61,53 @@
       </div>
     </div>
     <div class="flex items-center justify-end gap-sm sm:gap-md sm:w-1/3">
-      <button @click="ui.toggleSearch()" class="sm:hidden p-2 rounded-full hover:bg-surface-container-low dark:hover:bg-surface-variant transition-colors text-on-surface-variant">
+      <button @click="ui.toggleSearch()" class="sm:hidden p-2 rounded-full hover:bg-surface-container-low dark:hover:bg-white/[0.08] transition-colors text-on-surface-variant dark:text-outline">
         <span class="material-symbols-outlined">search</span>
       </button>
       <div class="flex items-center gap-xs">
         <NetworkIndicator />
         <div class="relative">
-          <button @click="showNotifications = !showNotifications" class="p-2 rounded-full hover:bg-surface-container-low dark:hover:bg-surface-variant transition-colors text-on-surface-variant relative">
+          <button @click="showNotifications = !showNotifications" class="p-2 rounded-full hover:bg-surface-container-low dark:hover:bg-white/[0.08] transition-colors text-on-surface-variant dark:text-outline relative">
             <span class="material-symbols-outlined">notifications</span>
             <span v-if="unreadCount > 0" class="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span>
           </button>
           <div v-if="showNotifications" class="fixed inset-0 z-40" @click="showNotifications = false"></div>
-          <div v-if="showNotifications" class="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-xl z-50">
-            <div class="p-4 border-b border-outline-variant flex justify-between items-center">
-              <span class="text-title-md font-label-md text-on-surface">Notifications</span>
-              <span v-if="unreadCount" class="text-label-sm text-on-surface-variant">{{ unreadCount }} new</span>
+          <div v-if="showNotifications" class="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-surface-container-lowest dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded-xl shadow-xl z-50">
+            <div class="p-4 border-b border-outline-variant dark:border-outline flex justify-between items-center">
+              <span class="text-title-md font-label-md text-on-surface dark:text-inverse-on-surface">Notifications</span>
+              <span v-if="unreadCount" class="text-label-sm text-on-surface-variant dark:text-outline">{{ unreadCount }} new</span>
             </div>
             <div class="max-h-80 overflow-y-auto">
-              <div v-for="note in recentNotifications" :key="note.id" class="flex items-start gap-3 p-4 border-b border-outline-variant/30 last:border-0 hover:bg-surface-container-low transition-colors cursor-pointer" :class="!note.read ? 'bg-surface-container-low/50' : ''">
-                <div class="w-9 h-9 rounded-full flex items-center justify-center shrink-0" :class="note.iconBg || 'bg-primary-container'">
-                  <span class="material-symbols-outlined text-[18px]" :class="note.iconColor || 'text-primary'">{{ note.icon || 'notifications' }}</span>
+              <div v-for="note in recentNotifications" :key="note.id" class="flex items-start gap-3 p-4 border-b border-outline-variant/30 dark:border-outline/30 last:border-0 hover:bg-surface-container-low dark:hover:bg-white/[0.08] transition-colors cursor-pointer" :class="!note.read ? 'bg-surface-container-low/50 dark:bg-white/[0.04]' : ''">
+                <div class="w-9 h-9 rounded-full flex items-center justify-center shrink-0" :class="note.iconBg || 'bg-primary-container dark:bg-primary-container/40'">
+                  <span class="material-symbols-outlined text-[18px]" :class="note.iconColor || 'text-primary dark:text-inverse-primary'">{{ note.icon || 'notifications' }}</span>
                 </div>
                 <div class="flex-1 min-w-0">
-                  <p class="text-body-sm font-medium text-on-surface truncate">{{ note.title }}</p>
-                  <p class="text-body-xs text-on-surface-variant truncate">{{ note.message }}</p>
+                  <p class="text-body-sm font-medium text-on-surface dark:text-inverse-on-surface truncate">{{ note.title }}</p>
+                  <p class="text-body-xs text-on-surface-variant dark:text-outline truncate">{{ note.message }}</p>
                   <p class="text-label-xs text-outline mt-0.5">{{ timeAgo(note.timestamp) }}</p>
                 </div>
                 <div v-if="!note.read" class="w-2 h-2 rounded-full bg-primary shrink-0 mt-1.5"></div>
               </div>
-              <div v-if="!recentNotifications.length" class="p-8 text-center text-on-surface-variant text-body-sm">
+              <div v-if="!recentNotifications.length" class="p-8 text-center text-on-surface-variant dark:text-outline text-body-sm">
                 <span class="material-symbols-outlined text-[36px] block mb-2">notifications_off</span>
                 No notifications yet
               </div>
             </div>
-            <div class="p-3 border-t border-outline-variant text-center">
-              <router-link to="/notifications" @click="showNotifications = false" class="text-label-md font-label-md text-primary hover:underline">More</router-link>
+            <div class="p-3 border-t border-outline-variant dark:border-outline text-center">
+              <router-link to="/notifications" @click="showNotifications = false" class="text-label-md font-label-md text-primary dark:text-inverse-primary hover:underline">More</router-link>
             </div>
           </div>
         </div>
-        <button @click="ui.toggleTheme()" class="p-2 rounded-full hover:bg-surface-container-low dark:hover:bg-surface-variant transition-colors text-on-surface-variant">
+        <button @click="ui.toggleTheme()" class="p-2 rounded-full hover:bg-surface-container-low dark:hover:bg-white/[0.08] transition-colors text-on-surface-variant dark:text-outline">
           <span class="material-symbols-outlined">contrast</span>
         </button>
-        <button @click="reloadPage" class="p-2 rounded-full hover:bg-surface-container-low dark:hover:bg-surface-variant transition-colors text-on-surface-variant" title="Reload page">
+        <button @click="reloadPage" class="p-2 rounded-full hover:bg-surface-container-low dark:hover:bg-white/[0.08] transition-colors text-on-surface-variant dark:text-outline" title="Reload page">
           <span class="material-symbols-outlined">refresh</span>
         </button>
       </div>
-      <div class="h-6 w-px bg-outline-variant mx-xs"></div>
-      <button @click="ui.openModal('Help')" class="hidden sm:inline-block text-body-sm font-label-md text-primary dark:text-inverse-primary hover:bg-surface-container-low dark:hover:bg-surface-variant px-3 py-1.5 rounded transition-colors uppercase tracking-wider">Help</button>
+      <div class="h-6 w-px bg-outline-variant dark:bg-outline mx-xs"></div>
+      <button @click="ui.openModal('Help')" class="hidden sm:inline-block text-body-sm font-label-md text-primary dark:text-inverse-primary hover:bg-surface-container-low dark:hover:bg-white/[0.08] px-3 py-1.5 rounded transition-colors uppercase tracking-wider">Help</button>
     </div>
   </header>
   <div v-if="isFocused && searchQuery.length >= 2" class="fixed inset-0 z-40" @click="clearSearch"></div>
@@ -121,7 +121,7 @@
         @blur="onBlur"
         @keydown="onKeydown"
         @input="onSearchInput"
-        class="w-full bg-surface-container-low dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded-full py-2 pl-10 pr-10 text-body-md text-on-surface dark:text-inverse-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent placeholder-on-surface-variant transition-colors"
+        class="w-full bg-surface-container-low dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded-full py-2 pl-10 pr-10 text-body-md text-on-surface dark:text-inverse-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent placeholder-on-surface-variant dark:placeholder:text-outline transition-colors"
         placeholder="Search tickets, assets, users..."
         type="text"
         autofocus

@@ -103,7 +103,7 @@ export function useGlobalSearch() {
           icon: 'person',
           label: name,
           subtitle: `${u.role || ''}${u.department ? ' · ' + u.department : ''}`,
-          route: '/users'
+          route: '/staffs'
         })
       }
     }

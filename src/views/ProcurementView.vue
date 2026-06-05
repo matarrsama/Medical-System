@@ -2,29 +2,29 @@
   <div>
     <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-lg">
       <div>
-        <div class="flex items-center space-x-2 text-label-md font-label-md text-on-surface-variant mb-1">
+        <div class="flex items-center space-x-2 text-label-md font-label-md text-on-surface-variant dark:text-outline mb-1">
           <span>Operations</span>
           <span class="material-symbols-outlined" style="font-size: 14px;">chevron_right</span>
-          <span class="text-primary font-bold">Procurement</span>
+          <span class="text-primary dark:text-inverse-primary font-bold">Procurement</span>
         </div>
-        <h2 class="text-display font-display text-on-surface">Procurement &amp; Vendor Management</h2>
-        <p class="text-body-md font-body-md text-on-surface-variant mt-1">Manage purchase orders, vendor contracts, and requisitions.</p>
+        <h2 class="text-display font-display text-on-surface dark:text-inverse-on-surface">Procurement &amp; Vendor Management</h2>
+        <p class="text-body-md font-body-md text-on-surface-variant dark:text-outline mt-1">Manage purchase orders, vendor contracts, and requisitions.</p>
       </div>
-      <button @click="ui.openModal('NewPurchaseOrder')" class="bg-primary text-on-primary text-label-md font-label-md px-4 py-2 rounded-lg hover:bg-primary-container transition-colors shadow-sm flex items-center gap-2">
+      <button v-if="auth.canCreatePO || !!auth.departmentHeadOf" @click="ui.openModal('NewPurchaseOrder')" class="bg-primary text-on-primary text-label-md font-label-md px-4 py-2 rounded-lg hover:bg-primary-container transition-colors shadow-sm flex items-center gap-2">
         <span class="material-symbols-outlined text-[18px]">add</span>
         New Purchase Order
       </button>
     </div>
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
-      <div class="lg:col-span-2 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden flex flex-col flex-1 min-h-[400px]">
-        <div class="border-b border-outline-variant p-4 bg-surface-container-lowest flex flex-wrap gap-3 items-center justify-between">
+      <div class="lg:col-span-2 bg-surface-container-lowest dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded-xl shadow-sm overflow-hidden flex flex-col flex-1 min-h-[400px]">
+        <div class="border-b border-outline-variant dark:border-outline p-4 bg-surface-container-lowest dark:bg-inverse-surface flex flex-wrap gap-3 items-center justify-between">
           <div class="flex flex-wrap gap-3 items-center flex-1">
             <div class="relative w-full sm:w-56">
-              <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" style="font-size: 18px;">search</span>
-              <input v-model="searchQuery" class="w-full bg-surface-container pl-9 pr-3 py-1.5 rounded border border-outline-variant text-body-sm font-body-sm placeholder:text-on-surface-variant focus:ring-1 focus:ring-primary focus:border-primary focus:bg-surface-container-lowest transition-colors" placeholder="Filter by PO or vendor..." type="text" />
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant dark:text-outline" style="font-size: 18px;">search</span>
+            <input v-model="searchQuery" class="w-full bg-surface-container dark:bg-inverse-surface pl-9 pr-3 py-1.5 rounded border border-outline-variant dark:border-outline text-body-sm font-body-sm placeholder:text-on-surface-variant dark:placeholder:text-outline focus:ring-1 focus:ring-primary focus:border-primary focus:bg-surface-container-lowest dark:focus:bg-inverse-surface transition-colors" placeholder="Filter by PO or vendor..." type="text" />
             </div>
             <div class="relative hidden sm:block">
-              <select v-model="filterStatus" class="appearance-none bg-surface-container border border-outline-variant rounded pl-3 pr-8 py-1.5 text-body-sm font-body-sm text-on-surface focus:ring-1 focus:ring-primary focus:border-primary focus:bg-surface-container-lowest transition-colors cursor-pointer">
+              <select v-model="filterStatus" class="appearance-none bg-surface-container dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded pl-3 pr-8 py-1.5 text-body-sm font-body-sm text-on-surface dark:text-inverse-on-surface focus:ring-1 focus:ring-primary focus:border-primary focus:bg-surface-container-lowest dark:focus:bg-inverse-surface transition-colors cursor-pointer">
                 <option value="">Status: All</option>
                 <option>Pending</option>
                 <option>Approved</option>
@@ -33,7 +33,7 @@
             </div>
           </div>
           <div class="flex items-center gap-2">
-            <button v-if="selectedIds.size > 0" @click="deleteSelected" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-label-sm font-label-sm text-on-error bg-error transition-colors shadow-sm">
+            <button v-if="auth.canDeletePO && selectedIds.size > 0" @click="deleteSelected" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-label-sm font-label-sm text-on-error bg-error transition-colors shadow-sm">
               <span class="material-symbols-outlined" style="font-size: 16px;">delete</span>
               Delete ({{ selectedIds.size }})
             </button>
@@ -42,25 +42,25 @@
         <div class="overflow-x-auto flex-1">
           <table class="w-full text-left border-collapse">
             <thead>
-              <tr class="bg-surface-container-low text-on-surface-variant text-label-sm font-label-sm uppercase tracking-wider">
-                <th class="p-3 pl-4 border-b border-outline-variant font-medium w-10">
-                  <input type="checkbox" :checked="allSelected" @change="toggleSelectAll" class="rounded border-outline-variant text-primary focus:ring-primary" />
-                </th>
-                <th class="p-3 border-b border-outline-variant font-medium cursor-pointer select-none" @click="toggleSort">PO Number <span class="material-symbols-outlined align-middle" style="font-size: 14px;">{{ sortDir === 'asc' ? 'arrow_upward' : 'arrow_downward' }}</span></th>
-                <th class="p-3 border-b border-outline-variant font-medium">Vendor</th>
-                <th class="p-3 border-b border-outline-variant font-medium hidden md:table-cell">Amount</th>
-                <th class="p-3 border-b border-outline-variant font-medium">Status</th>
-                <th class="p-3 pr-4 border-b border-outline-variant font-medium w-10"></th>
+            <tr class="bg-surface-container-low dark:bg-inverse-surface text-on-surface-variant dark:text-outline text-label-sm font-label-sm uppercase tracking-wider">
+              <th class="p-3 pl-4 border-b border-outline-variant dark:border-outline font-medium w-10">
+                <input type="checkbox" :checked="allSelected" @change="toggleSelectAll" class="rounded border-outline-variant dark:border-outline text-primary focus:ring-primary" />
+              </th>
+              <th class="p-3 border-b border-outline-variant dark:border-outline font-medium cursor-pointer select-none" @click="toggleSort">PO Number <span class="material-symbols-outlined align-middle" style="font-size: 14px;">{{ sortDir === 'asc' ? 'arrow_upward' : 'arrow_downward' }}</span></th>
+              <th class="p-3 border-b border-outline-variant dark:border-outline font-medium">Vendor</th>
+              <th class="p-3 border-b border-outline-variant dark:border-outline font-medium hidden md:table-cell">Amount</th>
+              <th class="p-3 border-b border-outline-variant dark:border-outline font-medium">Status</th>
+              <th class="p-3 pr-4 border-b border-outline-variant dark:border-outline font-medium w-10"></th>
               </tr>
             </thead>
-            <tbody class="text-body-sm font-body-sm text-on-surface">
-              <tr v-for="po in filteredOrders" :key="po.id" class="hover:bg-surface-container-lowest transition-colors group cursor-pointer border-b border-outline-variant/30 last:border-0" @click="openDetail(po)">
-                <td class="p-3 pl-4" @click.stop>
-                  <input type="checkbox" :checked="selectedIds.has(po.id)" @change="toggleSelect(po.id)" class="rounded border-outline-variant text-primary focus:ring-primary" />
-                </td>
-                <td class="p-3 text-primary font-medium font-mono">{{ po.poNumber || po.id }}</td>
-                <td class="p-3 font-medium">{{ po.vendor }}</td>
-                <td class="p-3 hidden md:table-cell text-on-surface-variant">{{ formatCurrency(po.amount) }}</td>
+          <tbody class="text-body-sm font-body-sm text-on-surface dark:text-inverse-on-surface">
+            <tr v-for="po in paginatedOrders" :key="po.id" class="hover:bg-surface-container-lowest dark:hover:bg-inverse-surface transition-colors group cursor-pointer border-b border-outline-variant/30 dark:border-outline/30 last:border-0" @click="openDetail(po)">
+              <td class="p-3 pl-4" @click.stop>
+                <input type="checkbox" :checked="selectedIds.has(po.id)" @change="toggleSelect(po.id)" class="rounded border-outline-variant dark:border-outline text-primary focus:ring-primary" />
+              </td>
+              <td class="p-3 text-primary dark:text-inverse-primary font-medium font-mono">{{ po.poNumber || po.id }}</td>
+              <td class="p-3 font-medium">{{ po.vendor }}</td>
+              <td class="p-3 hidden md:table-cell text-on-surface-variant dark:text-outline">{{ formatCurrency(po.amount) }}</td>
                 <td class="p-3">
                   <span :class="statusClass(po.status)" class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-label-sm font-label-sm">
                     <span class="w-1.5 h-1.5 rounded-full" :class="statusDot(po.status)"></span>
@@ -68,40 +68,56 @@
                   </span>
                 </td>
                 <td class="p-3 pr-4 relative" @click.stop>
-                  <button @click.stop="toggleDropdown(po.id, $event)" class="p-1 rounded hover:bg-surface-container text-on-surface-variant opacity-0 group-hover:opacity-100 transition-all">
+                  <button @click.stop="toggleDropdown(po.id, $event)" class="p-1 rounded hover:bg-surface-container dark:hover:bg-white/[0.08] text-on-surface-variant dark:text-outline opacity-0 group-hover:opacity-100 transition-all">
                     <span class="material-symbols-outlined" style="font-size: 18px;">more_vert</span>
                   </button>
-                  <div v-if="openDropdownId === po.id" class="po-dropdown absolute right-4 z-50 w-44 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-lg py-1" :class="dropdownUp ? 'bottom-full mb-2' : 'top-full mt-2'">
-                    <button @click.stop="openDetail(po)" class="flex items-center gap-2.5 w-full px-4 py-2.5 text-label-sm font-label-sm text-on-surface text-left">
+                <div v-if="openDropdownId === po.id" class="po-dropdown absolute right-4 z-50 w-44 bg-surface-container-lowest dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded-xl shadow-lg py-1" :class="dropdownUp ? 'bottom-full mb-2' : 'top-full mt-2'">
+                  <button @click.stop="openDetail(po)" class="flex items-center gap-2.5 w-full px-4 py-2.5 text-label-sm font-label-sm text-on-surface dark:text-inverse-on-surface text-left">
                       <span class="material-symbols-outlined text-[16px] text-outline">info</span>
                       View Details
                     </button>
-                    <button @click.stop="openEdit(po)" class="flex items-center gap-2.5 w-full px-4 py-2.5 text-label-sm font-label-sm text-on-surface text-left">
+                    <template v-if="auth.canEditPO || auth.canDeletePO">
+                    <button v-if="auth.canEditPO" @click.stop="openEdit(po)" class="flex items-center gap-2.5 w-full px-4 py-2.5 text-label-sm font-label-sm text-on-surface dark:text-inverse-on-surface text-left">
                       <span class="material-symbols-outlined text-[16px] text-outline">edit</span>
                       Edit
                     </button>
-                    <div class="border-t border-outline-variant my-1"></div>
-                    <button @click.stop="deletePO(po)" class="flex items-center gap-2.5 w-full px-4 py-2.5 text-label-sm font-label-sm text-error text-left">
-                      <span class="material-symbols-outlined text-[16px]">delete</span>
-                      Delete
-                    </button>
+                    <div v-if="auth.canEditPO && auth.canDeletePO" class="border-t border-outline-variant dark:border-outline my-1"></div>
+                      <button v-if="auth.canDeletePO" @click.stop="deletePO(po)" class="flex items-center gap-2.5 w-full px-4 py-2.5 text-label-sm font-label-sm text-error text-left">
+                        <span class="material-symbols-outlined text-[16px]">delete</span>
+                        Delete
+                      </button>
+                    </template>
                   </div>
                 </td>
               </tr>
             </tbody>
           </table>
+        <div class="border-t border-outline-variant dark:border-outline p-4 bg-surface-container-lowest dark:bg-inverse-surface flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div class="text-body-sm font-body-sm text-on-surface-variant dark:text-outline">Showing {{ paginatedOrders.length }} of {{ filteredOrders.length }} orders</div>
+          <div class="flex items-center gap-2">
+            <button @click="goToPage(currentPage - 1)" :disabled="currentPage <= 1" class="px-2 py-1 rounded border border-outline-variant dark:border-outline text-on-surface-variant dark:text-outline hover:bg-surface-container dark:hover:bg-white/[0.08] text-label-sm font-label-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed">Previous</button>
+            <template v-for="n in visiblePages" :key="n">
+              <button v-if="n !== '...'" @click="goToPage(n)" :class="n === currentPage ? 'bg-primary text-on-primary' : 'border border-outline-variant dark:border-outline text-on-surface-variant dark:text-outline hover:bg-surface-container dark:hover:bg-white/[0.08]'" class="px-3 py-1 rounded text-label-sm font-label-sm transition-colors">{{ n }}</button>
+              <span v-else class="px-1 text-on-surface-variant dark:text-outline">...</span>
+            </template>
+            <button @click="goToPage(currentPage + 1)" :disabled="currentPage >= totalPages" class="px-2 py-1 rounded border border-outline-variant dark:border-outline text-on-surface-variant dark:text-outline hover:bg-surface-container dark:hover:bg-white/[0.08] text-label-sm font-label-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed">Next</button>
+          </div>
+        </div>
         </div>
       </div>
-      <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-lg">
-        <h3 class="text-headline-sm font-headline-md text-on-surface mb-4">Top Vendors</h3>
-        <div v-if="vendors.length === 0" class="text-body-md text-on-surface-variant text-center py-8">No vendors yet.</div>
+      <div class="bg-surface-container-lowest dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded-xl shadow-sm p-lg">
+        <h3 class="text-headline-sm font-headline-md text-on-surface dark:text-inverse-on-surface mb-4">Top Vendors</h3>
+        <div v-if="topVendors.length === 0" class="text-body-md text-on-surface-variant dark:text-outline text-center py-8">No vendors yet.</div>
         <div v-else class="space-y-3">
-          <div v-for="vendor in vendors" :key="vendor.name" class="flex items-center justify-between p-3 bg-surface-container rounded-lg">
-            <div>
-              <div class="text-body-md font-medium text-on-surface">{{ vendor.name }}</div>
-              <div class="text-label-sm text-on-surface-variant">{{ vendor.contracts || vendor.email || '—' }}</div>
+          <div v-for="(vendor, idx) in topVendors" :key="vendor.name" class="flex items-center justify-between p-3 bg-surface-container dark:bg-white/[0.04] rounded-lg">
+            <div class="flex items-center gap-3 min-w-0">
+              <span class="w-5 text-label-sm font-label-sm text-outline text-center shrink-0">{{ idx + 1 }}</span>
+              <div class="min-w-0">
+                <div class="text-body-md font-medium text-on-surface dark:text-inverse-on-surface truncate">{{ vendor.name }}</div>
+                <div class="text-label-sm text-on-surface-variant dark:text-outline">{{ vendor.count }} PO{{ vendor.count > 1 ? 's' : '' }}</div>
+              </div>
             </div>
-            <span class="text-label-sm font-label-sm text-primary">{{ vendor.status || 'Active' }}</span>
+            <span class="text-label-sm font-label-sm text-primary dark:text-inverse-primary shrink-0 ml-2">{{ formatCurrency(vendor.total) }}</span>
           </div>
         </div>
       </div>
@@ -110,16 +126,18 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useUIStore } from '@/stores/ui'
+import { useAuthStore } from '@/stores/auth'
 import { useSettings } from '@/composables/useSettings'
 import { usePurchaseOrdersStore } from '@/stores/purchaseOrders'
-import { db } from '@/lib/firebase'
-import { collection, onSnapshot, query } from 'firebase/firestore'
 
 const ui = useUIStore()
+const auth = useAuthStore()
 const poStore = usePurchaseOrdersStore()
 const { formatCurrency } = useSettings()
+
+const canUpdateStatus = computed(() => auth.canUpdatePOStatus)
 
 const searchQuery = ref('')
 const filterStatus = ref('')
@@ -128,6 +146,41 @@ const sortDir = ref('asc')
 function toggleSort() {
   sortDir.value = sortDir.value === 'asc' ? 'desc' : 'asc'
 }
+
+const currentPage = ref(1)
+const pageSize = ref(20)
+
+const totalPages = computed(() => Math.ceil(filteredOrders.value.length / pageSize.value) || 1)
+
+const visiblePages = computed(() => {
+  const total = totalPages.value
+  const current = currentPage.value
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1)
+  const pages = [1]
+  if (current > 3) pages.push('...')
+  const start = Math.max(2, current - 1)
+  const end = Math.min(total - 1, current + 1)
+  for (let i = start; i <= end; i++) pages.push(i)
+  if (current < total - 2) pages.push('...')
+  if (total > 1) pages.push(total)
+  return pages
+})
+
+const paginatedOrders = computed(() => {
+  const tp = totalPages.value
+  const page = Math.min(currentPage.value, tp)
+  const start = (page - 1) * pageSize.value
+  return filteredOrders.value.slice(start, start + pageSize.value)
+})
+
+function goToPage(n) {
+  const tp = totalPages.value
+  if (n < 1) currentPage.value = 1
+  else if (n > tp) currentPage.value = tp
+  else currentPage.value = n
+}
+
+watch([searchQuery, filterStatus], () => { currentPage.value = 1 })
 
 const filteredOrders = computed(() => {
   const items = poStore.orders.filter(po => {
@@ -207,7 +260,7 @@ function deleteSelected() {
 }
 
 function statusClass(s) {
-  const map = { Pending: 'bg-amber-100 text-amber-800', Approved: 'bg-blue-100 text-blue-800', Delivered: 'bg-green-100 text-green-800' }
+  const map = { Pending: 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200', Approved: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200', Delivered: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' }
   return map[s] || ''
 }
 
@@ -216,20 +269,24 @@ function statusDot(s) {
   return map[s] || ''
 }
 
-const vendors = ref([])
-let unsubVendors = null
+const topVendors = computed(() => {
+  const groups = {}
+  poStore.orders.forEach(po => {
+    const raw = po.vendor
+    if (!raw) return
+    const key = raw.trim().toLowerCase()
+    if (!groups[key]) groups[key] = { name: raw.trim(), count: 0, total: 0 }
+    groups[key].count++
+    groups[key].total += Number(po.amount) || 0
+  })
+  return Object.values(groups).sort((a, b) => b.total - a.total).slice(0, 10)
+})
 
 onMounted(() => {
-  const qV = query(collection(db, 'vendors'))
-  unsubVendors = onSnapshot(qV, (snap) => {
-    vendors.value = snap.docs.map(doc => {
-      const { slug, ...rest } = doc.data()
-      return rest
-    })
-  }, () => {})
+  poStore.startListening(auth.canManageProcurement ? null : auth.user?.department)
 })
 
 onUnmounted(() => {
-  if (unsubVendors) unsubVendors()
+  poStore.stopListening()
 })
 </script>

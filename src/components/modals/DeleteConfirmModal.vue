@@ -1,37 +1,37 @@
 <template>
   <div class="flex flex-col">
     <div class="flex items-center gap-4 px-6 pt-6 pb-2">
-      <div class="w-12 h-12 rounded-full bg-error-container/30 flex items-center justify-center shrink-0">
+      <div class="w-12 h-12 rounded-full bg-error-container/30 dark:bg-error-container/50 flex items-center justify-center shrink-0">
         <span class="material-symbols-outlined text-error text-[24px] icon-fill">delete_forever</span>
       </div>
       <div>
-        <h3 class="text-headline-sm font-headline-md text-on-surface">{{ isBatch ? `Delete ${label(true)}` : `Delete ${label(false)}` }}</h3>
-        <p class="text-body-sm text-on-surface-variant mt-0.5">This action cannot be undone.</p>
+        <h3 class="text-headline-sm font-headline-md text-on-surface dark:text-inverse-on-surface">{{ isBatch ? `Delete ${label(true)}` : `Delete ${label(false)}` }}</h3>
+        <p class="text-body-sm text-on-surface-variant dark:text-outline mt-0.5">This action cannot be undone.</p>
       </div>
     </div>
 
     <div class="px-6 py-4">
       <template v-if="isBatch">
-        <div class="p-4 rounded-xl bg-surface-container-low border border-outline-variant/50 space-y-2">
-          <p class="text-body-sm text-on-surface-variant">You are about to delete {{ items.length }} {{ label(true) }}:</p>
+        <div class="p-4 rounded-xl bg-surface-container-low dark:bg-inverse-surface border border-outline-variant/50 dark:border-outline space-y-2">
+          <p class="text-body-sm text-on-surface-variant dark:text-outline">You are about to delete {{ items.length }} {{ label(true) }}:</p>
           <div v-for="t in items" :key="t.id" class="flex items-center gap-2">
-            <span class="font-mono text-label-sm font-label-sm text-primary bg-primary-container/30 px-2 py-0.5 rounded shrink-0">{{ displayId(t) }}</span>
-            <span class="text-body-sm text-on-surface truncate">{{ t.title }}</span>
+            <span class="font-mono text-label-sm font-label-sm text-primary dark:text-inverse-primary bg-primary-container/30 dark:bg-primary-container/20 px-2 py-0.5 rounded shrink-0">{{ displayId(t) }}</span>
+            <span class="text-body-sm text-on-surface dark:text-inverse-on-surface truncate">{{ t.name || t.title }}</span>
           </div>
         </div>
       </template>
       <template v-else>
-        <div class="p-4 rounded-xl bg-surface-container-low border border-outline-variant/50">
+        <div class="p-4 rounded-xl bg-surface-container-low dark:bg-inverse-surface border border-outline-variant/50 dark:border-outline">
           <div class="flex items-center gap-3">
-            <span class="font-mono text-label-sm font-label-sm text-primary bg-primary-container/30 px-2 py-0.5 rounded">{{ displayId(item) }}</span>
-            <span class="text-body-sm font-body-sm text-on-surface font-medium truncate">{{ item?.title }}</span>
+            <span class="font-mono text-label-sm font-label-sm text-primary dark:text-inverse-primary bg-primary-container/30 dark:bg-primary-container/20 px-2 py-0.5 rounded">{{ displayId(item) }}</span>
+            <span class="text-body-sm font-body-sm text-on-surface dark:text-inverse-on-surface font-medium truncate">{{ item?.name || item?.title }}</span>
           </div>
         </div>
       </template>
     </div>
 
-    <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-outline-variant bg-surface-container-low">
-      <button @click="$emit('close')" class="px-5 py-2.5 rounded-lg text-label-md font-label-md text-on-surface hover:bg-surface-container-higher transition-colors">
+    <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-outline-variant dark:border-outline bg-surface-container-low dark:bg-inverse-surface">
+      <button @click="$emit('close')" class="px-5 py-2.5 rounded-lg text-label-md font-label-md text-on-surface dark:text-inverse-on-surface hover:bg-surface-container-higher dark:hover:bg-white/[0.08] transition-colors">
         Cancel
       </button>
       <button @click="confirmDelete" :disabled="deleting" class="flex items-center gap-2 px-6 py-2.5 rounded-lg text-label-md font-label-md text-on-error bg-error transition-all shadow-sm disabled:opacity-40 disabled:cursor-not-allowed">
@@ -47,6 +47,7 @@
 import { ref, computed } from 'vue'
 import { useUIStore } from '@/stores/ui'
 import { useToast } from '@/composables/useToast'
+import { mapFirebaseError } from '@/utils/mapFirebaseError'
 import { useAuditLog } from '@/composables/useAuditLog'
 import { db, auth } from '@/lib/firebase'
 import { doc, deleteDoc } from 'firebase/firestore'
@@ -83,11 +84,12 @@ function collectionName() {
 }
 
 function displayId(t) {
+  if (typeOf(t) === 'user') return t?.name || t?.email || t?.uid
   return t?.ticketId || t?.requestId || t?.poNumber || t?.assetTag || t?.maintenanceId || t?.equipmentId || t?.reportId || t?.deptId || t?.id || t?.name || t?.resource
 }
 
 function label(plural) {
-  const map = { ticket: plural ? 'Tickets' : 'Ticket', request: plural ? 'Requests' : 'Request', po: plural ? 'POs' : 'PO', asset: plural ? 'Assets' : 'Asset', maintenance: plural ? 'Tasks' : 'Task', equipment: plural ? 'Equipment' : 'Equipment', department: plural ? 'Departments' : 'Department', report: plural ? 'Reports' : 'Report', auditLog: plural ? 'Audit Logs' : 'Audit Log' }
+  const map = { ticket: plural ? 'Tickets' : 'Ticket', request: plural ? 'Requests' : 'Request', po: plural ? 'POs' : 'PO', asset: plural ? 'Assets' : 'Asset', maintenance: plural ? 'Tasks' : 'Task', equipment: plural ? 'Equipment' : 'Equipment', department: plural ? 'Departments' : 'Department', report: plural ? 'Reports' : 'Report', auditLog: plural ? 'Audit Logs' : 'Audit Log', user: plural ? 'Staff' : 'Staff' }
   return map[typeOf(items.value[0])] || (plural ? 'Items' : 'Item')
 }
 
@@ -116,7 +118,7 @@ async function confirmDelete() {
     }
   }
   if (success > 0) toast.success(`${success} ${label(true)} deleted.`)
-  if (lastErr && success === 0) toast.error(lastErr.code === 'permission-denied' ? `You do not have permission to delete ${label(true).toLowerCase()}.` : `Failed to delete ${label(true).toLowerCase()}.`)
+  if (lastErr && success === 0) toast.error(mapFirebaseError(lastErr, `Failed to delete ${label(true).toLowerCase()}.`))
   deleting.value = false
   emit('close')
 }

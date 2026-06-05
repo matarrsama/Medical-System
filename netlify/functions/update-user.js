@@ -6,7 +6,7 @@ export const handler = async (event) => {
   }
   try {
     const data = JSON.parse(event.body)
-    const { uid, email, displayName, employeeId, title, department, role, mfa, status, avatar } = data
+    const { uid, email, displayName, employeeId, title, department, role, mfa, status, avatar, phoneNumber, sex, dateOfBirth, maritalStatus, bloodGroup, nationality, district, region, homeAddress, nextOfKin, hasMedicalCondition, medicalConditionDetails } = data
 
     await auth.updateUser(uid, { email, displayName })
     await auth.setCustomUserClaims(uid, { role })
@@ -21,7 +21,19 @@ export const handler = async (event) => {
       role,
       mfa,
       status,
-      avatar: avatar || ''
+      avatar: avatar || '',
+      phoneNumber: phoneNumber || '',
+      sex: sex || '',
+      dateOfBirth: dateOfBirth || '',
+      maritalStatus: maritalStatus || '',
+      bloodGroup: bloodGroup || '',
+      nationality: nationality || '',
+      district: district || '',
+      region: region || '',
+      homeAddress: homeAddress || '',
+      nextOfKin: nextOfKin || '',
+      hasMedicalCondition: hasMedicalCondition ?? null,
+      medicalConditionDetails: medicalConditionDetails || ''
     }
 
     await db.collection('users').doc(uid).update(update)

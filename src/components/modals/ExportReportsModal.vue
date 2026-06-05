@@ -1,54 +1,54 @@
 <template>
   <div class="flex flex-col h-full">
-    <div class="flex items-center justify-between px-6 py-4 border-b border-outline-variant shrink-0">
+    <div class="flex items-center justify-between px-6 py-4 border-b border-outline-variant dark:border-outline shrink-0">
       <div class="flex items-center gap-3">
         <span class="material-symbols-outlined text-primary text-[22px]">download</span>
         <div>
-          <h3 class="text-headline-md font-headline-md text-on-surface">Export Reports</h3>
-          <p class="text-body-sm text-on-surface-variant mt-0.5">Select reports to export as PDF</p>
+          <h3 class="text-headline-md font-headline-md text-on-surface dark:text-inverse-on-surface">Export Reports</h3>
+          <p class="text-body-sm text-on-surface-variant dark:text-outline mt-0.5">Select reports to export as PDF</p>
         </div>
       </div>
-      <button @click="$emit('close')" class="p-1.5 rounded-lg hover:bg-surface-container text-on-surface-variant transition-colors">
+      <button @click="$emit('close')" class="p-1.5 rounded-lg hover:bg-surface-container dark:hover:bg-white/[0.08] text-on-surface-variant dark:text-outline transition-colors">
         <span class="material-symbols-outlined text-[20px]">close</span>
       </button>
     </div>
 
     <div class="flex-1 overflow-y-auto px-6 py-5 space-y-3">
-      <div v-if="reportsStore.items.length === 0" class="flex flex-col items-center justify-center py-12 text-on-surface-variant">
+      <div v-if="reportsStore.items.length === 0" class="flex flex-col items-center justify-center py-12 text-on-surface-variant dark:text-outline">
         <span class="material-symbols-outlined text-[40px] mb-3">summarize</span>
         <p class="text-body-sm font-body-sm">No reports available to export.</p>
       </div>
 
       <div v-for="item in reportsStore.items" :key="item.id"
-        class="flex items-center gap-3 p-3 rounded-lg border border-outline-variant cursor-pointer hover:bg-surface-container transition-colors"
+        class="flex items-center gap-3 p-3 rounded-lg border border-outline-variant dark:border-outline cursor-pointer hover:bg-surface-container dark:hover:bg-white/[0.08] transition-colors"
         :class="{ 'border-primary bg-primary-container/20': selectedIds.has(item.id) }"
         @click="toggleSelect(item.id)">
         <input type="checkbox" :checked="selectedIds.has(item.id)" @click.stop="toggleSelect(item.id)"
-          class="rounded border-outline-variant text-primary focus:ring-primary shrink-0" />
+          class="rounded border-outline-variant dark:border-outline text-primary focus:ring-primary shrink-0" />
         <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" :class="iconBg(item.icon)">
           <span class="material-symbols-outlined text-on-primary" style="font-size:18px">{{ item.icon || 'summarize' }}</span>
         </div>
         <div class="min-w-0 flex-1">
-          <p class="text-body-sm font-bold text-on-surface truncate">{{ item.title }}</p>
-          <p class="text-label-xs text-on-surface-variant truncate">{{ item.reportId }} · {{ item.type }} · {{ item.status }}</p>
+          <p class="text-body-sm font-bold text-on-surface dark:text-inverse-on-surface truncate">{{ item.title }}</p>
+          <p class="text-label-xs text-on-surface-variant dark:text-outline truncate">{{ item.reportId }} · {{ item.type }} · {{ item.status }}</p>
         </div>
       </div>
     </div>
 
-    <div class="flex items-center justify-between px-6 py-4 border-t border-outline-variant shrink-0 bg-surface-container-lowest">
-      <span class="text-label-sm text-on-surface-variant">{{ selectedIds.size }} of {{ reportsStore.items.length }} selected</span>
+    <div class="flex items-center justify-between px-6 py-4 border-t border-outline-variant dark:border-outline shrink-0 bg-surface-container-lowest">
+      <span class="text-label-sm text-on-surface-variant dark:text-outline">{{ selectedIds.size }} of {{ reportsStore.items.length }} selected</span>
       <div class="flex gap-2">
         <button @click="selectAll" v-if="selectedIds.size < reportsStore.items.length"
           class="text-label-md font-label-md text-primary hover:text-primary-container transition-colors px-3 py-1.5">
           Select All
         </button>
         <button @click="deselectAll" v-if="selectedIds.size > 0"
-          class="text-label-md font-label-md text-on-surface-variant hover:text-on-surface transition-colors px-3 py-1.5">
+          class="text-label-md font-label-md text-on-surface-variant dark:text-outline hover:text-on-surface dark:text-inverse-on-surface transition-colors px-3 py-1.5">
           Clear
         </button>
         <button @click="exportPdf" :disabled="selectedIds.size === 0 || exporting"
           class="flex items-center gap-2 px-4 py-2 rounded-lg text-label-md font-label-md transition-colors shadow-sm"
-          :class="selectedIds.size === 0 ? 'bg-surface-container text-on-surface-variant cursor-not-allowed' : 'bg-primary text-on-primary hover:bg-primary-container'">
+          :class="selectedIds.size === 0 ? 'bg-surface-container text-on-surface-variant dark:text-outline cursor-not-allowed' : 'bg-primary text-on-primary hover:bg-primary-container'">
           <span v-if="exporting" class="material-symbols-outlined animate-spin text-[18px]">progress_activity</span>
           <span v-else class="material-symbols-outlined text-[18px]">picture_as_pdf</span>
           {{ exporting ? 'Generating…' : `Export as PDF${selectedIds.size > 1 ? ' (' + selectedIds.size + ')' : ''}` }}
@@ -176,8 +176,8 @@ function deselectAll() {
 function iconBg(icon) {
   const map = {
     bar_chart: 'bg-primary', pie_chart: 'bg-tertiary', show_chart: 'bg-secondary',
-    table_chart: 'bg-cyan-600', summarize: 'bg-surface-variant text-on-surface',
-    assessment: 'bg-amber-600', dashboard: 'bg-purple-600', analytics: 'bg-orange-600'
+    table_chart: 'bg-cyan-600 dark:bg-cyan-400', summarize: 'bg-surface-variant text-on-surface dark:bg-inverse-surface dark:text-inverse-on-surface',
+    assessment: 'bg-amber-600 dark:bg-amber-400', dashboard: 'bg-purple-600 dark:bg-purple-400', analytics: 'bg-orange-600 dark:bg-orange-400'
   }
   return map[icon] || 'bg-primary'
 }
