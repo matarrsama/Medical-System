@@ -105,6 +105,7 @@ import { useAuditLog } from '@/composables/useAuditLog'
 import { useAuthStore } from '@/stores/auth'
 import { createUser } from '@/services/api'
 import { sendWelcomeEmail } from '@/services/email'
+import { notifyWelcome } from '@/services/notifications'
 import { db } from '@/lib/firebase'
 import StepPersonalDetails from '@/components/provision/StepPersonalDetails.vue'
 import StepRoleAccess from '@/components/provision/StepRoleAccess.vue'
@@ -228,6 +229,7 @@ async function submit() {
     }
     await logActivity({ action: 'Create', resource: `Staff ${wizardData.fullName}`, details: `Provisioned with role ${wizardData.role}` })
     sendWelcomeEmail({ name: wizardData.fullName, email: wizardData.credentials.email, employeeId: wizardData.employeeId, role: wizardData.role, department: wizardData.department })
+    notifyWelcome({ name: wizardData.fullName, email: wizardData.credentials.email, employeeId: wizardData.employeeId, role: wizardData.role, department: wizardData.department })
     toast.success(`Staff "${wizardData.fullName}" provisioned successfully!`)
     emit('close')
   } catch (err) {

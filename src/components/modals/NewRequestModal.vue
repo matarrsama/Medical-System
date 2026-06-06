@@ -101,6 +101,8 @@ import { useDepartmentsStore } from '@/stores/departments'
 import { useAuthStore } from '@/stores/auth'
 import { db, auth } from '@/lib/firebase'
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
+import { sendRequestCreatedNotification } from '@/services/email'
+import { notifyRequestCreated } from '@/services/notifications'
 
 const emit = defineEmits(['close'])
 const toast = useToast()
@@ -138,6 +140,8 @@ async function submit() {
     })
     await logActivity({ action: 'Create', resource: `Request ${requestId.value}`, details: `"${form.title}" (${form.type}, ${form.priority} priority)` })
     toast.success(`Request ${requestId.value} submitted successfully!`)
+    sendRequestCreatedNotification({ requestId: requestId.value, title: form.title, type: form.type, priority: form.priority }, form.department)
+    notifyRequestCreated({ requestId: requestId.value, title: form.title, type: form.type, priority: form.priority }, form.department)
     emit('close')
   } catch (err) {
     console.error('[NewRequestModal] error creating request:', err)

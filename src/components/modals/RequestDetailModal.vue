@@ -154,6 +154,8 @@ import { useDepartmentsStore } from '@/stores/departments'
 import { useAuditLog } from '@/composables/useAuditLog'
 import { db } from '@/lib/firebase'
 import { doc, updateDoc, onSnapshot } from 'firebase/firestore'
+import { sendRequestStatusNotification } from '@/services/email'
+import { notifyRequestStatus } from '@/services/notifications'
 
 const ui = useUIStore()
 const authStore = useAuthStore()
@@ -202,9 +204,10 @@ async function save() {
       description: editForm.description
     })
     await logActivity({ action: 'Update', resource: `Request ${request.value.requestId || request.value.id}`, details: `Updated "${editForm.title}" (${editForm.status})` })
-    await logActivity({ action: 'Update', resource: `Request ${request.value.requestId || request.value.id}`, details: `Updated "${editForm.title}" (${editForm.status})` })
     toast.success(`Request ${request.value.requestId || request.value.id} updated successfully!`)
     editing.value = false
+    sendRequestStatusNotification({ requestId: request.value.requestId, title: editForm.title, type: editForm.type, priority: editForm.priority }, request.value.department || editForm.department, editForm.status)
+    notifyRequestStatus({ requestId: request.value.requestId, title: editForm.title, type: editForm.type, priority: editForm.priority }, request.value.department || editForm.department, editForm.status)
   } catch (err) {
     console.error('[RequestDetailModal] error updating request:', err)
     toast.error(mapFirebaseError(err, 'Failed to update request.'))
@@ -236,6 +239,8 @@ async function updateStatus(status) {
     await updateDoc(doc(db, 'requests', request.value.id), { status })
     await logActivity({ action: 'Update', resource: `Request ${request.value.requestId || request.value.id}`, details: `Status changed to ${status}` })
     toast.success(`Status updated to ${status}`)
+    sendRequestStatusNotification({ requestId: request.value.requestId, title: request.value.title, type: request.value.type, priority: request.value.priority }, request.value.department, status)
+    notifyRequestStatus({ requestId: request.value.requestId, title: request.value.title, type: request.value.type, priority: request.value.priority }, request.value.department, status)
   } catch (err) {
     console.error('[RequestDetailModal] error updating status:', err)
     toast.error(mapFirebaseError(err, 'Failed to update status.'))

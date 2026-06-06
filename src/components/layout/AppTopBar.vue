@@ -78,7 +78,7 @@
               <span v-if="unreadCount" class="text-label-sm text-on-surface-variant dark:text-outline">{{ unreadCount }} new</span>
             </div>
             <div class="max-h-80 overflow-y-auto">
-              <div v-for="note in recentNotifications" :key="note.id" class="flex items-start gap-3 p-4 border-b border-outline-variant/30 dark:border-outline/30 last:border-0 hover:bg-surface-container-low dark:hover:bg-white/[0.08] transition-colors cursor-pointer" :class="!note.read ? 'bg-surface-container-low/50 dark:bg-white/[0.04]' : ''">
+              <div v-for="note in recentNotifications" :key="note.id" @click="markNotifRead(note)" class="flex items-start gap-3 p-4 border-b border-outline-variant/30 dark:border-outline/30 last:border-0 hover:bg-surface-container-low dark:hover:bg-white/[0.08] transition-colors cursor-pointer" :class="!note.read ? 'bg-surface-container-low/50 dark:bg-white/[0.04]' : ''">
                 <div class="w-9 h-9 rounded-full flex items-center justify-center shrink-0" :class="note.iconBg || 'bg-primary-container dark:bg-primary-container/40'">
                   <span class="material-symbols-outlined text-[18px]" :class="note.iconColor || 'text-primary dark:text-inverse-primary'">{{ note.icon || 'notifications' }}</span>
                 </div>
@@ -143,7 +143,7 @@ import { useSettings } from '@/composables/useSettings'
 import { useGlobalSearch } from '@/composables/useGlobalSearch'
 import { useSearchNav } from '@/composables/useSearchNav'
 import { db } from '@/lib/firebase'
-import { collection, onSnapshot, query, orderBy, limit } from 'firebase/firestore'
+import { collection, onSnapshot, query, orderBy, limit, where, updateDoc, doc } from 'firebase/firestore'
 import { timeAgo } from '@/utils/timeAgo'
 import NetworkIndicator from '@/components/NetworkIndicator.vue'
 
@@ -167,8 +167,9 @@ let unsubNotifications = null
 const unreadCount = computed(() => recentNotifications.value.filter(n => !n.read).length)
 
 onMounted(() => {
+  if (!auth.user?.email) return
   unsubNotifications = onSnapshot(
-    query(collection(db, 'notifications'), orderBy('timestamp', 'desc'), limit(5)),
+    query(collection(db, 'notifications'), where('email', '==', auth.user.email), orderBy('timestamp', 'desc'), limit(5)),
     (snap) => { recentNotifications.value = snap.docs.map(d => ({ id: d.id, ...d.data() })) },
     () => {}
   )
@@ -280,5 +281,12 @@ function scrollToHighlight() {
 
 function reloadPage() {
   window.location.reload()
+}
+
+async function markNotifRead(note) {
+  if (note.read) return
+  try {
+    await updateDoc(doc(db, 'notifications', note.id), { read: true })
+  } catch {}
 }
 </script>

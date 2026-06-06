@@ -130,6 +130,8 @@ import { useDepartmentsStore } from '@/stores/departments'
 import { useAuditLog } from '@/composables/useAuditLog'
 import { db, auth } from '@/lib/firebase'
 import { doc, updateDoc, onSnapshot } from 'firebase/firestore'
+import { sendInventoryStatusNotification } from '@/services/email'
+import { notifyInventoryStatus } from '@/services/notifications'
 
 const ui = useUIStore()
 const toast = useToast()
@@ -176,7 +178,6 @@ async function save() {
       location: editForm.location || null
     })
     await logActivity({ action: 'Update', resource: `Asset ${asset.value.assetTag || asset.value.id}`, details: `Updated "${editForm.name}"` })
-    await logActivity({ action: 'Update', resource: `Asset ${asset.value.assetTag || asset.value.id}`, details: `Updated "${editForm.name}"` })
     toast.success(`Asset ${asset.value.assetTag || asset.value.id} updated successfully!`)
     editing.value = false
   } catch (err) {
@@ -210,6 +211,8 @@ async function updateStatus(status) {
     await updateDoc(doc(db, 'inventory', asset.value.id), { status })
     await logActivity({ action: 'Update', resource: `Asset ${asset.value.assetTag || asset.value.id}`, details: `Status changed to ${status}` })
     toast.success(`Status updated to ${status}`)
+    sendInventoryStatusNotification({ assetTag: asset.value.assetTag, name: asset.value.name }, asset.value.department, status)
+    notifyInventoryStatus({ assetTag: asset.value.assetTag, name: asset.value.name }, asset.value.department, status)
   } catch (err) {
     console.error('[InventoryDetailModal] error updating status:', err)
     toast.error(mapFirebaseError(err, 'Failed to update status.'))

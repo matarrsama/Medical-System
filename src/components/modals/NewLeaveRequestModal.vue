@@ -101,6 +101,7 @@ import { reactive, ref, computed, onMounted } from 'vue'
 import { useToast } from '@/composables/useToast'
 import { mapFirebaseError } from '@/utils/mapFirebaseError'
 import { sendLeaveSubmittedNotification } from '@/services/email'
+import { notifyLeaveSubmitted } from '@/services/notifications'
 import { generateId } from '@/utils/generateId'
 import { useAuditLog } from '@/composables/useAuditLog'
 import { useDepartmentsStore } from '@/stores/departments'
@@ -201,7 +202,8 @@ async function submit() {
     })
     await logActivity({ action: 'Create', resource: `Leave ${leaveId.value}`, details: `${form.type} leave, ${daysRequested.value} days` })
     toast.success(`Leave request ${leaveId.value} submitted successfully!`)
-    sendLeaveSubmittedNotification({ type: form.type, startDate: form.startDate, endDate: form.endDate }, { name: auth.currentUser?.displayName || 'Staff', email: auth.currentUser?.email })
+    sendLeaveSubmittedNotification({ type: form.type, startDate: form.startDate, endDate: form.endDate, createdByName: auth.currentUser?.displayName || 'Staff', createdBy: auth.currentUser?.uid }, form.department, auth.currentUser?.email)
+    notifyLeaveSubmitted({ type: form.type, startDate: form.startDate, endDate: form.endDate, createdByName: auth.currentUser?.displayName || 'Staff', createdBy: auth.currentUser?.uid }, form.department, auth.currentUser?.email)
     emit('close')
   } catch (err) {
     console.error('[NewLeaveRequestModal] error creating leave:', err)

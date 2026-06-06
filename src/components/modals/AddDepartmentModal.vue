@@ -63,7 +63,9 @@ import { mapFirebaseError } from '@/utils/mapFirebaseError'
 import { useAuditLog } from '@/composables/useAuditLog'
 import { useUsersStore } from '@/stores/users'
 import { db, auth } from '@/lib/firebase'
-import { collection, addDoc, doc, updateDoc, serverTimestamp } from 'firebase/firestore'
+import { collection, addDoc, doc, updateDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore'
+import { sendDepartmentNotification } from '@/services/email'
+import { notifyDepartment } from '@/services/notifications'
 
 const emit = defineEmits(['close'])
 const toast = useToast()
@@ -105,6 +107,14 @@ async function submit() {
     await Promise.all(updates)
     await logActivity({ action: 'Create', resource: `Department ${form.name}`, details: `Head: ${form.headName || '—'}, Location: ${form.location || '—'}` })
     toast.success('Department added successfully!')
+    getDocs(query(collection(db, 'users'), where('role', 'in', ['Sys Administrator', 'Hospital Admin', 'ICT Officer']))).then(snap => {
+      const adminUsers = snap.docs.map(d => {
+        const data = d.data()
+        return data.email ? { email: data.email, name: data.name || data.email } : null
+      }).filter(Boolean)
+      if (adminUsers.length) sendDepartmentNotification({ name: form.name, headName: form.headName, location: form.location }, 'created', adminUsers)
+      if (adminUsers.length) notifyDepartment({ name: form.name, headName: form.headName, location: form.location }, 'created', adminUsers)
+    }).catch(() => {})
     emit('close')
   } catch (err) {
     console.error('[AddDepartmentModal] error adding department:', err)

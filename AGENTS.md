@@ -53,24 +53,44 @@
 
 ### 1. Create the Apps Script Web App
 1. Go to https://script.google.com and create a new project
-2. Paste this code:
+2. Paste this code (click **Run** once to authorize — it will fail with `TypeError` which is normal; the authorization is what matters):
 ```js
 function doPost(e) {
-  const data = JSON.parse(e.postData.contents);
-  MailApp.sendEmail({
-    to: data.to,
-    subject: data.subject,
-    htmlBody: data.body
-  });
-  return ContentService
-    .createTextOutput(JSON.stringify({ success: true }))
-    .setMimeType(ContentService.MimeType.JSON);
+  try {
+    if (!e || !e.postData) throw new Error('Not an HTTP POST request')
+    const data = JSON.parse(e.postData.contents)
+    MailApp.sendEmail({
+      to: data.to,
+      subject: data.subject,
+      htmlBody: data.body
+    })
+    return ContentService
+      .createTextOutput(JSON.stringify({ success: true }))
+      .setMimeType(ContentService.MimeType.JSON)
+  } catch (err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ success: false, error: err.message }))
+      .setMimeType(ContentService.MimeType.JSON)
+  }
+}
+
+function testSend() {
+  const result = MailApp.sendEmail({
+    to: Session.getActiveUser().getEmail(),
+    subject: 'Test from Hospital System',
+    htmlBody: '<h1>Test</h1><p>If you see this, email works!</p>'
+  })
+  Logger.log('Test email sent to ' + Session.getActiveUser().getEmail())
 }
 ```
-3. Deploy → New Deployment → Web App
+3. Click **Run** → **Review Permissions** → choose your Google account → **Allow** (the `doPost` will error, but the authorization is now granted)
+4. To verify email works: in the editor, select function `testSend` and click **Run** — check your Gmail inbox
+5. Deploy → **New Deployment** → **Web App**
+   - Description: `Email sender`
    - Execute as: **Me**
    - Access: **Anyone**
-4. Copy the deployment URL
+6. Click **Deploy**, then copy the **Web App URL**
+7. **Important**: Every time you edit the code, you must click **Deploy** → **New Deployment** (or **Manage Deployments** → update existing) for changes to take effect
 
 ### 2. Set environment variable
 In Netlify, set `GAS_URL` to your Apps Script web app URL:

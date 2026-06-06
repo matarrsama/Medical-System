@@ -156,6 +156,8 @@ import { useAuditLog } from '@/composables/useAuditLog'
 import { useSettings } from '@/composables/useSettings'
 import { db, auth } from '@/lib/firebase'
 import { doc, updateDoc, onSnapshot } from 'firebase/firestore'
+import { sendPOStatusNotification } from '@/services/email'
+import { notifyPOStatus } from '@/services/notifications'
 
 const ui = useUIStore()
 const authStore = useAuthStore()
@@ -205,9 +207,10 @@ async function save() {
       description: editForm.description
     })
     await logActivity({ action: 'Update', resource: `PO ${order.value.poNumber || order.value.id}`, details: `Updated: ${editForm.vendor} - ${formatCurrency(editForm.amount)} (${editForm.status})` })
-    await logActivity({ action: 'Update', resource: `PO ${order.value.poNumber || order.value.id}`, details: `Updated: ${editForm.vendor} - ${formatCurrency(editForm.amount)} (${editForm.status})` })
     toast.success(`PO ${order.value.poNumber || order.value.id} updated successfully!`)
     editing.value = false
+    sendPOStatusNotification({ poNumber: order.value.poNumber, vendor: editForm.vendor, amount: editForm.amount, status: editForm.status }, order.value.department || editForm.department, editForm.status)
+    notifyPOStatus({ poNumber: order.value.poNumber, vendor: editForm.vendor, amount: editForm.amount, status: editForm.status }, order.value.department || editForm.department, editForm.status)
   } catch (err) {
     console.error('[PurchaseOrderDetailModal] error updating PO:', err)
     toast.error(mapFirebaseError(err, 'Failed to update purchase order.'))
@@ -243,6 +246,8 @@ async function updateStatus(status) {
     await updateDoc(doc(db, 'purchaseOrders', order.value.id), { status })
     await logActivity({ action: 'Update', resource: `PO ${order.value.poNumber || order.value.id}`, details: `Status changed to ${status}` })
     toast.success(`PO status updated to ${status}!`)
+    sendPOStatusNotification({ poNumber: order.value.poNumber, vendor: order.value.vendor, amount: order.value.amount, status }, order.value.department, status)
+    notifyPOStatus({ poNumber: order.value.poNumber, vendor: order.value.vendor, amount: order.value.amount, status }, order.value.department, status)
   } catch (err) {
     console.error('[PurchaseOrderDetailModal] error updating status:', err)
     toast.error('Failed to update PO status.')

@@ -20,4 +20,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
     flush: () => ipcRenderer.invoke('queue:flush'),
     count: () => ipcRenderer.invoke('queue:count'),
   },
+  checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
+  installUpdate: () => ipcRenderer.invoke('install-update'),
+  getUpdateStatus: () => ipcRenderer.invoke('get-update-status'),
+  onUpdateStatus: (callback) => {
+    const handler = (_event, status) => callback(status)
+    ipcRenderer.on('update-status', handler)
+    return () => ipcRenderer.removeListener('update-status', handler)
+  },
 })

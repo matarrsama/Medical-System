@@ -160,11 +160,13 @@ import { useDepartmentsStore } from '@/stores/departments'
 import { useAuditLog } from '@/composables/useAuditLog'
 import { db, auth } from '@/lib/firebase'
 import { doc, updateDoc, onSnapshot } from 'firebase/firestore'
+import { sendMaintenanceStatusNotification } from '@/services/email'
+import { notifyMaintenanceStatus } from '@/services/notifications'
 
 const ui = useUIStore()
-const authStore = useAuthStore()
 const toast = useToast()
 const { logActivity } = useAuditLog()
+const authStore = useAuthStore()
 const modalData = computed(() => ui.modalData || {})
 const taskData = ref(modalData.value.task || modalData.value)
 const task = computed(() => taskData.value)
@@ -213,6 +215,8 @@ async function save() {
         await logActivity({ action: 'Update', resource: `Maintenance ${task.value.maintenanceId || task.value.id}`, details: `Updated for ${editForm.equipment}` })
     toast.success(`Maintenance ${task.value.maintenanceId || task.value.id} updated successfully!`)
     editing.value = false
+    sendMaintenanceStatusNotification({ maintenanceId: task.value.maintenanceId, equipment: editForm.equipment, type: editForm.type, scheduledDate: editForm.scheduledDate }, task.value.department || editForm.department, editForm.status)
+    notifyMaintenanceStatus({ maintenanceId: task.value.maintenanceId, equipment: editForm.equipment, type: editForm.type, scheduledDate: editForm.scheduledDate }, task.value.department || editForm.department, editForm.status)
   } catch (err) {
     console.error('[MaintenanceDetailModal] error updating task:', err)
     toast.error(mapFirebaseError(err, 'Failed to update maintenance task.'))
@@ -227,6 +231,8 @@ async function updateStatus(status) {
     await updateDoc(doc(db, 'maintenanceTasks', task.value.id), { status })
     await logActivity({ action: 'Update', resource: `Maintenance ${task.value.maintenanceId || task.value.id}`, details: `Status changed to ${status}` })
     toast.success(`Maintenance status updated to ${status}!`)
+    sendMaintenanceStatusNotification({ maintenanceId: task.value.maintenanceId, equipment: task.value.equipment, type: task.value.type, scheduledDate: task.value.scheduledDate }, task.value.department, status)
+    notifyMaintenanceStatus({ maintenanceId: task.value.maintenanceId, equipment: task.value.equipment, type: task.value.type, scheduledDate: task.value.scheduledDate }, task.value.department, status)
   } catch (err) {
     console.error('[MaintenanceDetailModal] error updating status:', err)
     toast.error('Failed to update maintenance status.')

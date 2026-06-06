@@ -83,6 +83,8 @@ import { useDepartmentsStore } from '@/stores/departments'
 import { useAuditLog } from '@/composables/useAuditLog'
 import { db, auth } from '@/lib/firebase'
 import { collection, addDoc, serverTimestamp, doc, getDoc } from 'firebase/firestore'
+import { sendInventoryAddedNotification } from '@/services/email'
+import { notifyInventoryAdded } from '@/services/notifications'
 
 const emit = defineEmits(['close'])
 const toast = useToast()
@@ -115,6 +117,8 @@ async function submit() {
     })
     await logActivity({ action: 'Create', resource: `Asset ${assetTag.value}`, details: `Added "${form.name}" in ${form.category}` })
     toast.success(`Asset ${assetTag.value} added successfully!`)
+    sendInventoryAddedNotification({ assetTag: assetTag.value, name: form.name, category: form.category, status: form.status }, form.department)
+    notifyInventoryAdded({ assetTag: assetTag.value, name: form.name, category: form.category, status: form.status }, form.department)
     emit('close')
   } catch (err) {
     console.error('[AddInventoryModal] error adding asset:', err)

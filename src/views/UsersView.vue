@@ -168,6 +168,8 @@ import { suspendUser, deleteUser } from '@/services/api'
 import { useFirestoreCache } from '@/composables/useFirestoreCache'
 import { useAuditLog } from '@/composables/useAuditLog'
 import { timeAgo } from '@/utils/timeAgo'
+import { sendSuspensionNotification } from '@/services/email'
+import { notifySuspension } from '@/services/notifications'
 
 import { useAuthStore } from '@/stores/auth'
 import { useDepartmentsStore } from '@/stores/departments'
@@ -342,6 +344,8 @@ async function suspendUserHandler(user) {
     await suspendUser(user.uid, newStatus)
     await logActivity({ action: 'Update', resource: `Staff ${user.name}`, details: `${isSuspended ? 'Unsuspended' : 'Suspended'} staff account` })
     ui.showToast(`${user.name} has been ${isSuspended ? 'unsuspended' : 'suspended'}`, 'success')
+    sendSuspensionNotification({ email: user.email, name: user.name }, newStatus)
+    notifySuspension({ email: user.email, name: user.name }, newStatus)
   } catch (err) {
     ui.showToast(mapFirebaseError(err, `Failed to ${isSuspended ? 'unsuspend' : 'suspend'} user.`), 'error')
   } finally {

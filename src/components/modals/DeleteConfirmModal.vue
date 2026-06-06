@@ -50,8 +50,10 @@ import { useToast } from '@/composables/useToast'
 import { mapFirebaseError } from '@/utils/mapFirebaseError'
 import { useAuditLog } from '@/composables/useAuditLog'
 import { db, auth } from '@/lib/firebase'
-import { doc, deleteDoc } from 'firebase/firestore'
+import { doc, deleteDoc, collection, query, where, getDocs } from 'firebase/firestore'
 import { deleteUser } from '@/services/api'
+import { sendDeleteNotification } from '@/services/email'
+import { notifyDeleted } from '@/services/notifications'
 
 const ui = useUIStore()
 const toast = useToast()
@@ -119,6 +121,20 @@ async function confirmDelete() {
   }
   if (success > 0) toast.success(`${success} ${label(true)} deleted.`)
   if (lastErr && success === 0) toast.error(mapFirebaseError(lastErr, `Failed to delete ${label(true).toLowerCase()}.`))
+  if (success > 0 && typeOf(list[0]) !== 'auditLog' && typeOf(list[0]) !== 'user') {
+    try {
+      const adminQ = query(collection(db, 'users'), where('role', 'in', ['Sys Administrator', 'Hospital Admin', 'ICT Officer']))
+      const adminSnap = await getDocs(adminQ)
+      const adminUsers = adminSnap.docs.map(d => {
+        const data = d.data()
+        return data.email ? { email: data.email, name: data.name || data.email } : null
+      }).filter(Boolean)
+      if (adminUsers.length) {
+        sendDeleteNotification(displayId(list[0]), typeOf(list[0]), auth.currentUser?.displayName || auth.currentUser?.email || 'System', adminUsers)
+        notifyDeleted(displayId(list[0]), typeOf(list[0]), auth.currentUser?.displayName || auth.currentUser?.email || 'System', adminUsers)
+      }
+    } catch (_) {}
+  }
   deleting.value = false
   emit('close')
 }

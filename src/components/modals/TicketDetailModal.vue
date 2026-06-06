@@ -154,10 +154,11 @@ import { useAuthStore } from '@/stores/auth'
 import { useToast } from '@/composables/useToast'
 import { mapFirebaseError } from '@/utils/mapFirebaseError'
 import { useDepartmentsStore } from '@/stores/departments'
-import { useUsersStore } from '@/stores/users'
 import { useAuditLog } from '@/composables/useAuditLog'
 import { db, auth } from '@/lib/firebase'
 import { doc, updateDoc, onSnapshot } from 'firebase/firestore'
+import { sendTicketStatusNotification } from '@/services/email'
+import { notifyTicketStatus } from '@/services/notifications'
 
 const ui = useUIStore()
 const authStore = useAuthStore()
@@ -210,6 +211,8 @@ async function save() {
     await logActivity({ action: 'Update', resource: `Ticket ${ticket.value.ticketId || ticket.value.id}`, details: `Updated "${editForm.title}" (${editForm.status})` })
     toast.success(`Ticket ${ticket.value.ticketId || ticket.value.id} updated successfully!`)
     editing.value = false
+    sendTicketStatusNotification({ ticketId: ticket.value.ticketId, title: editForm.title, status: editForm.status }, ticket.value.department || editForm.department, editForm.status)
+    notifyTicketStatus({ ticketId: ticket.value.ticketId, title: editForm.title, status: editForm.status }, ticket.value.department || editForm.department, editForm.status)
   } catch (err) {
     console.error('[TicketDetailModal] error updating ticket:', err)
     toast.error(mapFirebaseError(err, 'Failed to update ticket.'))
@@ -241,6 +244,8 @@ async function updateStatus(status) {
     await updateDoc(doc(db, 'tickets', ticket.value.id), { status })
     await logActivity({ action: 'Update', resource: `Ticket ${ticket.value.ticketId || ticket.value.id}`, details: `Status changed to ${status}` })
     toast.success(`Status updated to ${status}`)
+    sendTicketStatusNotification({ ticketId: ticket.value.ticketId, title: ticket.value.title, status }, ticket.value.department, status)
+    notifyTicketStatus({ ticketId: ticket.value.ticketId, title: ticket.value.title, status }, ticket.value.department, status)
   } catch (err) {
     console.error('[TicketDetailModal] error updating status:', err)
     toast.error(mapFirebaseError(err, 'Failed to update status.'))

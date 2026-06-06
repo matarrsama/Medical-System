@@ -116,6 +116,8 @@ import { useDepartmentsStore } from '@/stores/departments'
 import { useAuditLog } from '@/composables/useAuditLog'
 import { db, auth } from '@/lib/firebase'
 import { addDoc, collection, serverTimestamp, getDoc, doc } from 'firebase/firestore'
+import { sendEquipmentCreatedNotification } from '@/services/email'
+import { notifyEquipmentCreated } from '@/services/notifications'
 
 const emit = defineEmits(['close'])
 const toast = useToast()
@@ -157,6 +159,8 @@ async function submit() {
     })
     await logActivity({ action: 'Create', resource: `Equipment ${equipmentId.value}`, details: `Added "${form.name}" (${form.type})` })
     toast.success(`Equipment ${equipmentId.value} added successfully!`)
+    sendEquipmentCreatedNotification({ equipmentId: equipmentId.value, name: form.name, type: form.type, status: form.status }, form.department)
+    notifyEquipmentCreated({ equipmentId: equipmentId.value, name: form.name, type: form.type, status: form.status }, form.department)
     emit('close')
   } catch (err) {
     console.error('[NewEquipmentModal] error creating equipment:', err)

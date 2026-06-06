@@ -85,6 +85,8 @@ import { useSettings } from '@/composables/useSettings'
 import { useAuditLog } from '@/composables/useAuditLog'
 import { db, auth } from '@/lib/firebase'
 import { addDoc, collection, serverTimestamp, getDoc, doc } from 'firebase/firestore'
+import { sendPOCreatedNotification } from '@/services/email'
+import { notifyPOCreated } from '@/services/notifications'
 
 const emit = defineEmits(['close'])
 const toast = useToast()
@@ -118,6 +120,8 @@ async function submit() {
     })
     await logActivity({ action: 'Create', resource: `PO ${poNumber.value}`, details: `Vendor: ${form.vendor} - ${formatCurrency(form.amount)}` })
     toast.success(`PO ${poNumber.value} created successfully!`)
+    sendPOCreatedNotification({ poNumber: poNumber.value, vendor: form.vendor, amount: form.amount }, form.department)
+    notifyPOCreated({ poNumber: poNumber.value, vendor: form.vendor, amount: form.amount }, form.department)
     emit('close')
   } catch (err) {
     console.error('[NewPurchaseOrderModal] error creating PO:', err)

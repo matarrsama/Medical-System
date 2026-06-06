@@ -94,6 +94,8 @@ import { useDepartmentsStore } from '@/stores/departments'
 import { useAuditLog } from '@/composables/useAuditLog'
 import { db, auth } from '@/lib/firebase'
 import { addDoc, collection, serverTimestamp, getDoc, doc } from 'firebase/firestore'
+import { sendMaintenanceScheduledNotification } from '@/services/email'
+import { notifyMaintenanceScheduled } from '@/services/notifications'
 
 const emit = defineEmits(['close'])
 const toast = useToast()
@@ -129,6 +131,8 @@ async function submit() {
     })
     await logActivity({ action: 'Create', resource: `Maintenance ${maintenanceId.value}`, details: `Scheduled for ${form.equipment}` })
     toast.success(`Maintenance ${maintenanceId.value} scheduled successfully!`)
+    sendMaintenanceScheduledNotification({ maintenanceId: maintenanceId.value, equipment: form.equipment, type: form.type, scheduledDate: form.scheduledDate }, form.department)
+    notifyMaintenanceScheduled({ maintenanceId: maintenanceId.value, equipment: form.equipment, type: form.type, scheduledDate: form.scheduledDate }, form.department)
     emit('close')
   } catch (err) {
     console.error('[ScheduleMaintenanceModal] error creating maintenance task:', err)

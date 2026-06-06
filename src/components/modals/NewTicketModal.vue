@@ -106,6 +106,8 @@ import { useUsersStore } from '@/stores/users'
 import { useAuthStore } from '@/stores/auth'
 import { db, auth } from '@/lib/firebase'
 import { collection, addDoc, serverTimestamp, getDoc, doc } from 'firebase/firestore'
+import { sendTicketCreatedNotification } from '@/services/email'
+import { notifyTicketCreated } from '@/services/notifications'
 
 const emit = defineEmits(['close'])
 const toast = useToast()
@@ -152,6 +154,9 @@ async function submit() {
     })
     await logActivity({ action: 'Create', resource: `Ticket ${ticketId.value}`, details: `"${form.title}" (${form.priority} priority, ${form.category})` })
     toast.success(`Ticket ${ticketId.value} created successfully!`)
+    const assigneeUser = usersStore.items.find(u => u.email === form.assignee || (u.name || u.email || u.id) === form.assignee)
+    sendTicketCreatedNotification({ ticketId: ticketId.value, title: form.title, priority: form.priority, category: form.category, status: form.assignee ? 'Assigned' : 'Open', assignee: form.assignee }, form.department, assigneeUser?.email)
+    notifyTicketCreated({ ticketId: ticketId.value, title: form.title, priority: form.priority, category: form.category, status: form.assignee ? 'Assigned' : 'Open', assignee: form.assignee }, form.department, assigneeUser?.email)
     emit('close')
   } catch (err) {
     console.error('[NewTicketModal] error creating ticket:', err)

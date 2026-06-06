@@ -181,14 +181,15 @@ import { useToast } from '@/composables/useToast'
 import { mapFirebaseError } from '@/utils/mapFirebaseError'
 import { useDepartmentsStore } from '@/stores/departments'
 import { useAuditLog } from '@/composables/useAuditLog'
-import { useSettings } from '@/composables/useSettings'
 import { db, auth } from '@/lib/firebase'
 import { doc, updateDoc, onSnapshot } from 'firebase/firestore'
+import { sendEquipmentUpdatedNotification } from '@/services/email'
+import { notifyEquipmentUpdated } from '@/services/notifications'
 
 const ui = useUIStore()
-const authStore = useAuthStore()
 const toast = useToast()
 const { logActivity } = useAuditLog()
+const authStore = useAuthStore()
 const modalData = computed(() => ui.modalData || {})
 const equipData = ref(modalData.value.equipment || modalData.value)
 const equipment = computed(() => equipData.value)
@@ -243,9 +244,10 @@ async function save() {
       description: editForm.description
     })
     await logActivity({ action: 'Update', resource: `Equipment ${equipment.value.equipmentId || equipment.value.id}`, details: `Updated "${editForm.name}"` })
-    await logActivity({ action: 'Update', resource: `Equipment ${equipment.value.equipmentId || equipment.value.id}`, details: `Updated "${editForm.name}"` })
     toast.success(`Equipment ${equipment.value.equipmentId || equipment.value.id} updated successfully!`)
     editing.value = false
+    sendEquipmentUpdatedNotification({ equipmentId: equipment.value.equipmentId, name: editForm.name, type: editForm.type, status: editForm.status }, equipment.value.department || editForm.department)
+    notifyEquipmentUpdated({ equipmentId: equipment.value.equipmentId, name: editForm.name, type: editForm.type, status: editForm.status }, equipment.value.department || editForm.department)
   } catch (err) {
     console.error('[EquipmentDetailModal] error updating equipment:', err)
     toast.error(mapFirebaseError(err, 'Failed to update equipment.'))

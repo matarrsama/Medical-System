@@ -89,7 +89,8 @@ const navItems = [
   { to: '/procurement', icon: 'shopping_cart', label: 'Procurement' },
   { to: '/maintenance', icon: 'build', label: 'Maintenance' },
   { to: '/biomedical', icon: 'medical_services', label: 'Biomedical' },
-  { to: '/leave-requests', icon: 'event', label: 'Leave Requests' }
+  { to: '/leave-requests', icon: 'event', label: 'Leave Requests' },
+  { to: '/notifications', icon: 'notifications', label: 'Notifications' }
 ]
 
 const bottomNavItems = computed(() => {

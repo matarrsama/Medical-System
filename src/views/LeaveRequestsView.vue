@@ -149,7 +149,7 @@ import { useUIStore } from '@/stores/ui'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from '@/composables/useToast'
 import { db } from '@/lib/firebase'
-import { collection, query, where, getDocs, getDoc, doc as fDoc } from 'firebase/firestore'
+import { collection, query, where, onSnapshot, getDoc, doc as fDoc } from 'firebase/firestore'
 import { useFirestoreCache } from '@/composables/useFirestoreCache'
 
 const ui = useUIStore()
@@ -161,6 +161,7 @@ const allLeaves = ref([])
 const cache = useFirestoreCache()
 const cached = cache.load('leaveRequests')
 if (cached) allLeaves.value = cached
+let unsubscribe = null
 
 const leaveConfig = ref({ approvalIntervalDays: 0, rejectionIntervalDays: 0 })
 const cooldownBlocked = ref(false)
@@ -207,36 +208,24 @@ async function checkCooldown() {
   }
 }
 
-function getLeaveQuery() {
-  if (auth.canViewAllLeaves) {
-    return collection(db, 'leaveRequests')
-  } else if (auth.departmentHeadOf) {
-    return query(collection(db, 'leaveRequests'), where('department', '==', auth.departmentHeadOf))
-  } else {
-    return query(collection(db, 'leaveRequests'), where('createdBy', '==', auth.user?.uid || ''))
-  }
-}
-
-let retryTimer = null
-async function loadLeaves() {
-  const q = getLeaveQuery()
-  try {
-    const snapshot = await getDocs(q)
-    allLeaves.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
-    cache.save('leaveRequests', allLeaves.value)
+onMounted(() => {
+  const q = auth.canViewAllLeaves
+    ? collection(db, 'leaveRequests')
+    : auth.departmentHeadOf
+      ? query(collection(db, 'leaveRequests'), where('department', '==', auth.departmentHeadOf))
+      : query(collection(db, 'leaveRequests'), where('createdBy', '==', auth.user?.uid || ''))
+  unsubscribe = onSnapshot(q, (snapshot) => {
+    const mapped = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+    allLeaves.value = mapped
+    cache.save('leaveRequests', mapped)
     checkCooldown()
-  } catch (err) {
-    console.warn('[LeaveRequestsView] failed to load leaves:', err)
-  }
-}
-
-onMounted(async () => {
-  await loadLeaves()
-  checkCooldown()
+  }, (err) => {
+    console.error('[LeaveRequestsView] snapshot error:', err)
+  })
 })
 
 onUnmounted(() => {
-  if (retryTimer) clearTimeout(retryTimer)
+  if (unsubscribe) unsubscribe()
 })
 
 const tabs = computed(() => [

@@ -174,8 +174,10 @@ import { useAuditLog } from '@/composables/useAuditLog'
 import { useUsersStore } from '@/stores/users'
 import { setDeptHead } from '@/services/api'
 import { db, auth } from '@/lib/firebase'
-import { doc, updateDoc, collection, onSnapshot } from 'firebase/firestore'
+import { doc, updateDoc, collection, onSnapshot, query, where, getDocs } from 'firebase/firestore'
 import { getDeptColor } from '@/stores/departments'
+import { sendDepartmentNotification } from '@/services/email'
+import { notifyDepartment } from '@/services/notifications'
 
 const ui = useUIStore()
 const toast = useToast()
@@ -276,6 +278,14 @@ async function save() {
 
     await logActivity({ action: 'Update', resource: `Department ${editForm.name}`, details: `Updated department info` })
     toast.success(`Department ${editForm.name} updated successfully!`)
+    getDocs(query(collection(db, 'users'), where('role', 'in', ['Sys Administrator', 'Hospital Admin', 'ICT Officer']))).then(snap => {
+      const adminUsers = snap.docs.map(d => {
+        const data = d.data()
+        return data.email ? { email: data.email, name: data.name || data.email } : null
+      }).filter(Boolean)
+      if (adminUsers.length) sendDepartmentNotification({ name: editForm.name, headName: editForm.headName, location: editForm.location }, 'updated', adminUsers)
+      if (adminUsers.length) notifyDepartment({ name: editForm.name, headName: editForm.headName, location: editForm.location }, 'updated', adminUsers)
+    }).catch(() => {})
     editing.value = false
   } catch (err) {
     console.error('[DepartmentDetailModal] error updating department:', err)

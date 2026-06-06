@@ -26,6 +26,17 @@
         <span class="text-label-sm text-outline font-medium mr-1">Status:</span>
         <button v-for="s in ['Pending', 'Approved', 'Rejected']" :key="s" @click="updateStatus(s)" :class="[s === leave.status ? 'bg-primary text-on-primary shadow-sm' : 'bg-surface-container hover:bg-surface-container-higher text-on-surface-variant dark:text-outline dark:hover:bg-white/[0.08]', 'px-3 py-1.5 rounded-lg text-label-sm font-label-sm transition-all']">{{ s === 'Approved' ? 'Approve' : s === 'Rejected' ? 'Reject' : s }}</button>
       </div>
+      <div v-if="showRejectionInput" class="px-4 py-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700">
+        <p class="text-label-sm font-medium text-red-800 dark:text-red-200 mb-2">Reason for rejection:</p>
+        <textarea v-model="rejectionNote" rows="3" class="w-full px-3 py-2 border border-red-200 dark:border-red-700 rounded-lg text-body-sm bg-white dark:bg-inverse-surface focus:ring-1 focus:ring-error resize-none mb-2" placeholder="Enter the reason for rejecting this leave request..."></textarea>
+        <div class="flex items-center gap-2">
+          <button @click="confirmUpdateStatus('Rejected')" :disabled="saving" class="px-3 py-1.5 rounded-lg bg-error text-on-error text-label-sm font-label-sm whitespace-nowrap disabled:opacity-40">
+            <span v-if="saving" class="material-symbols-outlined animate-spin text-[16px]">sync</span>
+            <span v-else>Confirm Reject</span>
+          </button>
+          <button @click="showRejectionInput = false; rejectionNote = ''" class="px-3 py-1.5 rounded-lg bg-surface-container dark:bg-white/[0.08] text-on-surface-variant dark:text-outline text-label-sm font-label-sm whitespace-nowrap">Cancel</button>
+        </div>
+      </div>
       <div v-if="showApprovalWarning" class="px-4 py-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 flex items-center gap-3">
         <span class="material-symbols-outlined text-amber-600 dark:text-amber-400 text-[20px]">warning</span>
         <p class="flex-1 text-body-sm text-amber-800 dark:text-amber-200">{{ approvalWarningMessage }}</p>
@@ -165,6 +176,7 @@ import { useAuditLog } from '@/composables/useAuditLog'
 import { db } from '@/lib/firebase'
 import { doc, updateDoc, onSnapshot, collection, query, where, getDocs } from 'firebase/firestore'
 import { sendLeaveNotification } from '@/services/email'
+import { notifyLeaveProcessed } from '@/services/notifications'
 
 const ui = useUIStore()
 const authStore = useAuthStore()
@@ -211,6 +223,8 @@ const daysRemaining = computed(() => {
 
 const showApprovalWarning = ref(false)
 const approvalWarningMessage = ref('')
+const showRejectionInput = ref(false)
+const rejectionNote = ref('')
 
 function recalcDays() {
   if (!editForm.startDate || !editForm.endDate) { editDays.value = 0; return }
@@ -264,7 +278,8 @@ async function save() {
     if (changed && (editForm.status === 'Approved' || editForm.status === 'Rejected')) {
       const email = await getLeaveCreatorEmail()
       if (email) {
-        sendLeaveNotification(leave.value, { name: leave.value.createdByName || 'Staff', email }, editForm.status === 'Approved' ? 'approved' : 'rejected')
+        sendLeaveNotification(leave.value, { name: leave.value.createdByName || 'Staff', email }, editForm.status === 'Approved' ? 'approved' : 'rejected', null, leave.value.department)
+        notifyLeaveProcessed(leave.value, { name: leave.value.createdByName || 'Staff', email }, editForm.status === 'Approved' ? 'approved' : 'rejected', null, leave.value.department)
       }
     }
   } catch (err) {
@@ -293,6 +308,11 @@ onUnmounted(() => {
 
 async function updateStatus(status) {
   if (status === leave.value.status) return
+  if (status === 'Rejected') {
+    rejectionNote.value = ''
+    showRejectionInput.value = true
+    return
+  }
   if (status === 'Approved') {
     const warning = await checkDepartmentLeaveWarning()
     if (warning) {
@@ -307,18 +327,23 @@ async function updateStatus(status) {
 async function confirmUpdateStatus(status) {
   saving.value = true
   try {
-    await updateDoc(doc(db, 'leaveRequests', leave.value.id), {
-      status,
-      statusChangedAt: new Date().toISOString(),
-      approvedBy: status === 'Approved' ? authStore.currentUser?.displayName || authStore.currentUser?.email || null : null,
-      approvedAt: status === 'Approved' ? new Date().toISOString() : null
-    })
-    await logActivity({ action: 'Update', resource: `Leave ${leave.value.leaveId || leave.value.id}`, details: `Status changed to ${status}` })
+    const note = status === 'Rejected' ? rejectionNote.value : ''
+    const payload = { status, statusChangedAt: new Date().toISOString() }
+    if (status === 'Approved') {
+      payload.approvedBy = authStore.currentUser?.displayName || authStore.currentUser?.email || null
+      payload.approvedAt = new Date().toISOString()
+    }
+    if (note) {
+      payload.adminNote = note
+    }
+    await updateDoc(doc(db, 'leaveRequests', leave.value.id), payload)
+    await logActivity({ action: 'Update', resource: `Leave ${leave.value.leaveId || leave.value.id}`, details: `Status changed to ${status}${note ? `: ${note}` : ''}` })
     toast.success(`Status updated to ${status}`)
     if (status === 'Approved' || status === 'Rejected') {
       const email = await getLeaveCreatorEmail()
       if (email) {
-        sendLeaveNotification(leave.value, { name: leave.value.createdByName || 'Staff', email }, status === 'Approved' ? 'approved' : 'rejected')
+        sendLeaveNotification(leave.value, { name: leave.value.createdByName || 'Staff', email }, status === 'Approved' ? 'approved' : 'rejected', note, leave.value.department)
+        notifyLeaveProcessed(leave.value, { name: leave.value.createdByName || 'Staff', email }, status === 'Approved' ? 'approved' : 'rejected', note, leave.value.department)
       }
     }
   } catch (err) {
@@ -327,6 +352,8 @@ async function confirmUpdateStatus(status) {
   } finally {
     saving.value = false
     showApprovalWarning.value = false
+    showRejectionInput.value = false
+    rejectionNote.value = ''
   }
 }
 

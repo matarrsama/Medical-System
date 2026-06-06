@@ -31,6 +31,7 @@
     <!-- Global modals -->
     <ModalOverlay />
     <ToastContainer />
+    <UpdateNotification />
 
     <!-- Force change password overlay -->
     <Teleport to="body">
@@ -59,6 +60,7 @@ import ModalOverlay from '@/components/modals/ModalOverlay.vue'
 import ToastContainer from '@/components/shared/ToastContainer.vue'
 import ChangePasswordModal from '@/components/modals/ChangePasswordModal.vue'
 import OfflineBanner from '@/components/OfflineBanner.vue'
+import UpdateNotification from '@/components/UpdateNotification.vue'
 import { useOfflineSync } from '@/composables/useOfflineSync'
 
 const route = useRoute()

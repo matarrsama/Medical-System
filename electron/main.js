@@ -2,6 +2,8 @@ import { app, BrowserWindow, session, Menu, nativeTheme, ipcMain } from 'electro
 import path from 'path'
 import fs from 'fs'
 import { fileURLToPath } from 'node:url'
+import pkg from 'electron-updater'
+const { autoUpdater } = pkg
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -60,8 +62,117 @@ ipcMain.handle('queue:flush', () => { writeQueue([]); return 0 })
 
 ipcMain.handle('queue:count', () => readQueue().length)
 
+// ── Auto-updater IPC handlers ─────────────────────────
+ipcMain.handle('check-for-updates', async () => {
+  if (app.isPackaged) {
+    try {
+      await autoUpdater.checkForUpdates()
+    } catch (err) {
+      updateStatus.error = err.message
+      updateStatus.checking = false
+      sendUpdateStatus()
+    }
+  }
+})
+
+ipcMain.handle('install-update', () => {
+  if (app.isPackaged && updateStatus.downloaded) {
+    autoUpdater.quitAndInstall()
+  }
+})
+
+ipcMain.handle('get-update-status', () => ({ ...updateStatus }))
+
+// ── Auto-updater setup ────────────────────────────────
+function setupAutoUpdater() {
+  autoUpdater.logger = console
+  autoUpdater.autoDownload = false
+  autoUpdater.autoInstallOnAppQuit = true
+
+  updateStatus.checking = true
+  sendUpdateStatus()
+
+  autoUpdater.checkForUpdates().catch(err => {
+    updateStatus.error = err.message
+    updateStatus.checking = false
+    sendUpdateStatus()
+  })
+
+  autoUpdater.on('update-available', (info) => {
+    if (lastNotifiedVersion === info.version) return
+    lastNotifiedVersion = info.version
+    updateStatus.checking = false
+    updateStatus.available = true
+    updateStatus.version = info.version
+    updateStatus.error = null
+    sendUpdateStatus()
+
+    if (!isDownloadingInSession) {
+      isDownloadingInSession = true
+      autoUpdater.downloadUpdate().catch(err => {
+        updateStatus.error = err.message
+        isDownloadingInSession = false
+        sendUpdateStatus()
+      })
+    }
+  })
+
+  autoUpdater.on('update-not-available', () => {
+    updateStatus.checking = false
+    updateStatus.available = false
+    updateStatus.version = null
+    updateStatus.error = null
+    sendUpdateStatus()
+  })
+
+  autoUpdater.on('download-progress', (progress) => {
+    updateStatus.percent = Math.round(progress.percent)
+    sendUpdateStatus()
+  })
+
+  autoUpdater.on('update-downloaded', () => {
+    updateStatus.downloaded = true
+    updateStatus.percent = 100
+    updateStatus.available = true
+    isDownloadingInSession = false
+    sendUpdateStatus()
+  })
+
+  autoUpdater.on('error', (err) => {
+    updateStatus.error = err.message
+    updateStatus.checking = false
+    isDownloadingInSession = false
+    sendUpdateStatus()
+  })
+
+  // Periodic check every 30 minutes
+  setInterval(() => {
+    if (!updateStatus.available && !updateStatus.downloaded && !isDownloadingInSession) {
+      autoUpdater.checkForUpdates().catch(() => {})
+    }
+  }, 1800000)
+}
+
 let mainWindow
 let appTitle = ''
+
+// ── Auto-updater state ───────────────────────────────
+let updateStatus = {
+  checking: false,
+  available: false,
+  downloaded: false,
+  error: null,
+  version: null,
+  percent: 0,
+}
+let isDownloadingInSession = false
+let lastNotifiedVersion = null
+
+function sendUpdateStatus() {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('update-status', { ...updateStatus })
+  }
+}
 
 ipcMain.on('set-app-title', (_event, title) => {
   appTitle = title
@@ -139,6 +250,9 @@ app.whenReady().then(() => {
     })
   })
   createWindow()
+  if (app.isPackaged) {
+    setupAutoUpdater()
+  }
 })
 
 app.on('window-all-closed', () => {
