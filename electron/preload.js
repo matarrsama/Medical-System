@@ -21,6 +21,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     count: () => ipcRenderer.invoke('queue:count'),
   },
   checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
+  downloadUpdate: () => ipcRenderer.invoke('download-update'),
   installUpdate: () => ipcRenderer.invoke('install-update'),
   getUpdateStatus: () => ipcRenderer.invoke('get-update-status'),
   onUpdateStatus: (callback) => {

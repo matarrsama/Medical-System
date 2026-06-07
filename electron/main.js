@@ -69,7 +69,24 @@ ipcMain.handle('get-app-version', () => app.getVersion())
 ipcMain.handle('check-for-updates', async () => {
   if (app.isPackaged) {
     try {
+      lastNotifiedVersion = null
+      Object.assign(updateStatus, { checking: true, error: null, available: false, version: null, percent: 0, downloaded: false })
+      sendUpdateStatus()
       await autoUpdater.checkForUpdates()
+    } catch (err) {
+      updateStatus.error = err.message
+      updateStatus.checking = false
+      sendUpdateStatus()
+    }
+  }
+})
+
+ipcMain.handle('download-update', async () => {
+  if (app.isPackaged && updateStatus.available && !updateStatus.downloaded) {
+    try {
+      updateStatus.error = null
+      sendUpdateStatus()
+      await autoUpdater.downloadUpdate()
     } catch (err) {
       updateStatus.error = err.message
       updateStatus.checking = false
@@ -85,6 +102,12 @@ ipcMain.handle('install-update', () => {
 })
 
 ipcMain.handle('get-update-status', () => ({ ...updateStatus }))
+
+ipcMain.handle('toggle-devtools', () => {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.toggleDevTools()
+  }
+})
 
 // ── Auto-updater setup ────────────────────────────────
 function setupAutoUpdater() {
@@ -109,15 +132,6 @@ function setupAutoUpdater() {
     updateStatus.version = info.version
     updateStatus.error = null
     sendUpdateStatus()
-
-    if (!isDownloadingInSession) {
-      isDownloadingInSession = true
-      autoUpdater.downloadUpdate().catch(err => {
-        updateStatus.error = err.message
-        isDownloadingInSession = false
-        sendUpdateStatus()
-      })
-    }
   })
 
   autoUpdater.on('update-not-available', () => {
@@ -130,6 +144,7 @@ function setupAutoUpdater() {
 
   autoUpdater.on('download-progress', (progress) => {
     updateStatus.percent = Math.round(progress.percent)
+    updateStatus.checking = false
     sendUpdateStatus()
   })
 
@@ -137,20 +152,18 @@ function setupAutoUpdater() {
     updateStatus.downloaded = true
     updateStatus.percent = 100
     updateStatus.available = true
-    isDownloadingInSession = false
     sendUpdateStatus()
   })
 
   autoUpdater.on('error', (err) => {
     updateStatus.error = err.message
     updateStatus.checking = false
-    isDownloadingInSession = false
     sendUpdateStatus()
   })
 
   // Periodic check every 30 minutes
   setInterval(() => {
-    if (!updateStatus.available && !updateStatus.downloaded && !isDownloadingInSession) {
+    if (!updateStatus.available && !updateStatus.downloaded) {
       autoUpdater.checkForUpdates().catch(() => {})
     }
   }, 1800000)
@@ -168,7 +181,6 @@ let updateStatus = {
   version: null,
   percent: 0,
 }
-let isDownloadingInSession = false
 let lastNotifiedVersion = null
 
 function sendUpdateStatus() {
@@ -221,6 +233,15 @@ function createWindow() {
       mainWindow.webContents.openDevTools()
     }
   })
+
+  // Open DevTools in packaged builds by setting DEV_TOOLS=true (remove for final product)
+  if (process.env.DEV_TOOLS) {
+    mainWindow.webContents.on('before-input-event', (_event, input) => {
+      if (input.key === 'F12' || (input.control && input.shift && input.key === 'I')) {
+        mainWindow.webContents.toggleDevTools()
+      }
+    })
+  }
 
   if (process.env.VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL)

@@ -90,6 +90,9 @@ onMounted(() => {
       if (!s.error) {
         dismissedError.value = false
       }
+      if (s.checking) {
+        dismissedVersion.value = null
+      }
       Object.assign(status, s)
     })
   }
@@ -118,8 +121,11 @@ function retry() {
 }
 
 function download() {
-  if (window.electronAPI?.checkForUpdates) {
-    window.electronAPI.checkForUpdates()
+  if (window.electronAPI?.downloadUpdate) {
+    status.available = true
+    status.checking = false
+    status.error = null
+    window.electronAPI.downloadUpdate()
   }
 }
 
