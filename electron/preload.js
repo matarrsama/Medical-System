@@ -28,4 +28,5 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.on('update-status', handler)
     return () => ipcRenderer.removeListener('update-status', handler)
   },
+  getAppVersion: () => ipcRenderer.invoke('get-app-version'),
 })

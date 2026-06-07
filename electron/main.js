@@ -62,6 +62,9 @@ ipcMain.handle('queue:flush', () => { writeQueue([]); return 0 })
 
 ipcMain.handle('queue:count', () => readQueue().length)
 
+// ── App version IPC ───────────────────────────────────
+ipcMain.handle('get-app-version', () => app.getVersion())
+
 // ── Auto-updater IPC handlers ─────────────────────────
 ipcMain.handle('check-for-updates', async () => {
   if (app.isPackaged) {

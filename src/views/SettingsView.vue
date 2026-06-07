@@ -163,6 +163,29 @@
         </button>
       </div>
 
+      <!-- About -->
+      <div class="bg-surface-container-lowest dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded-xl p-lg shadow-sm mt-lg">
+        <div class="flex items-center gap-3 mb-4">
+          <img src="/icon.png" alt="" class="w-10 h-10 object-contain rounded-lg" />
+          <div>
+            <h3 class="text-headline-sm font-headline-md text-on-surface dark:text-inverse-on-surface">About</h3>
+            <p class="text-body-sm text-on-surface-variant dark:text-outline">{{ hospitalName }} — Medical Records System</p>
+          </div>
+        </div>
+        <div class="flex flex-wrap items-center gap-4">
+          <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container-higher dark:bg-white/[0.08] text-label-sm font-label-md">
+            <span class="material-symbols-outlined text-[16px] text-on-surface-variant dark:text-outline">tag</span>
+            Version <strong>{{ appVersion }}</strong>
+          </div>
+          <button @click="checkForUpdates" :disabled="updateChecking" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-label-sm font-label-sm border border-outline-variant dark:border-outline text-on-surface dark:text-inverse-on-surface hover:bg-surface-container dark:hover:bg-white/[0.08] transition-colors">
+            <span v-if="updateChecking" class="material-symbols-outlined animate-spin text-[16px]">sync</span>
+            <span v-else class="material-symbols-outlined text-[16px]">system_update</span>
+            Check for Updates
+          </button>
+          <span v-if="updateMessage" class="text-label-sm" :class="updateOk ? 'text-green-600 dark:text-green-400' : 'text-error'">{{ updateMessage }}</span>
+        </div>
+      </div>
+
       <div v-if="auth.isSuperAdmin || auth.role === 'Hospital Admin'" class="bg-surface-container-lowest dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded-xl p-lg shadow-sm mt-lg">
         <div class="flex items-center justify-between mb-4">
           <div>
@@ -246,11 +269,13 @@ import { db, auth as firebaseAuth } from '@/lib/firebase'
 import { doc, onSnapshot, updateDoc, collection, setDoc, deleteDoc, getDocs } from 'firebase/firestore'
 import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from 'firebase/auth'
 import { PERMISSIONS, ROLES } from '@/data/roles'
+import { useSettings } from '@/composables/useSettings'
 
 const auth = useAuthStore()
 const ui = useUIStore()
 const { logActivity } = useAuditLog()
 const cache = useFirestoreCache()
+const { hospitalName } = useSettings()
 
 const loading = ref(true)
 const saving = ref(false)
@@ -258,6 +283,10 @@ const avatarInput = ref(null)
 const passwordForm = reactive({ current: '', newPassword: '', confirm: '' })
 const passwordError = ref('')
 const pwSubmitting = ref(false)
+const appVersion = ref('--')
+const updateChecking = ref(false)
+const updateMessage = ref('')
+const updateOk = ref(false)
 const profile = reactive({
   name: '', initials: '', employeeId: '', email: '', title: '', department: '',
   role: '', status: '', mfa: 'push', avatar: ''
@@ -574,6 +603,35 @@ async function changePassword() {
     ui.showToast(msg, 'error')
   } finally {
     pwSubmitting.value = false
+  }
+}
+
+onMounted(async () => {
+  if (window.electronAPI?.getAppVersion) {
+    try {
+      appVersion.value = await window.electronAPI.getAppVersion()
+    } catch {}
+  }
+  // The existing onMounted code still runs below
+})
+
+async function checkForUpdates() {
+  if (!window.electronAPI?.checkForUpdates) {
+    updateMessage.value = 'Updates only available in the desktop app'
+    updateOk.value = false
+    return
+  }
+  updateChecking.value = true
+  updateMessage.value = 'Checking...'
+  try {
+    await window.electronAPI.checkForUpdates()
+    updateMessage.value = 'Check initiated. See the update notification.'
+    updateOk.value = true
+  } catch (err) {
+    updateMessage.value = err.message || 'Update check failed'
+    updateOk.value = false
+  } finally {
+    setTimeout(() => { updateChecking.value = false }, 3000)
   }
 }
 </script>

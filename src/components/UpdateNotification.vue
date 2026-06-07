@@ -19,7 +19,7 @@
       <!-- Body -->
       <p v-if="status.checking" class="text-body-sm text-on-surface-variant dark:text-outline">Checking for updates...</p>
       <p v-else-if="status.version" class="text-body-sm text-on-surface-variant dark:text-outline">Version <strong>{{ status.version }}</strong> is available.</p>
-      <p v-else-if="status.error" class="text-body-sm text-error">Update check failed: {{ status.error }}</p>
+      <p v-else-if="status.error" class="text-body-sm text-error">{{ friendlyError }}</p>
 
       <!-- Progress bar -->
       <div v-if="status.percent > 0 && !status.downloaded" class="w-full bg-surface-container-high dark:bg-white/[0.08] rounded-full h-2 overflow-hidden">
@@ -56,17 +56,40 @@ const status = reactive({
 })
 
 const dismissedVersion = ref(null)
+const dismissedError = ref(false)
 let removeListener = null
 
+const friendlyError = computed(() => {
+  if (!status.error) return ''
+  const msg = String(status.error)
+  const netError = msg.toLowerCase()
+  if (netError.includes('404') && netError.includes('releases.atom')) {
+    return 'Update check failed. Make sure the release has assets uploaded, or set GH_TOKEN.'
+  }
+  if (netError.includes('404')) return 'Update check failed (404). Publish with --publish always first.'
+  if (netError.includes('err_name_not_resolved') || netError.includes('eai_again')) return 'Update check failed. Could not reach the update server — check your internet connection.'
+  if (netError.includes('enotfound')) return 'Update check failed. Update server not found — check your internet connection.'
+  if (netError.includes('etimedout') || netError.includes('err_connection_timed_out')) return 'Update check timed out. Check your internet connection.'
+  if (netError.includes('err_connection_refused')) return 'Update check failed. Connection refused — check firewall or update server availability.'
+  if (netError.includes('err_internet_disconnected')) return 'Update check failed. No internet connection.'
+  if (netError.includes('err_network_changed') || netError.includes('err_network')) return 'Update check failed. Network connection changed.'
+  if (netError.includes('econnrefused')) return 'Update check failed. Could not reach the update server.'
+  return 'Update check failed: ' + (msg.length > 80 ? msg.slice(0, 80) + '...' : msg)
+})
+
 const visible = computed(() => {
+  if (dismissedVersion.value === status.version) return false
+  if (dismissedError.value && status.error) return false
   if (!status.available && !status.error && !status.checking) return false
-  if (dismissedVersion.value === status.version && !status.error) return false
   return true
 })
 
 onMounted(() => {
   if (window.electronAPI?.onUpdateStatus) {
     removeListener = window.electronAPI.onUpdateStatus((s) => {
+      if (!s.error) {
+        dismissedError.value = false
+      }
       Object.assign(status, s)
     })
   }
@@ -83,6 +106,7 @@ onUnmounted(() => {
 
 function dismiss() {
   dismissedVersion.value = status.version
+  if (status.error) dismissedError.value = true
 }
 
 function retry() {

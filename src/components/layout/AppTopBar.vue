@@ -4,7 +4,7 @@
       <button @click="ui.toggleSidebar()" class="p-2 rounded-full hover:bg-surface-container-low dark:hover:bg-white/[0.08] transition-colors text-on-surface-variant dark:text-outline sm:hidden">
         <span class="material-symbols-outlined">menu</span>
       </button>
-      <span class="material-symbols-outlined text-primary dark:text-inverse-primary text-[28px]">health_and_safety</span>
+      <img src="/icon.png" alt="" class="w-7 h-7 object-contain" />
       <span class="text-headline-md font-headline-md font-bold text-primary dark:text-inverse-primary truncate">{{ hospitalName }}</span>
     </div>
     <div class="hidden sm:flex flex-1 justify-start ml-4 max-w-lg relative" style="z-index: 50">

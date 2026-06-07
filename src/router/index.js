@@ -1,6 +1,7 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import { getAuth } from 'firebase/auth'
 import LoginView from '@/views/LoginView.vue'
 
 const routes = [
@@ -49,11 +50,20 @@ router.beforeEach(async (to, from, next) => {
           if (!val) { unwatch(); resolve() }
         }, { immediate: true })
       }),
-      new Promise(r => setTimeout(r, 5000))
+      new Promise(r => setTimeout(r, 15000))
     ])
   }
 
   if (publicRoutes.includes(to.name)) return next()
+
+  // If still loading after timeout, check local auth state before redirecting
+  if (auth.loading) {
+    const localUser = getAuth().currentUser
+    if (localUser) {
+      // Auth exists locally — let it through; the store will catch up
+      return next()
+    }
+  }
 
   if (!auth.isAuthenticated) return next('/login')
 

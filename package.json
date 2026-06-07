@@ -1,7 +1,11 @@
 {
-    "name":  "hospital-itsm-app",
-    "version":  "1.0.3",
+    "name":  "medical-records-system",
+    "version":  "1.0.4",
     "description":  "Medical Records System Web Application",
+    "author":  {
+                   "name":  "Matarr Sama",
+                   "email":  "matarrsama@gmail.com"
+               },
     "main":  "dist-electron/main.js",
     "type":  "module",
     "scripts":  {
@@ -57,7 +61,7 @@
                                                           ]
                                              }
                                          ],
-                              "icon":  "public/icon.png",
+                              "icon":  "public/icon.ico",
                               "artifactName":  "${productName}.Setup.${version}.${ext}"
                           },
                   "nsis":  {

@@ -73,15 +73,15 @@ export default {
         'lg': '24px'
       },
       fontFamily: {
-        'label-sm': ['Inter'],
-        'display': ['Inter'],
-        'body-md': ['Inter'],
-        'body-lg': ['Inter'],
-        'body-sm': ['Inter'],
-        'label-md': ['Inter'],
-        'headline-lg-mobile': ['Inter'],
-        'headline-md': ['Inter'],
-        'headline-lg': ['Inter']
+        'label-sm': ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+        'display': ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+        'body-md': ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+        'body-lg': ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+        'body-sm': ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+        'label-md': ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+        'headline-lg-mobile': ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+        'headline-md': ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+        'headline-lg': ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif']
       },
       fontSize: {
         'label-sm': ['11px', { lineHeight: '14px', fontWeight: '500' }],

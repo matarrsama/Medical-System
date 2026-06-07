@@ -100,11 +100,6 @@ export const useAuthStore = defineStore('auth', () => {
   function init() {
     if (initialized) return
     initialized = true
-    getDocs(collection(db, 'roles')).then(snap => {
-      const map = {}
-      snap.docs.forEach(d => { map[d.id] = d.data() })
-      rolePermissions.value = map
-    })
 
     unsubRoles = onSnapshot(collection(db, 'roles'), (snap) => {
       const map = {}
@@ -115,9 +110,18 @@ export const useAuthStore = defineStore('auth', () => {
     unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       loading.value = true
       if (firebaseUser) {
-        const tokenResult = await firebaseUser.getIdTokenResult()
-        role.value = tokenResult.claims.role || null
-        window.__tokenClaims = tokenResult.claims
+        // Timeout for token refresh — fall back to cached user if network is slow
+        const tokenResult = await Promise.race([
+          firebaseUser.getIdTokenResult(),
+          new Promise(r => setTimeout(r, 3000))
+        ])
+        if (tokenResult) {
+          role.value = tokenResult.claims.role || null
+          window.__tokenClaims = tokenResult.claims
+        } else {
+          // Token refresh timed out — set a basic user from cached data
+          role.value = null
+        }
         user.value = {
           uid: firebaseUser.uid,
           email: firebaseUser.email,
@@ -151,7 +155,7 @@ export const useAuthStore = defineStore('auth', () => {
         }).catch(() => {})
 
         await checkDepartmentHead(firebaseUser.uid, tokenResult)
-        console.log('[Auth] departmentHeadOf after check:', departmentHeadOf.value, 'role:', role.value, 'canAccessDepartments:', canAccessDepartments.value, 'token.deptHeadOf:', tokenResult.claims.deptHeadOf)
+        console.log('[Auth] departmentHeadOf after check:', departmentHeadOf.value, 'role:', role.value, 'canAccessDepartments:', canAccessDepartments.value)
       } else {
         user.value = null
         role.value = null
@@ -202,6 +206,7 @@ export const useAuthStore = defineStore('auth', () => {
       departmentHeadOf.value = tokenResult.claims.deptHeadOf
       return
     }
+    // If token timed out or no claim set, query Firestore directly
     try {
       const q = query(collection(db, 'departments'), where('headId', '==', uid))
       unsubDeptHead = onSnapshot(q, (snap) => {

@@ -6,9 +6,20 @@
     </div>
     <div class="absolute inset-0 z-0 bg-gradient-to-br from-surface-container-high/80 to-surface/90 dark:from-inverse-surface/90 dark:to-inverse-surface/95"></div>
     <div class="relative z-10 w-full max-w-md px-container-padding py-xl mx-auto flex flex-col gap-lg">
+
+      <!-- Loading state while auth initializes -->
+      <div v-if="auth.loading" class="flex flex-col items-center justify-center py-16 gap-4">
+        <div class="w-16 h-16 rounded-lg bg-primary flex items-center justify-center shadow-sm overflow-hidden">
+          <img src="/icon.png" alt="Medical Records System" class="w-full h-full object-cover" />
+        </div>
+        <div class="w-10 h-10 border-4 border-outline-variant border-t-primary rounded-full animate-spin"></div>
+        <p class="text-body-sm text-on-surface-variant dark:text-outline">Initializing...</p>
+      </div>
+
+      <template v-else>
       <div class="flex flex-col items-center text-center gap-sm mb-md">
-        <div class="w-16 h-16 rounded-lg bg-primary flex items-center justify-center shadow-sm mb-xs">
-          <span class="material-symbols-outlined text-on-primary" style="font-size: 32px;">medical_services</span>
+        <div class="w-16 h-16 rounded-lg bg-primary flex items-center justify-center shadow-sm mb-xs overflow-hidden">
+          <img src="/icon.png" alt="Medical Records System" class="w-full h-full object-cover" />
         </div>
         <h1 class="text-headline-lg font-headline-lg text-primary dark:text-inverse-primary">{{ hospitalName }}</h1>
         <p class="text-body-md font-body-md text-on-surface-variant dark:text-outline">Enterprise Authentication Portal</p>
@@ -100,6 +111,7 @@
           Secure Enterprise Connection
         </p>
       </div>
+      </template>
     </div>
     <button @click="ui.toggleTheme()" class="fixed bottom-4 right-4 w-10 h-10 rounded-full bg-surface-container dark:bg-inverse-surface border border-outline-variant dark:border-outline flex items-center justify-center text-on-surface dark:text-inverse-on-surface shadow-md hover:bg-surface-container-high dark:hover:bg-white/[0.08] transition-colors z-50">
       <span class="material-symbols-outlined">contrast</span>
