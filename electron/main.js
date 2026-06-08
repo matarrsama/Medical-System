@@ -1,4 +1,4 @@
-import { app, BrowserWindow, session, Menu, nativeTheme, ipcMain } from 'electron'
+import { app, BrowserWindow, session, Menu, nativeTheme, ipcMain, globalShortcut } from 'electron'
 import path from 'path'
 import fs from 'fs'
 import { fileURLToPath } from 'node:url'
@@ -73,26 +73,15 @@ ipcMain.handle('check-for-updates', async () => {
       Object.assign(updateStatus, { checking: true, error: null, available: false, version: null, percent: 0, downloaded: false })
       sendUpdateStatus()
       await autoUpdater.checkForUpdates()
+      return { available: updateStatus.available, version: updateStatus.version, downloaded: updateStatus.downloaded }
     } catch (err) {
       updateStatus.error = err.message
       updateStatus.checking = false
       sendUpdateStatus()
+      return { available: false, error: err.message }
     }
   }
-})
-
-ipcMain.handle('download-update', async () => {
-  if (app.isPackaged && updateStatus.available && !updateStatus.downloaded) {
-    try {
-      updateStatus.error = null
-      sendUpdateStatus()
-      await autoUpdater.downloadUpdate()
-    } catch (err) {
-      updateStatus.error = err.message
-      updateStatus.checking = false
-      sendUpdateStatus()
-    }
-  }
+  return { available: false }
 })
 
 ipcMain.handle('install-update', () => {
@@ -132,6 +121,11 @@ function setupAutoUpdater() {
     updateStatus.version = info.version
     updateStatus.error = null
     sendUpdateStatus()
+    // Auto-download
+    autoUpdater.downloadUpdate().catch(err => {
+      updateStatus.error = err.message
+      sendUpdateStatus()
+    })
   })
 
   autoUpdater.on('update-not-available', () => {
@@ -234,12 +228,13 @@ function createWindow() {
     }
   })
 
-  // Open DevTools in packaged builds by setting DEV_TOOLS=true (remove for final product)
-  if (process.env.DEV_TOOLS) {
-    mainWindow.webContents.on('before-input-event', (_event, input) => {
-      if (input.key === 'F12' || (input.control && input.shift && input.key === 'I')) {
-        mainWindow.webContents.toggleDevTools()
-      }
+  // DevTools shortcut for packaged builds (remove for final product)
+  if (app.isPackaged) {
+    globalShortcut.register('F12', () => {
+      mainWindow?.webContents.toggleDevTools()
+    })
+    globalShortcut.register('CommandOrControl+Shift+I', () => {
+      mainWindow?.webContents.toggleDevTools()
     })
   }
 

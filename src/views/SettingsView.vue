@@ -624,9 +624,17 @@ async function checkForUpdates() {
   updateChecking.value = true
   updateMessage.value = 'Checking...'
   try {
-    await window.electronAPI.checkForUpdates()
-    updateMessage.value = 'Check initiated. See the update notification.'
-    updateOk.value = true
+    const result = await window.electronAPI.checkForUpdates()
+    if (result.available) {
+      updateMessage.value = 'Update v' + result.version + ' is downloading'
+      updateOk.value = true
+    } else if (result.error) {
+      updateMessage.value = result.error
+      updateOk.value = false
+    } else {
+      updateMessage.value = 'You\u2019re on the latest version'
+      updateOk.value = true
+    }
   } catch (err) {
     updateMessage.value = err.message || 'Update check failed'
     updateOk.value = false

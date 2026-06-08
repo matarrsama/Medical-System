@@ -35,9 +35,6 @@
         <button v-if="status.downloaded" @click="install" class="text-label-sm font-label-md px-3 py-1.5 rounded-lg bg-tertiary text-on-tertiary hover:bg-tertiary-container hover:text-on-tertiary-container transition-colors">
           Restart & Install
         </button>
-        <button v-if="status.available && !status.downloaded && status.percent === 0" @click="download" class="text-label-sm font-label-md px-3 py-1.5 rounded-lg bg-primary text-on-primary hover:bg-primary-container hover:text-on-primary-container transition-colors">
-          Download
-        </button>
       </div>
     </div>
   </div>
@@ -67,6 +64,8 @@ const friendlyError = computed(() => {
     return 'Update check failed. Make sure the release has assets uploaded, or set GH_TOKEN.'
   }
   if (netError.includes('404')) return 'Update check failed (404). Publish with --publish always first.'
+  if (netError.includes('502') || netError.includes('503') || netError.includes('504')) return 'Update check failed. GitHub Releases temporarily unavailable — try again later.'
+  if (netError.includes('rate') || netError.includes('api rate')) return 'Update check failed. GitHub API rate limit exceeded — set GH_TOKEN or try again later.'
   if (netError.includes('err_name_not_resolved') || netError.includes('eai_again')) return 'Update check failed. Could not reach the update server — check your internet connection.'
   if (netError.includes('enotfound')) return 'Update check failed. Update server not found — check your internet connection.'
   if (netError.includes('etimedout') || netError.includes('err_connection_timed_out')) return 'Update check timed out. Check your internet connection.'
@@ -117,15 +116,6 @@ function retry() {
     status.error = null
     status.checking = true
     window.electronAPI.checkForUpdates()
-  }
-}
-
-function download() {
-  if (window.electronAPI?.downloadUpdate) {
-    status.available = true
-    status.checking = false
-    status.error = null
-    window.electronAPI.downloadUpdate()
   }
 }
 
