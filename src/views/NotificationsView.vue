@@ -40,6 +40,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { db } from '@/lib/firebase'
 import { collection, onSnapshot, query, orderBy, where, updateDoc, doc, deleteDoc, getDocs } from 'firebase/firestore'
@@ -47,7 +48,20 @@ import { useFirestoreCache } from '@/composables/useFirestoreCache'
 import { timeAgo } from '@/utils/timeAgo'
 
 const auth = useAuthStore()
+const router = useRouter()
 const notifications = ref([])
+
+const resourceRoutes = {
+  leave: '/leave-requests',
+  ticket: '/tickets',
+  request: '/requests',
+  asset: '/inventory',
+  equipment: '/biomedical',
+  maintenance: '/maintenance',
+  po: '/procurement',
+  department: '/departments',
+  user: '/staffs',
+}
 const cache = useFirestoreCache()
 const cached = cache.load('notifications')
 if (cached) notifications.value = cached
@@ -75,6 +89,10 @@ async function markAsRead(note) {
   try {
     await updateDoc(doc(db, 'notifications', note.id), { read: true })
   } catch {}
+  const routePath = resourceRoutes[note.resourceType]
+  if (routePath) {
+    router.push({ path: routePath, query: note.resourceId ? { q: note.resourceId } : undefined })
+  }
 }
 
 async function markAllAsRead() {

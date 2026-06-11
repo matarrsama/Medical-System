@@ -127,12 +127,15 @@
 
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useUIStore } from '@/stores/ui'
 import { useAuthStore } from '@/stores/auth'
 import { db } from '@/lib/firebase'
 import { collection, query, where, onSnapshot } from 'firebase/firestore'
 import { useFirestoreCache } from '@/composables/useFirestoreCache'
 
+const route = useRoute()
+const router = useRouter()
 const ui = useUIStore()
 const auth = useAuthStore()
 const activeTab = ref('pending')
@@ -168,7 +171,7 @@ const tabs = computed(() => [
   { key: 'all', label: 'All', count: allRequests.value.length }
 ])
 
-const searchQuery = ref('')
+const searchQuery = ref(route.query.q || '')
 const filterDepartment = ref('')
 const filterStatus = ref('')
 const sortDir = ref('asc')
@@ -211,6 +214,18 @@ function goToPage(n) {
 }
 
 watch([searchQuery, filterDepartment, filterStatus, activeTab], () => { currentPage.value = 1 })
+watch(searchQuery, (q) => {
+  const currentQ = route.query.q || ''
+  if (q !== currentQ) {
+    router.replace({ query: q ? { q } : undefined })
+  }
+})
+watch(() => route.query.q, (q) => {
+  const newQ = q || ''
+  if (newQ !== searchQuery.value) {
+    searchQuery.value = newQ
+  }
+})
 
 const departments = computed(() => {
   const set = new Set()

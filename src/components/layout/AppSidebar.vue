@@ -89,8 +89,7 @@ const navItems = [
   { to: '/procurement', icon: 'shopping_cart', label: 'Procurement' },
   { to: '/maintenance', icon: 'build', label: 'Maintenance' },
   { to: '/biomedical', icon: 'medical_services', label: 'Biomedical' },
-  { to: '/leave-requests', icon: 'event', label: 'Leave Requests' },
-  { to: '/notifications', icon: 'notifications', label: 'Notifications' }
+  { to: '/leave-requests', icon: 'event', label: 'Leave Requests' }
 ]
 
 const bottomNavItems = computed(() => {
@@ -100,9 +99,6 @@ const bottomNavItems = computed(() => {
   }
   items.push({ to: '/reports', icon: 'analytics', label: 'Reports' })
   items.push({ to: '/settings', icon: 'settings', label: 'Settings' })
-  if (auth.canManageRoles) {
-    items.push({ to: '/roles', icon: 'badge', label: 'Roles' })
-  }
   if (auth.canAccessAdmin) {
     items.push({ to: '/admin', icon: 'admin_panel_settings', label: 'Admin' })
   }

@@ -96,6 +96,7 @@ export const useAuthStore = defineStore('auth', () => {
   let initialized = false
   let unsubscribe = null
   let unsubUserDoc = null
+  let rolesReady = false
 
   function init() {
     if (initialized) return
@@ -105,9 +106,16 @@ export const useAuthStore = defineStore('auth', () => {
       const map = {}
       snap.docs.forEach(d => { map[d.id] = d.data() })
       rolePermissions.value = map
+      rolesReady = true
     }, () => {})
 
     unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      // Skip transient null callbacks during initial load where
+      // Firebase hasn't fully resolved persistence yet
+      if (!firebaseUser && auth.currentUser) {
+        console.log('[Auth] onAuthStateChanged fired null but currentUser exists — waiting for real event')
+        return
+      }
       loading.value = true
       if (firebaseUser) {
         // Timeout for token refresh — fall back to cached user if network is slow
@@ -166,6 +174,16 @@ export const useAuthStore = defineStore('auth', () => {
           unsubUserDoc()
           unsubUserDoc = null
         }
+      }
+      // Wait for role permissions snapshot to fire before marking loading complete,
+      // so computed permissions are accurate on first render
+      if (!rolesReady) {
+        await new Promise(resolve => {
+          const interval = setInterval(() => {
+            if (rolesReady) { clearInterval(interval); resolve() }
+          }, 50)
+          setTimeout(() => { clearInterval(interval); resolve() }, 5000)
+        })
       }
       loading.value = false
       console.log('[Auth] loading set to false, departmentHeadOf:', departmentHeadOf.value, 'role:', role.value)

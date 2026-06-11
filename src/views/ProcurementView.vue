@@ -127,11 +127,14 @@
 
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useUIStore } from '@/stores/ui'
 import { useAuthStore } from '@/stores/auth'
 import { useSettings } from '@/composables/useSettings'
 import { usePurchaseOrdersStore } from '@/stores/purchaseOrders'
 
+const route = useRoute()
+const router = useRouter()
 const ui = useUIStore()
 const auth = useAuthStore()
 const poStore = usePurchaseOrdersStore()
@@ -139,7 +142,7 @@ const { formatCurrency } = useSettings()
 
 const canUpdateStatus = computed(() => auth.canUpdatePOStatus)
 
-const searchQuery = ref('')
+const searchQuery = ref(route.query.q || '')
 const filterStatus = ref('')
 const sortDir = ref('asc')
 
@@ -181,6 +184,18 @@ function goToPage(n) {
 }
 
 watch([searchQuery, filterStatus], () => { currentPage.value = 1 })
+watch(searchQuery, (q) => {
+  const currentQ = route.query.q || ''
+  if (q !== currentQ) {
+    router.replace({ query: q ? { q } : undefined })
+  }
+})
+watch(() => route.query.q, (q) => {
+  const newQ = q || ''
+  if (newQ !== searchQuery.value) {
+    searchQuery.value = newQ
+  }
+})
 
 const filteredOrders = computed(() => {
   const items = poStore.orders.filter(po => {

@@ -198,12 +198,15 @@
 
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useUIStore } from '@/stores/ui'
 import { useAuthStore } from '@/stores/auth'
 import { useDepartmentsStore } from '@/stores/departments'
 import { db } from '@/lib/firebase'
 import { collection, query, where, onSnapshot } from 'firebase/firestore'
 
+const route = useRoute()
+const router = useRouter()
 const ui = useUIStore()
 const authStore = useAuthStore()
 const deptStore = useDepartmentsStore()
@@ -258,7 +261,7 @@ const availabilityPercent = computed(() => {
   return Math.round(activeStaffCount.value / totalStaff.value * 100)
 })
 
-const searchQuery = ref('')
+const searchQuery = ref(route.query.q || '')
 const selectedIds = ref(new Set())
 const openDropdownId = ref(null)
 const dropdownUp = ref(false)
@@ -349,6 +352,18 @@ onMounted(() => {
 })
 
 watch([canManageDepartments, () => authStore.departmentHeadOf], subscribeLeaveReqs, { immediate: false })
+watch(searchQuery, (q) => {
+  const currentQ = route.query.q || ''
+  if (q !== currentQ) {
+    router.replace({ query: q ? { q } : undefined })
+  }
+})
+watch(() => route.query.q, (q) => {
+  const newQ = q || ''
+  if (newQ !== searchQuery.value) {
+    searchQuery.value = newQ
+  }
+})
 onUnmounted(() => {
   document.removeEventListener('click', onDocClick)
   if (unsubUsers) unsubUsers()

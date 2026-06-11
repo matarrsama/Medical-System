@@ -141,6 +141,7 @@
 
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useUIStore } from '@/stores/ui'
 import { useAuthStore } from '@/stores/auth'
 import { useEquipmentStore } from '@/stores/equipment'
@@ -148,6 +149,8 @@ import { useDepartmentsStore } from '@/stores/departments'
 import { db, auth } from '@/lib/firebase'
 import { doc, getDoc } from 'firebase/firestore'
 
+const route = useRoute()
+const router = useRouter()
 const ui = useUIStore()
 const authStore = useAuthStore()
 const equipmentStore = useEquipmentStore()
@@ -161,7 +164,7 @@ const userDept = ref('')
 
 const filterDepartmentOptions = computed(() => isAdmin.value ? deptStore.items : deptStore.items.filter(d => d.name === userDept.value))
 
-const searchQuery = ref('')
+const searchQuery = ref(route.query.q || '')
 const filterStatus = ref('')
 const filterType = ref('')
 const filterDepartment = ref('')
@@ -205,6 +208,18 @@ function goToPage(n) {
 }
 
 watch([searchQuery, filterStatus, filterType, filterDepartment], () => { currentPage.value = 1 })
+watch(searchQuery, (q) => {
+  const currentQ = route.query.q || ''
+  if (q !== currentQ) {
+    router.replace({ query: q ? { q } : undefined })
+  }
+})
+watch(() => route.query.q, (q) => {
+  const newQ = q || ''
+  if (newQ !== searchQuery.value) {
+    searchQuery.value = newQ
+  }
+})
 
 const filteredItems = computed(() => {
   const items = equipmentStore.items.filter(item => {

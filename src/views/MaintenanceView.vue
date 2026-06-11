@@ -138,12 +138,15 @@
 
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useUIStore } from '@/stores/ui'
 import { useAuthStore } from '@/stores/auth'
 import { useMaintenanceStore } from '@/stores/maintenance'
 import { db, auth } from '@/lib/firebase'
 import { doc, getDoc } from 'firebase/firestore'
 
+const route = useRoute()
+const router = useRouter()
 const ui = useUIStore()
 const authStore = useAuthStore()
 const maintenanceStore = useMaintenanceStore()
@@ -154,7 +157,7 @@ const userDept = ref('')
 
 const userTasks = computed(() => maintenanceStore.tasks)
 
-const searchQuery = ref('')
+const searchQuery = ref(route.query.q || '')
 const filterStatus = ref('')
 const filterType = ref('')
 const sortDir = ref('asc')
@@ -197,6 +200,18 @@ function goToPage(n) {
 }
 
 watch([searchQuery, filterStatus, filterType], () => { currentPage.value = 1 })
+watch(searchQuery, (q) => {
+  const currentQ = route.query.q || ''
+  if (q !== currentQ) {
+    router.replace({ query: q ? { q } : undefined })
+  }
+})
+watch(() => route.query.q, (q) => {
+  const newQ = q || ''
+  if (newQ !== searchQuery.value) {
+    searchQuery.value = newQ
+  }
+})
 
 const filteredTasks = computed(() => {
   const items = userTasks.value.filter(t => {

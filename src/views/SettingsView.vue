@@ -616,6 +616,7 @@ onMounted(async () => {
 })
 
 async function checkForUpdates() {
+  console.log('[SettingsView] checkForUpdates called, electronAPI:', !!window.electronAPI?.checkForUpdates)
   if (!window.electronAPI?.checkForUpdates) {
     updateMessage.value = 'Updates only available in the desktop app'
     updateOk.value = false
@@ -625,19 +626,24 @@ async function checkForUpdates() {
   updateMessage.value = 'Checking...'
   try {
     const result = await window.electronAPI.checkForUpdates()
+    console.log('[SettingsView] checkForUpdates result:', JSON.stringify(result))
     if (result.available) {
       updateMessage.value = 'Update v' + result.version + ' is downloading'
       updateOk.value = true
+      console.log('[SettingsView] Update v' + result.version + ' is now downloading')
     } else if (result.error) {
       updateMessage.value = result.error
       updateOk.value = false
+      console.log('[SettingsView] Update error:', result.error)
     } else {
       updateMessage.value = 'You\u2019re on the latest version'
       updateOk.value = true
+      console.log('[SettingsView] Already on latest version')
     }
   } catch (err) {
     updateMessage.value = err.message || 'Update check failed'
     updateOk.value = false
+    console.log('[SettingsView] Update check caught error:', err)
   } finally {
     setTimeout(() => { updateChecking.value = false }, 3000)
   }

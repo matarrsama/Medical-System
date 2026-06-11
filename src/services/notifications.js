@@ -297,6 +297,7 @@ export async function notifyWelcome(user) {
     title: 'Welcome to the Staff Portal',
     message: `Your account has been created. Employee ID: ${user.employeeId}`,
     resourceType: 'user',
+    resourceId: user.employeeId || null,
   })
 }
 
@@ -310,6 +311,7 @@ export async function notifyPasswordReset(user, tempPassword) {
     title: 'Password Reset',
     message: `Your password has been reset by an administrator.`,
     resourceType: 'user',
+    resourceId: user.employeeId || null,
   })
 }
 
@@ -324,5 +326,6 @@ export async function notifySuspension(user, status) {
     title: isSuspended ? 'Account Suspended' : 'Account Reactivated',
     message: isSuspended ? 'Your account has been suspended.' : 'Your account has been reactivated.',
     resourceType: 'user',
+    resourceId: user.employeeId || null,
   })
 }

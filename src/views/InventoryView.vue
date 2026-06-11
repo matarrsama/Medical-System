@@ -127,10 +127,13 @@
 
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useUIStore } from '@/stores/ui'
 import { useAuthStore } from '@/stores/auth'
 import { useInventoryStore } from '@/stores/inventory'
 
+const route = useRoute()
+const router = useRouter()
 const ui = useUIStore()
 const authStore = useAuthStore()
 const inventoryStore = useInventoryStore()
@@ -138,7 +141,7 @@ const inventoryStore = useInventoryStore()
 const canManageInventory = computed(() => authStore.canManageInventory)
 const canAddInventory = computed(() => canManageInventory.value || !!authStore.departmentHeadOf)
 
-const searchQuery = ref('')
+const searchQuery = ref(route.query.q || '')
 const filterCategory = ref('')
 const filterStatus = ref('')
 const sortDir = ref('asc')
@@ -181,6 +184,18 @@ function goToPage(n) {
 }
 
 watch([searchQuery, filterCategory, filterStatus], () => { currentPage.value = 1 })
+watch(searchQuery, (q) => {
+  const currentQ = route.query.q || ''
+  if (q !== currentQ) {
+    router.replace({ query: q ? { q } : undefined })
+  }
+})
+watch(() => route.query.q, (q) => {
+  const newQ = q || ''
+  if (newQ !== searchQuery.value) {
+    searchQuery.value = newQ
+  }
+})
 
 const filteredAssets = computed(() => {
   let items = inventoryStore.assets

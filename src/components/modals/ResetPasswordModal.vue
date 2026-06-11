@@ -58,7 +58,7 @@ onMounted(async () => {
     await logActivity({ action: 'Update', resource: `User ${user.value.name || user.value.uid}`, details: `Password reset` })
     tempPassword.value = result.tempPassword
     sendPasswordResetEmail({ name: user.value.name, email: user.value.email }, result.tempPassword)
-    notifyPasswordReset({ name: user.value.name, email: user.value.email }, result.tempPassword)
+    notifyPasswordReset({ name: user.value.name, email: user.value.email, employeeId: user.value.employeeId }, result.tempPassword)
   } catch (err) {
     ui.showToast(mapFirebaseError(err, 'Failed to reset password.'), 'error')
     tempPassword.value = 'Error generating password'

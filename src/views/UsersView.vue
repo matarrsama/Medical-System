@@ -159,7 +159,7 @@
 
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useUIStore } from '@/stores/ui'
 import { mapFirebaseError } from '@/utils/mapFirebaseError'
 import { db } from '@/lib/firebase'
@@ -175,6 +175,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useDepartmentsStore } from '@/stores/departments'
 
 const route = useRoute()
+const router = useRouter()
 const ui = useUIStore()
 const authStore = useAuthStore()
 const deptStore = useDepartmentsStore()
@@ -182,9 +183,17 @@ const { logActivity } = useAuditLog()
 const searchQuery = ref(route.query.q || '')
 console.log('[UsersView] searchQuery initialized to:', searchQuery.value)
 
+watch(searchQuery, (q) => {
+  const currentQ = route.query.q || ''
+  if (q !== currentQ) {
+    router.replace({ query: q ? { q } : undefined })
+  }
+})
 watch(() => route.query.q, (q) => {
-  console.log('[UsersView] route.query.q changed to:', q)
-  searchQuery.value = q || ''
+  const newQ = q || ''
+  if (newQ !== searchQuery.value) {
+    searchQuery.value = newQ
+  }
 })
 const filterRole = ref('')
 const roleOptions = computed(() =>
@@ -345,7 +354,7 @@ async function suspendUserHandler(user) {
     await logActivity({ action: 'Update', resource: `Staff ${user.name}`, details: `${isSuspended ? 'Unsuspended' : 'Suspended'} staff account` })
     ui.showToast(`${user.name} has been ${isSuspended ? 'unsuspended' : 'suspended'}`, 'success')
     sendSuspensionNotification({ email: user.email, name: user.name }, newStatus)
-    notifySuspension({ email: user.email, name: user.name }, newStatus)
+    notifySuspension({ email: user.email, name: user.name, employeeId: user.employeeId }, newStatus)
   } catch (err) {
     ui.showToast(mapFirebaseError(err, `Failed to ${isSuspended ? 'unsuspend' : 'suspend'} user.`), 'error')
   } finally {

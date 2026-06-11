@@ -192,20 +192,29 @@
 
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useTicketsStore } from '@/stores/tickets'
 import { useUIStore } from '@/stores/ui'
 import { useAuthStore } from '@/stores/auth'
 const route = useRoute()
+const router = useRouter()
 const ticketsStore = useTicketsStore()
 const ui = useUIStore()
 const auth = useAuthStore()
 const searchQuery = ref(route.query.q || '')
 console.log('[TicketsView] searchQuery initialized to:', searchQuery.value)
 
+watch(searchQuery, (q) => {
+  const currentQ = route.query.q || ''
+  if (q !== currentQ) {
+    router.replace({ query: q ? { q } : undefined })
+  }
+})
 watch(() => route.query.q, (q) => {
-  console.log('[TicketsView] route.query.q changed to:', q)
-  searchQuery.value = q || ''
+  const newQ = q || ''
+  if (newQ !== searchQuery.value) {
+    searchQuery.value = newQ
+  }
 })
 
 const selectedIds = ref(new Set())

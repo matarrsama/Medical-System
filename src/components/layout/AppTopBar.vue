@@ -78,7 +78,7 @@
               <span v-if="unreadCount" class="text-label-sm text-on-surface-variant dark:text-outline">{{ unreadCount }} new</span>
             </div>
             <div class="max-h-80 overflow-y-auto">
-              <div v-for="note in recentNotifications" :key="note.id" @click="markNotifRead(note)" class="flex items-start gap-3 p-4 border-b border-outline-variant/30 dark:border-outline/30 last:border-0 hover:bg-surface-container-low dark:hover:bg-white/[0.08] transition-colors cursor-pointer" :class="!note.read ? 'bg-surface-container-low/50 dark:bg-white/[0.04]' : ''">
+              <div v-for="note in recentNotifications" :key="note.id" @click="markNotifRead(note)" class="flex items-start gap-3 p-4 border-b border-outline-variant/30 dark:border-outline/30 last:border-0 hover:bg-surface-container-low dark:hover:bg-white/[0.08] transition-colors cursor-pointer group" :class="!note.read ? 'bg-surface-container-low/50 dark:bg-white/[0.04]' : ''">
                 <div class="w-9 h-9 rounded-full flex items-center justify-center shrink-0" :class="note.iconBg || 'bg-primary-container dark:bg-primary-container/40'">
                   <span class="material-symbols-outlined text-[18px]" :class="note.iconColor || 'text-primary dark:text-inverse-primary'">{{ note.icon || 'notifications' }}</span>
                 </div>
@@ -87,6 +87,9 @@
                   <p class="text-body-xs text-on-surface-variant dark:text-outline truncate">{{ note.message }}</p>
                   <p class="text-label-xs text-outline mt-0.5">{{ timeAgo(note.timestamp) }}</p>
                 </div>
+                <button @click.stop="deleteNotification(note)" class="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-surface-container-high dark:hover:bg-white/[0.08] text-on-surface-variant dark:text-outline" title="Dismiss">
+                  <span class="material-symbols-outlined text-[16px]">close</span>
+                </button>
                 <div v-if="!note.read" class="w-2 h-2 rounded-full bg-primary shrink-0 mt-1.5"></div>
               </div>
               <div v-if="!recentNotifications.length" class="p-8 text-center text-on-surface-variant dark:text-outline text-body-sm">
@@ -114,18 +117,18 @@
   <div v-if="ui.searchOpen" class="sm:hidden fixed inset-x-0 top-0 z-50 bg-surface-container-lowest dark:bg-inverse-surface border-b border-outline-variant dark:border-outline p-3 flex items-center gap-2">
     <div class="relative flex-1">
       <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant dark:text-outline">search</span>
-      <input
-        ref="inputRef"
-        v-model="searchQuery"
-        @focus="onFocus"
-        @blur="onBlur"
-        @keydown="onKeydown"
-        @input="onSearchInput"
-        class="w-full bg-surface-container-low dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded-full py-2 pl-10 pr-10 text-body-md text-on-surface dark:text-inverse-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent placeholder-on-surface-variant dark:placeholder:text-outline transition-colors"
-        placeholder="Search tickets, assets, users..."
-        type="text"
-        autofocus
-      />
+<input
+          ref="inputRef"
+          v-model="searchQuery"
+          @focus="onFocus"
+          @blur="onBlur"
+          @keydown="onKeydown"
+          @input="onSearchInput"
+          class="w-full bg-surface-container-low dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded-full py-2 pl-10 pr-10 text-body-md text-on-surface dark:text-inverse-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent placeholder-on-surface-variant dark:placeholder:text-outline transition-colors"
+          placeholder="Search tickets, assets, users..."
+          type="text"
+          autofocus
+        />
       <button v-if="searchQuery" @click="clearSearch" class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant dark:text-outline hover:text-on-surface dark:hover:text-inverse-on-surface transition-colors">
         <span class="material-symbols-outlined text-[18px]">close</span>
       </button>
@@ -143,9 +146,21 @@ import { useSettings } from '@/composables/useSettings'
 import { useGlobalSearch } from '@/composables/useGlobalSearch'
 import { useSearchNav } from '@/composables/useSearchNav'
 import { db } from '@/lib/firebase'
-import { collection, onSnapshot, query, orderBy, limit, where, updateDoc, doc } from 'firebase/firestore'
+import { collection, onSnapshot, query, orderBy, limit, where, updateDoc, doc, deleteDoc } from 'firebase/firestore'
 import { timeAgo } from '@/utils/timeAgo'
 import NetworkIndicator from '@/components/NetworkIndicator.vue'
+
+const resourceRoutes = {
+  leave: '/leave-requests',
+  ticket: '/tickets',
+  request: '/requests',
+  asset: '/inventory',
+  equipment: '/biomedical',
+  maintenance: '/maintenance',
+  po: '/procurement',
+  department: '/departments',
+  user: '/staffs',
+}
 
 const router = useRouter()
 const route = useRoute()
@@ -185,6 +200,12 @@ watch(() => ui.searchOpen, (open) => {
   }
 })
 
+function onSearchInput() {
+  if (!searchQuery.value && route.query.q) {
+    router.replace({ query: undefined })
+  }
+}
+
 function flatIndex(gi, ii) {
   let idx = 0
   for (let g = 0; g < gi; g++) {
@@ -201,12 +222,6 @@ function totalItems() {
   let count = 0
   for (const g of groupedResults.value) count += g.items.length
   return count
-}
-
-function onSearchInput(e) {
-  if (!e.target.value && route.query.q) {
-    router.replace({ query: undefined })
-  }
 }
 
 function onFocus() {
@@ -287,6 +302,17 @@ async function markNotifRead(note) {
   if (note.read) return
   try {
     await updateDoc(doc(db, 'notifications', note.id), { read: true })
+  } catch {}
+  showNotifications.value = false
+  const routePath = resourceRoutes[note.resourceType]
+  if (routePath) {
+    router.push({ path: routePath, query: note.resourceId ? { q: note.resourceId } : undefined })
+  }
+}
+
+async function deleteNotification(note) {
+  try {
+    await deleteDoc(doc(db, 'notifications', note.id))
   } catch {}
 }
 </script>

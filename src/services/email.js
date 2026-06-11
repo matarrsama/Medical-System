@@ -10,7 +10,12 @@ export async function sendEmail({ to, subject, body, type }) {
     })
     const text = await res.text()
     if (!text) return { success: false, error: 'Empty response' }
-    return JSON.parse(text)
+    try {
+      return JSON.parse(text)
+    } catch (parseErr) {
+      console.debug('[email] Non-JSON response:', res.status, text.slice(0, 200))
+      return { success: false, error: 'Email service unavailable (non-JSON response)' }
+    }
   } catch (err) {
     if (err.message !== 'Empty response') console.debug('[email] Not available:', err.message)
     return { success: false, error: err.message }
