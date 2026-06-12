@@ -16,8 +16,10 @@
           @focus="onFocus"
           @blur="onBlur"
           @keydown="onKeydown"
-          @input="onSearchInput"
-          class="w-full bg-surface-container-low dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded-full py-2 pl-10 pr-10 text-body-md text-on-surface dark:text-inverse-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent placeholder-on-surface-variant dark:placeholder:text-outline transition-colors"
+          :class="[
+            'w-full bg-surface-container-low dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded-full py-2 pl-10 pr-10 text-body-md text-on-surface dark:text-inverse-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent placeholder-on-surface-variant dark:placeholder:text-outline transition-colors',
+            searchLocked && 'caret-transparent'
+          ]"
           placeholder="Search tickets, assets, users..."
           type="text"
         />
@@ -25,7 +27,7 @@
           <span class="material-symbols-outlined text-[18px]">close</span>
         </button>
       </div>
-      <div v-if="isFocused && searchQuery.length >= 2" class="absolute top-full left-0 right-0 mt-2 bg-surface-container-high dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded-xl shadow-xl max-h-96 overflow-y-auto">
+      <div v-if="!searchLocked && isFocused && searchQuery.length >= 2" class="absolute top-full left-0 right-0 mt-2 bg-surface-container-high dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded-xl shadow-xl max-h-96 overflow-y-auto">
         <div v-if="results.length === 0" class="p-6 text-center text-on-surface-variant dark:text-outline">
           <span class="material-symbols-outlined text-[36px] block mb-2">search_off</span>
           <p class="text-body-md font-body-md">No results found</p>
@@ -113,7 +115,7 @@
       <button @click="ui.openModal('Help')" class="hidden sm:inline-block text-body-sm font-label-md text-primary dark:text-inverse-primary hover:bg-surface-container-low dark:hover:bg-white/[0.08] px-3 py-1.5 rounded transition-colors uppercase tracking-wider">Help</button>
     </div>
   </header>
-  <div v-if="isFocused && searchQuery.length >= 2" class="fixed inset-0 z-40" @click="clearSearch"></div>
+  <div v-if="!searchLocked && isFocused && searchQuery.length >= 2" class="fixed inset-0 z-40" @click="clearSearch"></div>
   <div v-if="ui.searchOpen" class="sm:hidden fixed inset-x-0 top-0 z-50 bg-surface-container-lowest dark:bg-inverse-surface border-b border-outline-variant dark:border-outline p-3 flex items-center gap-2">
     <div class="relative flex-1">
       <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant dark:text-outline">search</span>
@@ -123,8 +125,10 @@
           @focus="onFocus"
           @blur="onBlur"
           @keydown="onKeydown"
-          @input="onSearchInput"
-          class="w-full bg-surface-container-low dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded-full py-2 pl-10 pr-10 text-body-md text-on-surface dark:text-inverse-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent placeholder-on-surface-variant dark:placeholder:text-outline transition-colors"
+          :class="[
+            'w-full bg-surface-container-low dark:bg-inverse-surface border border-outline-variant dark:border-outline rounded-full py-2 pl-10 pr-10 text-body-md text-on-surface dark:text-inverse-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent placeholder-on-surface-variant dark:placeholder:text-outline transition-colors',
+            searchLocked && 'caret-transparent'
+          ]"
           placeholder="Search tickets, assets, users..."
           type="text"
           autofocus
@@ -173,6 +177,7 @@ const { searchQuery, isFocused, results, groupedResults } = useGlobalSearch()
 const inputRef = ref(null)
 const highlightIndex = ref(-1)
 const itemRefs = ref({})
+const searchLocked = ref(false)
 let blurTimeout
 
 const showNotifications = ref(false)
@@ -199,12 +204,6 @@ watch(() => ui.searchOpen, (open) => {
     nextTick(() => inputRef.value?.focus())
   }
 })
-
-function onSearchInput() {
-  if (!searchQuery.value && route.query.q) {
-    router.replace({ query: undefined })
-  }
-}
 
 function flatIndex(gi, ii) {
   let idx = 0
@@ -238,22 +237,27 @@ function clearSearch() {
   clearTimeout(blurTimeout)
   searchQuery.value = ''
   isFocused.value = false
+  searchLocked.value = false
   highlightIndex.value = -1
   ui.searchOpen = false
   router.replace({ query: undefined })
 }
 
 function navigateTo(item) {
-  console.log('[AppTopBar] navigateTo called with item:', JSON.stringify(item))
   clearTimeout(blurTimeout)
   isFocused.value = false
+  searchLocked.value = true
   const q = searchQuery.value
   highlightIndex.value = -1
-  console.log('[AppTopBar] pushing route:', item.route, 'with q:', q)
   router.push({ path: item.route, query: q ? { q } : undefined })
 }
 
 function onKeydown(e) {
+  if (searchLocked.value) {
+    e.preventDefault()
+    return
+  }
+
   const total = totalItems()
   if (total === 0) return
 

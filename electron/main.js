@@ -1,6 +1,7 @@
 import { app, BrowserWindow, session, Menu, nativeTheme, ipcMain, globalShortcut } from 'electron'
 import path from 'path'
 import fs from 'fs'
+import http from 'http'
 import { fileURLToPath } from 'node:url'
 import pkg from 'electron-updater'
 const { autoUpdater } = pkg
@@ -241,7 +242,44 @@ function createWindow() {
   if (process.env.VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL)
   } else {
-    mainWindow.loadFile(path.join(__dirname, '../dist/index.html'))
+    // Serve from a local HTTP server so Firebase Auth OAuth popup works
+    // (file:// protocol is not supported by Firebase Auth)
+    const distDir = path.join(__dirname, '../dist')
+    const MIME = {
+      '.html': 'text/html; charset=utf-8',
+      '.js': 'application/javascript; charset=utf-8',
+      '.css': 'text/css; charset=utf-8',
+      '.json': 'application/json; charset=utf-8',
+      '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
+      '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.map': 'application/json',
+      '.woff': 'font/woff', '.woff2': 'font/woff2',
+    }
+    const server = http.createServer((req, res) => {
+      const filePath = req.url === '/' ? '/index.html' : req.url.split('?')[0]
+      const fullPath = path.join(distDir, filePath)
+      try {
+        if (!fs.existsSync(fullPath) || fs.statSync(fullPath).isDirectory()) {
+          // SPA fallback — serve index.html for hash-based routing
+          const content = fs.readFileSync(path.join(distDir, 'index.html'))
+          res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' })
+          return res.end(content)
+        }
+        const ext = path.extname(fullPath).toLowerCase()
+        const content = fs.readFileSync(fullPath)
+        res.writeHead(200, { 'Content-Type': MIME[ext] || 'application/octet-stream' })
+        res.end(content)
+      } catch {
+        try {
+          const content = fs.readFileSync(path.join(distDir, 'index.html'))
+          res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' })
+          res.end(content)
+        } catch { res.writeHead(500); res.end('Error') }
+      }
+    })
+    server.listen(0, '127.0.0.1', () => {
+      const port = server.address().port
+      mainWindow.loadURL(`http://127.0.0.1:${port}`)
+    })
   }
 }
 
