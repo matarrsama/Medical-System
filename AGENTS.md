@@ -118,6 +118,10 @@ Provision a new staff member — they should receive a welcome email.
 | Leave submitted | `NewLeaveRequestModal.vue` | Staff's email |
 | Leave approved/rejected | `LeaveDetailModal.vue` | Leave creator's email |
 
+## Fixed: Update notification showing "Retry" instead of progress
+- **Root cause**: Race condition in `electron/main.js` — `setupAutoUpdater()` calls `checkForUpdates()` at startup, triggering `update-available` which starts `downloadUpdate()`. When user clicks "Check for Updates" in Settings, the IPC handler calls `checkForUpdates()` again, triggering a second `downloadUpdate()` that fails because the first is already running.
+- **Fix**: Added `downloadStarted` flag. The `update-available` handler only calls `downloadUpdate()` once (`if (!downloadStarted)`). The `check-for-updates` IPC handler resets `downloadStarted = false` so manual checks trigger a fresh download.
+
 ## Remaining
 1. **Deploy firestore.rules**: `firebase deploy --only firestore:rules` (manual)
 2. **Seed default roles**: visit Settings page → Roles Management → click "Seed Defaults"

@@ -71,6 +71,7 @@ ipcMain.handle('check-for-updates', async () => {
   if (app.isPackaged) {
     try {
       lastNotifiedVersion = null
+      downloadStarted = false
       Object.assign(updateStatus, { checking: true, error: null, available: false, version: null, percent: 0, downloaded: false })
       sendUpdateStatus()
       await autoUpdater.checkForUpdates()
@@ -122,11 +123,14 @@ function setupAutoUpdater() {
     updateStatus.version = info.version
     updateStatus.error = null
     sendUpdateStatus()
-    // Auto-download
-    autoUpdater.downloadUpdate().catch(err => {
-      updateStatus.error = err.message
-      sendUpdateStatus()
-    })
+    // Auto-download (only once to avoid race)
+    if (!downloadStarted) {
+      downloadStarted = true
+      autoUpdater.downloadUpdate().catch(err => {
+        updateStatus.error = err.message
+        sendUpdateStatus()
+      })
+    }
   })
 
   autoUpdater.on('update-not-available', () => {
@@ -177,6 +181,7 @@ let updateStatus = {
   percent: 0,
 }
 let lastNotifiedVersion = null
+let downloadStarted = false
 
 function sendUpdateStatus() {
   if (mainWindow && !mainWindow.isDestroyed()) {
