@@ -18,10 +18,12 @@
 
       <!-- Body -->
       <p v-if="status.checking" class="text-body-sm text-on-surface-variant dark:text-outline">Checking for updates...</p>
+      <!-- While downloading, show progress text instead of any stale error -->
+      <p v-else-if="status.percent > 0 && !status.downloaded" class="text-body-sm text-on-surface-variant dark:text-outline">Downloading version <strong>{{ status.version }}</strong>...</p>
       <p v-else-if="status.version" class="text-body-sm text-on-surface-variant dark:text-outline">Version <strong>{{ status.version }}</strong> is available.</p>
       <p v-else-if="status.error" class="text-body-sm text-error">{{ friendlyError }}</p>
 
-      <!-- Progress bar -->
+      <!-- Progress bar (shown during download, hides error message while active) -->
       <div v-if="status.percent > 0 && !status.downloaded" class="w-full bg-surface-container-high dark:bg-white/[0.08] rounded-full h-2 overflow-hidden">
         <div class="h-full bg-primary dark:bg-inverse-primary rounded-full transition-all duration-300" :style="{ width: status.percent + '%' }"></div>
       </div>
@@ -29,11 +31,12 @@
 
       <!-- Actions -->
       <div class="flex gap-2 justify-end">
-        <button v-if="status.error" @click="retry" class="text-label-sm font-label-md px-3 py-1.5 rounded-lg bg-primary text-on-primary hover:bg-primary-container hover:text-on-primary-container transition-colors">
+        <!-- Only show Retry if there's an error AND no download is in progress -->
+        <button v-if="status.error && status.percent === 0" @click="retry" class="text-label-sm font-label-md px-3 py-1.5 rounded-lg bg-primary text-on-primary hover:bg-primary-container hover:text-on-primary-container transition-colors">
           Retry
         </button>
         <button v-if="status.downloaded" @click="install" class="text-label-sm font-label-md px-3 py-1.5 rounded-lg bg-tertiary text-on-tertiary hover:bg-tertiary-container hover:text-on-tertiary-container transition-colors">
-          Restart & Install
+          Restart &amp; Install
         </button>
       </div>
     </div>
@@ -91,6 +94,11 @@ onMounted(() => {
       }
       if (s.checking) {
         dismissedVersion.value = null
+      }
+      // If download progress is coming in, clear any stale error so the
+      // progress bar is shown instead of the Retry button.
+      if (s.percent > 0 && !s.downloaded) {
+        s.error = null
       }
       Object.assign(status, s)
     })

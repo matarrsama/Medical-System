@@ -70,6 +70,12 @@ ipcMain.handle('get-app-version', () => app.getVersion())
 ipcMain.handle('check-for-updates', async () => {
   if (app.isPackaged) {
     try {
+      // If a download is already running, just return the current status — don't
+      // reset downloadStarted or re-call checkForUpdates, which would trigger a
+      // second downloadUpdate() and put the updater into an error state.
+      if (downloadStarted && !updateStatus.downloaded) {
+        return { available: updateStatus.available, version: updateStatus.version, downloaded: updateStatus.downloaded }
+      }
       lastNotifiedVersion = null
       downloadStarted = false
       Object.assign(updateStatus, { checking: true, error: null, available: false, version: null, percent: 0, downloaded: false })
@@ -155,6 +161,9 @@ function setupAutoUpdater() {
   })
 
   autoUpdater.on('error', (err) => {
+    // If we get an error mid-download, reset downloadStarted so a manual retry
+    // from the UI can kick off a fresh download.
+    downloadStarted = false
     updateStatus.error = err.message
     updateStatus.checking = false
     sendUpdateStatus()
