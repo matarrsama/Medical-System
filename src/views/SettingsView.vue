@@ -286,7 +286,7 @@ const pwSubmitting = ref(false)
 const appVersion = ref('--')
 const updateChecking = ref(false)
 const updateMessage = ref('')
-const updateOk = ref(false)
+const updateOk = ref(true)
 const profile = reactive({
   name: '', initials: '', employeeId: '', email: '', title: '', department: '',
   role: '', status: '', mfa: 'push', avatar: ''
@@ -326,6 +326,7 @@ function onAvatarChange(e) {
 }
 
 let watchUnsub = null
+let updateStatusUnsub = null
 
 onMounted(async () => {
   rolesUnsub = onSnapshot(collection(db, 'roles'), (snap) => {
@@ -429,6 +430,7 @@ onUnmounted(() => {
   if (rolesUnsub) rolesUnsub()
   if (watchUnsub) watchUnsub()
   if (unsub) unsub()
+  if (updateStatusUnsub) updateStatusUnsub()
 })
 
 function toggle(key) {
@@ -624,25 +626,35 @@ async function checkForUpdates() {
   updateMessage.value = 'Checking...'
   try {
     const result = await window.electronAPI.checkForUpdates()
-    if (result.downloaded) {
-      updateMessage.value = 'Update ready — restart to install'
-      updateOk.value = true
-    } else if (result.available) {
-      // Could be a fresh download starting, or already in progress
-      updateMessage.value = 'Update v' + result.version + ' is downloading'
-      updateOk.value = true
-    } else if (result.error) {
+    
+    if (!result.success && result.error) {
       updateMessage.value = result.error
       updateOk.value = false
-    } else {
-      updateMessage.value = 'You\u2019re on the latest version'
-      updateOk.value = true
+      updateChecking.value = false
+      return
     }
+
+    // If result.success is true, the onUpdateStatus listener will handle
+    // the "downloading" or "already on latest" state transitions based
+    // on the events that fire from autoUpdater.
+    if (result.success && result.updateInfo) {
+      // The update-available event will fire shortly
+    } else if (result.success && !result.updateInfo) {
+      // The update-not-available event might have fired, or will fire
+      // We set a fallback timeout just in case
+      setTimeout(() => {
+        if (updateChecking.value && updateMessage.value === 'Checking...') {
+          updateMessage.value = 'You\u2019re on the latest version'
+          updateOk.value = true
+          updateChecking.value = false
+        }
+      }, 2000)
+    }
+
   } catch (err) {
     updateMessage.value = err.message || 'Update check failed'
     updateOk.value = false
-  } finally {
-    setTimeout(() => { updateChecking.value = false }, 3000)
+    updateChecking.value = false
   }
 }
 </script>

@@ -68,37 +68,31 @@ ipcMain.handle('get-app-version', () => app.getVersion())
 
 // ── Auto-updater IPC handlers ─────────────────────────
 ipcMain.handle('check-for-updates', async () => {
-  if (app.isPackaged) {
-    try {
-      // If a download is already running, just return the current status — don't
-      // reset downloadStarted or re-call checkForUpdates, which would trigger a
-      // second downloadUpdate() and put the updater into an error state.
-      if (downloadStarted && !updateStatus.downloaded) {
-        return { available: updateStatus.available, version: updateStatus.version, downloaded: updateStatus.downloaded }
-      }
-      lastNotifiedVersion = null
-      downloadStarted = false
-      Object.assign(updateStatus, { checking: true, error: null, available: false, version: null, percent: 0, downloaded: false })
-      sendUpdateStatus()
-      await autoUpdater.checkForUpdates()
-      return { available: updateStatus.available, version: updateStatus.version, downloaded: updateStatus.downloaded }
-    } catch (err) {
-      updateStatus.error = err.message
-      updateStatus.checking = false
-      sendUpdateStatus()
-      return { available: false, error: err.message }
-    }
+  if (!app.isPackaged) {
+    return { success: false, error: 'Not in packaged app' }
   }
-  return { available: false }
-})
-
-ipcMain.handle('install-update', () => {
-  if (app.isPackaged && updateStatus.downloaded) {
-    autoUpdater.quitAndInstall()
+  try {
+    const result = await autoUpdater.checkForUpdates()
+    return { success: true, updateInfo: result?.updateInfo || null }
+  } catch (err) {
+    return { success: false, error: err.message }
   }
 })
 
-ipcMain.handle('get-update-status', () => ({ ...updateStatus }))
+ipcMain.handle('install-update', async () => {
+  if (!app.isPackaged) {
+    return { success: false, error: 'Not in packaged app' }
+  }
+  if (!updateStatus.downloaded) {
+    return { success: false, error: 'No update downloaded' }
+  }
+  autoUpdater.quitAndInstall()
+  return { success: true }
+})
+
+ipcMain.handle('get-update-status', async () => {
+  return updateStatus
+})
 
 ipcMain.handle('toggle-devtools', () => {
   if (mainWindow && !mainWindow.isDestroyed()) {
@@ -109,72 +103,140 @@ ipcMain.handle('toggle-devtools', () => {
 // ── Auto-updater setup ────────────────────────────────
 function setupAutoUpdater() {
   autoUpdater.logger = console
-  autoUpdater.autoDownload = false
-  autoUpdater.autoInstallOnAppQuit = true
+  autoUpdater.autoDownload = false // Manual download
+  autoUpdater.autoInstallOnAppQuit = true // Install on restart
 
+  // Check for updates on startup
+  console.log('[AutoUpdater] Checking for updates...')
   updateStatus.checking = true
   sendUpdateStatus()
-
+  
   autoUpdater.checkForUpdates().catch(err => {
-    updateStatus.error = err.message
+    console.error('[AutoUpdater] Failed to check for updates:', err)
     updateStatus.checking = false
+    updateStatus.error = err.message
     sendUpdateStatus()
   })
 
+  // Update available
   autoUpdater.on('update-available', (info) => {
-    if (lastNotifiedVersion === info.version) return
-    lastNotifiedVersion = info.version
-    updateStatus.checking = false
-    updateStatus.available = true
-    updateStatus.version = info.version
-    updateStatus.error = null
+    console.log('[AutoUpdater] Update available event fired. Version:', info.version)
+    
+    // Check if we are already downloading or have downloaded this version
+    if (isDownloadingInSession) {
+      console.log('[AutoUpdater] Skip download trigger: already active in this session')
+      return
+    }
+
+    if (updateStatus.downloaded && updateStatus.version === info.version) {
+      console.log('[AutoUpdater] Skip download trigger: already downloaded in this session')
+      return
+    }
+
+    // Immediately lock to prevent race conditions from multiple events
+    isDownloadingInSession = true
+
+    console.log('[AutoUpdater] Starting fresh download for version:', info.version)
+    
+    const alreadyNotified = lastNotifiedVersion === info.version
+    
+    updateStatus = {
+      checking: false,
+      available: true,
+      downloaded: false,
+      error: null,
+      version: info.version,
+      percent: 0,
+    }
+    
+    // Only send status update if we haven't already notified about this version
+    if (!alreadyNotified) {
+      lastNotifiedVersion = info.version
+      sendUpdateStatus()
+    }
+    
+    // Start download
+    autoUpdater.downloadUpdate().then(() => {
+      console.log('[AutoUpdater] downloadUpdate call resolved')
+    }).catch((err) => {
+      console.error('[AutoUpdater] downloadUpdate call failed:', err)
+      isDownloadingInSession = false
+      updateStatus.error = err.message
+      sendUpdateStatus()
+    })
+  })
+
+  // Update not available
+  autoUpdater.on('update-not-available', (info) => {
+    console.log('[AutoUpdater] Update not available:', info?.version)
+    updateStatus = {
+      checking: false,
+      available: false,
+      downloaded: false,
+      error: null,
+      version: null,
+      percent: 0,
+    }
     sendUpdateStatus()
-    // Auto-download (only once to avoid race)
-    if (!downloadStarted) {
-      downloadStarted = true
-      autoUpdater.downloadUpdate().catch(err => {
-        updateStatus.error = err.message
-        sendUpdateStatus()
-      })
+  })
+
+  // Download progress
+  let lastProgressUpdate = 0
+  autoUpdater.on('download-progress', (progress) => {
+    const now = Date.now()
+    updateStatus.percent = Math.round(progress.percent)
+    
+    // Update in-memory state for UI
+    sendUpdateStatus()
+    
+    // Throttle logging to once every 2 seconds to avoid performance issues
+    if (now - lastProgressUpdate > 2000) {
+      console.log(`[AutoUpdater] Progress: ${updateStatus.percent}% (${progress.transferred}/${progress.total})`)
+      lastProgressUpdate = now
     }
   })
 
-  autoUpdater.on('update-not-available', () => {
-    updateStatus.checking = false
-    updateStatus.available = false
-    updateStatus.version = null
-    updateStatus.error = null
+  // Update downloaded
+  autoUpdater.on('update-downloaded', (info) => {
+    console.log('[AutoUpdater] Update downloaded successfully:', info.version)
+    updateStatus = {
+      checking: false,
+      available: true,
+      downloaded: true,
+      error: null,
+      version: info.version,
+      percent: 100,
+    }
+    
+    isDownloadingInSession = false
+    
     sendUpdateStatus()
   })
 
-  autoUpdater.on('download-progress', (progress) => {
-    updateStatus.percent = Math.round(progress.percent)
-    updateStatus.checking = false
-    sendUpdateStatus()
-  })
-
-  autoUpdater.on('update-downloaded', () => {
-    updateStatus.downloaded = true
-    updateStatus.percent = 100
-    updateStatus.available = true
-    sendUpdateStatus()
-  })
-
+  // Error
   autoUpdater.on('error', (err) => {
-    // If we get an error mid-download, reset downloadStarted so a manual retry
-    // from the UI can kick off a fresh download.
-    downloadStarted = false
-    updateStatus.error = err.message
-    updateStatus.checking = false
-    sendUpdateStatus()
+    console.error('[AutoUpdater] Global error event:', err)
+    
+    // Don't reset everything if it was already downloaded (sometimes verification errors happen but file is fine)
+    if (!updateStatus.downloaded) {
+      updateStatus = {
+        ...updateStatus,
+        checking: false,
+        error: err.message,
+      }
+      isDownloadingInSession = false
+      sendUpdateStatus()
+    }
   })
 
   // Periodic check every 30 minutes
   setInterval(() => {
-    if (!updateStatus.available && !updateStatus.downloaded) {
+    // Skip check if update already available or downloaded
+    if (!updateStatus.available && !updateStatus.downloaded && !isDownloadingInSession) {
+      console.log('[AutoUpdater] Periodic update check...')
       autoUpdater.checkForUpdates().catch(() => {})
     }
-  }, 1800000)
+  }, 30 * 60 * 1000)
 }
 
 let mainWindow
@@ -190,7 +252,7 @@ let updateStatus = {
   percent: 0,
 }
 let lastNotifiedVersion = null
-let downloadStarted = false
+let isDownloadingInSession = false
 
 function sendUpdateStatus() {
   if (mainWindow && !mainWindow.isDestroyed()) {
